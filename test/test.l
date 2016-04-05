@@ -1,33 +1,36 @@
+%option noyywrap
+
 %{
+#include <iostream>
 
-int yylex(void);
-int yywrap(void){}
-
+using namespace std;
 %}
 
 %%
+
 [0-9]+ {
-    printf("NUMBER %s\n", yytext);
+    cout << "NUMBER " << yytext << " ";
 }
 [a-zA-Z]+ {
-    printf("VARIABLE %s\n", yytext);
+    cout << "VARIABLE " << yytext << " ";
 }
 ; {
-    printf("TERMINATE %s\n", yytext);
+    cout << "TERMINATE " << yytext << " ";
 }
 \+ {
-    printf("PLUS %s\n", yytext);
+    cout << "PLUS " << yytext << " ";
 }
 = {
-    printf("ASSIGN %s\n", yytext);
+    cout << "ASSIGN " << yytext << " ";
 }
 \n {
-    printf("NEW LINE %s\n", yytext);
+    cout << "NEW LINE " << yytext << endl;
 }
 . ;
+
 %%
 
 int main(int argc, char* argv[]){
-    yylex();
+    for(yyFlexLexer f; f.yylex(); ){}
     return 0;
 }
