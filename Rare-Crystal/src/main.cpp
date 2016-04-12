@@ -1,7 +1,3 @@
-//
-// Created by pavel on 05.04.16.
-//
-
 #include <iostream>
 #include <stdexcept>
 

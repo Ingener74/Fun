@@ -1,7 +1,11 @@
 %option noyywrap
 
 %{
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
+
+#include "y.tab.h"
 
 using namespace std;
 %}
@@ -10,7 +14,7 @@ using namespace std;
 
 ";"                 return SEMICOLON;
 "hello-world"       return { cout << "got Hello, World token" << endl; return HELLO; }
-"quit"              return { cout << "got Quit toker" << endl; return QUIT; }
+"quit"              return { cout << "got Quit token" << endl; return QUIT; }
 
 %%
 
