@@ -9,6 +9,7 @@ add_definitions(-std=c++11)
 
 add_executable(Tainted-Bulldozer main.cpp)
 
-llvm_map_components_to_libnames(LLVM_LIBS support core irreader)
+# llvm_map_components_to_libnames(LLVM_LIBS support core irreader nativecodegen)
+llvm_map_components_to_libnames(LLVM_LIBS all)
 
 target_link_libraries(Tainted-Bulldozer ${LLVM_LIBS})
