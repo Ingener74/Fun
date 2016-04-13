@@ -29,3 +29,7 @@
 *.app
 
 test/lex.yy.c
+
+.idea/
+build/
+
