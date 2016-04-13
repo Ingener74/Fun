@@ -62,18 +62,19 @@ int main(int argc, char *argv[]) {
             builder.CreateRet(add1CallRes);
         }
 
-        ExecutionEngine* ee = EngineBuilder(std::unique_ptr<Module>(module)).create();
+        module->dump();
 
-        std::vector<GenericValue> noargs;
-        GenericValue ret = ee->runFunction(foo, noargs);
+        std::string errorStr;
+        ExecutionEngine* ee = EngineBuilder(std::unique_ptr<Module>(module)).setErrorStr(&errorStr).create();
+        if(ee){
+            std::vector<GenericValue> noargs;
+            GenericValue ret = ee->runFunction(foo, noargs);
 
-        outs() << ret.IntVal;
-        outs().flush();
-//        cout << ret.IntVal << endl;
+            outs() << ret.IntVal;
+            outs().flush();
+        }
 
         delete ee;
-
-//        module->dump();
 
     } catch (const exception &e) {
         cerr << e.what() << endl;
