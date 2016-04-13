@@ -24,11 +24,11 @@ int main(int argc, char *argv[]) {
 
         module->dump();
 
-        verifyModule(*module/*, */);
+        verifyModule(*module);
 
         ModulePassManager mpm;
-//         mpm.addPass();
-        mpm.run(module);
+        // mpm.addPass(createPrintModul);
+		mpm.run(*module);
 
     } catch (const exception &e) {
         cerr << e.what() << endl;
@@ -50,14 +50,17 @@ Module * makeModule() {
 
     Function::arg_iterator args = mul_add->arg_begin();
 
-    Value* x = args++;
+	Value* x = args.getNodePtrUnchecked();
     x->setName("x");
+	args++;
 
-    Value* y = args++;
+    Value* y = args.getNodePtrUnchecked();
     y->setName("y");
+	args++;
 
-    Value* z = args++;
+    Value* z = args.getNodePtrUnchecked();
     z->setName("z");
+	args++;
 
     BasicBlock* block = BasicBlock::Create(context, "block", mul_add);
 

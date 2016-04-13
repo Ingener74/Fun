@@ -30,6 +30,8 @@
 
 test/lex.yy.c
 
+
 .idea/
 build/
+build-msvc/
 

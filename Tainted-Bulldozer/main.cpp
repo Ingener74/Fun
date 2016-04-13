@@ -1,14 +1,14 @@
 #include <iostream>
 
-#include <llvm/>
+//#include <llvm/>
 
 using namespace std;
-using namespace llvm;
+//using namespace llvm;
 
 int main(int argc, char *argv[]) {
     try {
 
-        Initialli
+//        Initialli
 
     } catch (const exception &e) {
         cerr << e.what() << endl;

@@ -5,7 +5,9 @@ find_package(LLVM REQUIRED)
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-add_definitions(-std=c++11)
+if(NOT MSVC)
+	add_definitions(-std=c++11)
+endif()
 
 add_executable(Deserted-Xylophone main.cpp)
 
