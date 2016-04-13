@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
 
         Module* module = makeModule();
 
+        module->dump();
+
         verifyModule(*module/*, */);
 
         ModulePassManager mpm;
