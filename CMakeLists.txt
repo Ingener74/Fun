@@ -4,4 +4,4 @@ add_subdirectory(Deserted-Xylophone)
 
 add_subdirectory(Tainted-Bulldozer)
 
-# add_subdirectory(Rare-Crystal)
+add_subdirectory(Rare-Crystal)

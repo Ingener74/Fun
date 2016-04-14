@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_subdirectory(../Deserted-Xylophone)
-
 find_package(BISON)
 find_package(FLEX)
 
@@ -30,8 +28,8 @@ add_library(parsing
         ${BISON_BisonParser_OUTPUTS}
         ${FLEX_FlexLexer_OUTPUTS})
 
-set(TidyBoomerang_SOURCES
+set(Rare-Crystal_SOURCES
         src/main.cpp)
 
-add_executable(TidyBoomerang ${TidyBoomerang_SOURCES})
-target_link_libraries(TidyBoomerang parsing)
+add_executable(Rare-Crystal ${Rare-Crystal_SOURCES})
+target_link_libraries(Rare-Crystal parsing)
