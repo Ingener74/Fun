@@ -51,17 +51,14 @@ Module *makeModule() {
 
     Function::arg_iterator args = mul_add->arg_begin();
 
-    Value *x = args.getNodePtrUnchecked();
+    Value *x = &*args++;
     x->setName("x");
-    args++;
 
-    Value *y = args.getNodePtrUnchecked();
+    Value *y = &*args++;
     y->setName("y");
-    args++;
 
-    Value *z = args.getNodePtrUnchecked();
+    Value *z = &*args++;
     z->setName("z");
-    args++;
 
     BasicBlock *block = BasicBlock::Create(context, "block", mul_add);
 
