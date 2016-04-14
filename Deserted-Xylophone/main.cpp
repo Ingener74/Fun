@@ -15,12 +15,12 @@
 using namespace std;
 using namespace llvm;
 
-Module * makeModule();
+Module *makeModule();
 
 int main(int argc, char *argv[]) {
     try {
 
-        Module* module = makeModule();
+        Module *module = makeModule();
 
         module->dump();
 
@@ -28,46 +28,47 @@ int main(int argc, char *argv[]) {
 
         ModulePassManager mpm;
         // mpm.addPass(createPrintModul);
-		mpm.run(*module);
+        mpm.run(*module);
 
     } catch (const exception &e) {
         cerr << e.what() << endl;
     }
 }
 
-Module * makeModule() {
+Module *makeModule() {
     LLVMContext &context = getGlobalContext();
-    Module* module = new Module("MainModule", context);
+    Module *module = new Module("MainModule", context);
 
-    Constant* function = module->getOrInsertFunction("mul_add",
-                                IntegerType::get(context, 32),
-                                IntegerType::get(context, 32),
-                                IntegerType::get(context, 32),
-                                IntegerType::get(context, 32));
+    Constant *function = module->getOrInsertFunction("mul_add",
+                                                     IntegerType::get(context, 32),
+                                                     IntegerType::get(context, 32),
+                                                     IntegerType::get(context, 32),
+                                                     IntegerType::get(context, 32),
+                                                     nullptr);
 
-    Function* mul_add = cast<Function>(function);
+    Function *mul_add = cast<Function>(function);
     mul_add->setCallingConv(CallingConv::C);
 
     Function::arg_iterator args = mul_add->arg_begin();
 
-	Value* x = args.getNodePtrUnchecked();
+    Value *x = args.getNodePtrUnchecked();
     x->setName("x");
-	args++;
+    args++;
 
-    Value* y = args.getNodePtrUnchecked();
+    Value *y = args.getNodePtrUnchecked();
     y->setName("y");
-	args++;
+    args++;
 
-    Value* z = args.getNodePtrUnchecked();
+    Value *z = args.getNodePtrUnchecked();
     z->setName("z");
-	args++;
+    args++;
 
-    BasicBlock* block = BasicBlock::Create(context, "block", mul_add);
+    BasicBlock *block = BasicBlock::Create(context, "block", mul_add);
 
     IRBuilder<> builder(block);
 
-    Value* tmp = builder.CreateBinOp(BinaryOperator::Mul, x, y, "tmp");
-    Value* tmp2 = builder.CreateBinOp(BinaryOperator::Add, tmp, z, "tmp2");
+    Value *tmp = builder.CreateBinOp(BinaryOperator::Mul, x, y, "tmp");
+    Value *tmp2 = builder.CreateBinOp(BinaryOperator::Add, tmp, z, "tmp2");
 
     builder.CreateRet(tmp2);
 
