@@ -23,6 +23,11 @@ set(PARSING_SOURCES
         src/Lexer.cpp
         src/Parser.cpp)
 
+if(MSVC)
+else()
+    add_definitions(-std=c++11)
+endif()
+
 add_library(parsing
         ${PARSING_SOURCES}
         ${BISON_BisonParser_OUTPUTS}

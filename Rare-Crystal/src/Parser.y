@@ -1,7 +1,15 @@
+%skeleton "lalr1.cc" /* -*- C++ -*- */
+%require "3.0.4"
+%defines
 
-%verbose
+// %verbose
 %define parser_class_name {Parser}
 %define api.namespace {bison}
+
+%code{
+static int yylex(bison::Parser::semantic_type *yylval,
+                 Lexer &lexer);
+}
 
 %{
 

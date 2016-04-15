@@ -7,7 +7,7 @@
 #undef YY_DECL
 #define YY_DECL int Lexer::yylex();
 
-#include "BisonParser.h"
+#include "BisonParser.hpp"
 
 class Lexer : public yyFlexLexer {
 public:
