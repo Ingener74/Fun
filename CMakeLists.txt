@@ -10,6 +10,11 @@ if(ENABLE_RARE_CRYSTAL)
     add_subdirectory(Rare-Crystal)
 endif()
 
+option(ENABLE_RAW_RAILROAD "Enable Raw-Railroad" OFF)
+
+if(ENABLE_RAW_RAILROAD)
+    add_subdirectory(Raw-Railroad)
+endif()
 option(ENABLE_DREADED_BACKPACK "Enable Tainted-Bulldozer" OFF)
 
 if(ENABLE_DREADED_BACKPACK)
