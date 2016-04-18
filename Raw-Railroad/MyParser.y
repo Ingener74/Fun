@@ -26,6 +26,7 @@ void yyerror(const char* );
 
 %token <num> NUM
 %token <str> ID
+%token END 0
 
 %parse-param { char const *parsing_param };
 
@@ -38,11 +39,11 @@ void yyerror(const char* );
 
 %start root;
 
-root : 
-    NUM { 
+root : |
+    NUM END { 
         cout << "NUM " << $1 << endl; 
         // $$ = $1; 
-    } | ID {
+    } | ID END {
         cout << "ID " << $1 << endl; 
         // $$ = $1;
     };
@@ -50,6 +51,9 @@ root :
 // expr: ID '=' NUM { cout << "Expression " << endl; }
 
 %%
+
+int yylex(){
+}
 
 void yyerror(const char* error){
     cerr << "error: " << error << endl;
