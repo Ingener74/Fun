@@ -10,13 +10,14 @@
 using namespace std;
 
 #include <MyParser.hpp>
+#include <MyLexer.h>
 
 %}
 
 %option c++
 %option noyywrap
 
-/* %option yyclass="MyFlexLexer" */
+%option yyclass="MyLexer"
 
 DIGIT    [0-9]+
 ID       [a-zA-Z]+
@@ -27,24 +28,19 @@ ID       [a-zA-Z]+
 int nnn1 = 0;
 %}
 
-DIGIT {
+{DIGIT} {
     cout << "Number " << yytext << endl; 
-    yylval.num = atoi(yytext); 
-    return NUM; 
+    yylval->num = atoi(yytext); 
+    return myparser::parser::token::NUM; 
 }
 
-ID {
+{ID} {
     cout << "Identifier " << yytext << endl;
-    yylval.str = new string(yytext);
-    return ID;
+    yylval->str = new string(yytext);
+    return myparser::parser::token::ID;
 }
 
-. return 0;
+. { cerr << "Invalid symbol " << yytext << endl; }
 
 %%
-
-int yylex(){
-    return NUM;
-}
-
 

@@ -3,46 +3,32 @@ cmake_minimum_required(VERSION 3.0)
 find_package(BISON)
 find_package(FLEX)
 
+include_directories(
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 BISON_TARGET(
         MyParser
         MyParser.y
         ${CMAKE_CURRENT_BINARY_DIR}/MyParser.cpp
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 FLEX_TARGET(
-        MyLexer
-        MyLexer.l
-        ${CMAKE_CURRENT_BINARY_DIR}/MyLexer.cpp)
+        MyScanner
+        MyScanner.l
+        ${CMAKE_CURRENT_BINARY_DIR}/MyScanner.cpp)
 
-ADD_FLEX_BISON_DEPENDENCY(MyLexer MyParser)
+ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
 add_executable(
         Raw-RailroadParser
+        ${CMAKE_CURRENT_SOURCE_DIR}/MyLexer.cpp
         ${BISON_MyParser_OUTPUTS}
-        ${FLEX_MyLexer_OUTPUTS}
+        ${FLEX_MyScanner_OUTPUTS}
 )
 
-#
-#
-#
-#set(PARSING_SOURCES
-#        src/Lexer.cpp
-#        src/Parser.cpp)
-#
 #if(MSVC)
 #else()
 #    add_definitions(-std=c++11)
 #endif()
-#
-#add_library(parsing
-#        ${PARSING_SOURCES}
-#        ${BISON_BisonParser_OUTPUTS}
-#        ${FLEX_FlexLexer_OUTPUTS})
-#
-#set(Rare-Crystal_SOURCES
-#        src/main.cpp)
-#
-#add_executable(Rare-Crystal ${Rare-Crystal_SOURCES})
-#target_link_libraries(Rare-Crystal parsing)

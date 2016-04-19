@@ -5,13 +5,16 @@
 
 %define api.namespace {myparser}
 
+%code requires{
+class MyLexer;
+// #include <MyLexer.h>
+}
+
 %{
 
 #include <iostream>
 
 using namespace std;
-
-extern int yylex();
 
 void yyerror(const char* );
 
@@ -19,16 +22,21 @@ void yyerror(const char* );
 
 %union{
     int num;
-    string* str;
+    std::string* str;
 }
 
 %destructor { delete $$; /* string destructor */ } <str>
+
+%code{
+int yylex(myparser::parser::semantic_type* , MyLexer&);
+}
 
 %token <num> NUM
 %token <str> ID
 %token END 0
 
-%parse-param { char const *parsing_param };
+%param{ MyLexer& myLexer };
+// %parse-param { char const *parsing_param };
 
 %initial-action
 {
@@ -39,27 +47,42 @@ void yyerror(const char* );
 
 %start root;
 
-root : |
-    NUM END { 
-        cout << "NUM " << $1 << endl; 
-        // $$ = $1; 
-    } | ID END {
-        cout << "ID " << $1 << endl; 
-        // $$ = $1;
-    };
-    
-// expr: ID '=' NUM { cout << "Expression " << endl; }
+root
+    : %empty { cout << "empty" << endl; } 
+    | NUM { cout << "NUM " << $1 << endl; /* $$ = $1; */  } 
+    | ID { cout << "ID " << $1 << endl; /* $$ = $1; */ };
 
 %%
 
-int yylex(){
+#include <fstream>
+#include <MyLexer.h>
+
+int yylex(myparser::parser::semantic_type* yylval, MyLexer& myLexer){
+    return myLexer.yylex(yylval);
 }
 
-void yyerror(const char* error){
-    cerr << "error: " << error << endl;
+void myparser::parser::error(const std::string& message){
+    cerr << "error: " << message << endl;
 }
 
 int main(int argc, char* argv[]){
     cout << "MyParser" << endl;
-    yyparse();
+
+    try {
+        if(argc < 2)
+            throw std::runtime_error("no files");
+        
+        ifstream file(argv[1]);
+        
+        MyLexer myLexer(&file);
+        myparser::parser prsr(myLexer);
+        prsr.parse();
+
+        return 0;
+    } catch (const std::exception& e){
+        cerr << "error: " << e.what() << endl;
+        return 1;
+    }
 }
+
+
