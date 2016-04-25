@@ -35,3 +35,6 @@ test/lex.yy.c
 build/
 build-msvc/
 
+/.settings/
+/.cproject
+/.project
