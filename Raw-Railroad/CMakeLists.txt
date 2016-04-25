@@ -23,7 +23,20 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
 add_executable(
         Raw-RailroadParser
-        ${CMAKE_CURRENT_SOURCE_DIR}/MyLexer.cpp
+        MyLexer.cpp
+        
+        Expr.cpp
+        Expr.h
+        
+        IdExpr.cpp
+        IdExpr.h
+        
+        NumExpr.cpp
+        NumExpr.h
+        
+        AssignExpr.cpp
+        AssignExpr.h
+        
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
 )

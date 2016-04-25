@@ -7,7 +7,11 @@
 
 %code requires{
 class MyLexer;
-// #include <MyLexer.h>
+
+#include "Expr.h"
+#include "AssignExpr.h"
+#include "IdExpr.h"
+#include "NumExpr.h"
 }
 
 %{
@@ -23,9 +27,11 @@ void yyerror(const char* );
 %union{
     int num;
     std::string* str;
+    char chr;
+    Expr* expr1;
 }
 
-%destructor { delete $$; /* string destructor */ } <str>
+%destructor { delete $$; /* string destructor */ } <str> <expr1>
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -33,7 +39,10 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 
 %token <num> NUM
 %token <str> ID
-%token END 0
+%token EOL
+%token <chr> ASSIGN "="
+
+%type <expr1> expr
 
 %param{ MyLexer& myLexer };
 // %parse-param { char const *parsing_param };
@@ -47,10 +56,21 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 
 %start root;
 
-root
-    : %empty { cout << "empty" << endl; } 
-    | NUM { cout << "NUM " << $1 << endl; /* $$ = $1; */  } 
-    | ID { cout << "ID " << $1 << endl; /* $$ = $1; */ };
+root 
+    : %empty
+    | root line
+    ;
+
+line
+    : EOL
+    | expr EOL { cout << "expression " << endl; }
+    ;
+
+expr
+    : ID "=" NUM { cout << "assign expr " << endl; $$ = new AssignExpr(*$1, $3); }
+    | ID         { cout << "id expr " << $1 << endl; $$ = new IdExpr(*$1); }
+    | NUM        { cout << "num expr " << $1 << endl; $$ = new NumExpr($1); }
+    ;
 
 %%
 

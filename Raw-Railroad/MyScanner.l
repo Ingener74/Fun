@@ -40,6 +40,16 @@ int nnn1 = 0;
     return myparser::parser::token::ID;
 }
 
+"=" {
+    cout << "Assign " << endl;
+    return myparser::parser::token::ASSIGN;
+}
+
+"\n" {
+    cout << "End of line" << endl;
+    return myparser::parser::token::EOL;
+}
+
 . { cerr << "Invalid symbol " << yytext << endl; }
 
 %%
