@@ -28,10 +28,10 @@ void yyerror(const char* );
     int num;
     std::string* str;
     char chr;
-    Expr* expr1;
+    Expr* expr_type;
 }
 
-%destructor { delete $$; /* string destructor */ } <str> <expr1>
+%destructor { delete $$; /* string destructor */ } <str> <expr_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -42,7 +42,7 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token EOL
 %token <chr> ASSIGN "="
 
-%type <expr1> expr
+%type <expr_type> expr
 
 %param{ MyLexer& myLexer };
 // %parse-param { char const *parsing_param };
@@ -63,13 +63,13 @@ root
 
 line
     : EOL
-    | expr EOL { cout << "expression " << endl; }
+    | expr EOL { cout << $1->toString() << endl; }
     ;
 
 expr
-    : ID "=" NUM { cout << "assign expr " << endl; $$ = new AssignExpr(*$1, $3); }
-    | ID         { cout << "id expr " << $1 << endl; $$ = new IdExpr(*$1); }
-    | NUM        { cout << "num expr " << $1 << endl; $$ = new NumExpr($1); }
+    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); }
+    | ID         { $$ = new IdExpr(*$1); }
+    | NUM        { $$ = new NumExpr($1); }
     ;
 
 %%

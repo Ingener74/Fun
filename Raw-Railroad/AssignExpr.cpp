@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include "AssignExpr.h"
 
@@ -6,10 +7,13 @@ using namespace std;
 
 AssignExpr::AssignExpr(const std::string& id, int value) :
     m_id(id), m_value(value) {
-    cout << __PRETTY_FUNCTION__ << " " << m_id << " = " << m_value << endl;
 }
 
 AssignExpr::~AssignExpr() {
-    cout << __PRETTY_FUNCTION__ << " " << m_id << " = " << m_value << endl;
 }
 
+std::string AssignExpr::toString() const {
+    stringstream ss;
+    ss << m_id << " = " << m_value;
+    return ss.str();
+}

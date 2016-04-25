@@ -7,6 +7,7 @@ public:
     NumExpr(int);
     virtual ~NumExpr();
 
+    virtual std::string toString() const ;
 private:
     int m_num;
 };

@@ -22,7 +22,7 @@ FLEX_TARGET(
 ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
 add_executable(
-        Raw-RailroadParser
+        Raw-Railroad
         MyLexer.cpp
         
         Expr.cpp
@@ -40,8 +40,3 @@ add_executable(
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
 )
-
-#if(MSVC)
-#else()
-#    add_definitions(-std=c++11)
-#endif()

@@ -8,6 +8,7 @@ public:
     IdExpr(const std::string& id);
     virtual ~IdExpr();
 
+    virtual std::string toString() const ;
 private:
     std::string m_id;
 };

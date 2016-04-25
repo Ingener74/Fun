@@ -19,8 +19,8 @@ using namespace std;
 
 %option yyclass="MyLexer"
 
-DIGIT    [0-9]+
-ID       [a-zA-Z][a-zA-Z0-9]+
+DIGIT    [0-9]*
+ID       [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
 
@@ -29,26 +29,19 @@ int nnn1 = 0;
 %}
 
 {DIGIT} {
-    cout << "Number " << yytext << endl; 
     yylval->num = atoi(yytext); 
     return myparser::parser::token::NUM; 
 }
 
 {ID} {
-    cout << "Identifier " << yytext << endl;
     yylval->str = new string(yytext);
     return myparser::parser::token::ID;
 }
 
-"=" {
-    cout << "Assign " << endl;
-    return myparser::parser::token::ASSIGN;
-}
+"="  return myparser::parser::token::ASSIGN;
+"\n" return myparser::parser::token::EOL;
 
-"\n" {
-    cout << "End of line" << endl;
-    return myparser::parser::token::EOL;
-}
+[ \t] ;
 
 . { cerr << "Invalid symbol " << yytext << endl; }
 

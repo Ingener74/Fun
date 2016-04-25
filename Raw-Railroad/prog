@@ -1,3 +1,6 @@
+
+a
+
 foo=42
 bar=54
 test
@@ -12,4 +15,6 @@ a555
 
 fuck
 
-54adf
+a = b + c
+
+print a
