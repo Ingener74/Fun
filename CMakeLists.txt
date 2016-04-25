@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 
+if(MSVC)
+else()
+    add_definitions(-std=c++11)
+endif()
+
 add_subdirectory(Deserted-Xylophone)
 
 add_subdirectory(Tainted-Bulldozer)

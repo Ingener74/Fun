@@ -8,6 +8,10 @@
 %code requires{
 class MyLexer;
 
+//class MyAst;
+
+#include "MyAst.h"
+
 #include "Expr.h"
 #include "AssignExpr.h"
 #include "IdExpr.h"
@@ -44,8 +48,11 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 
 %type <expr_type> expr
 
-%param{ MyLexer& myLexer };
-// %parse-param { char const *parsing_param };
+%param{ 
+    MyLexer& myLexer
+};
+
+%parse-param { MyAst* myAst };
 
 %initial-action
 {
@@ -67,15 +74,16 @@ line
     ;
 
 expr
-    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); }
-    | ID         { $$ = new IdExpr(*$1); }
-    | NUM        { $$ = new NumExpr($1); }
+    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); myAst->addVariable(*$1, $3); }
+    // | ID         { $$ = new IdExpr(*$1); }
+    // | NUM        { $$ = new NumExpr($1); }
     ;
 
 %%
 
-#include <fstream>
+// #include <fstream>
 #include <MyLexer.h>
+// #include <MyAst.h>
 
 int yylex(myparser::parser::semantic_type* yylval, MyLexer& myLexer){
     return myLexer.yylex(yylval);
@@ -85,6 +93,7 @@ void myparser::parser::error(const std::string& message){
     cerr << "error: " << message << endl;
 }
 
+/*
 int main(int argc, char* argv[]){
     cout << "MyParser" << endl;
 
@@ -104,5 +113,5 @@ int main(int argc, char* argv[]){
         return 1;
     }
 }
-
+*/
 

@@ -23,6 +23,11 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
 add_executable(
         Raw-Railroad
+        
+        main.cpp
+        MyAst.cpp
+        MyAst.h
+        
         MyLexer.cpp
         
         Expr.cpp

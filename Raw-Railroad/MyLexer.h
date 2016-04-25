@@ -18,5 +18,5 @@ public:
 
 private:
     int yylex();
-    myparser::parser::semantic_type* yylval;
+    myparser::parser::semantic_type* yylval = nullptr;
 };
