@@ -1,7 +1,35 @@
+import soDll
+
 foo = 42
 bar = 54
 
 quz = 65
 quuuuz = 123
+
+print foo
+
+fun quzMore()
+    print foo
+end
+
+fun quzLess()
+    print quuuuz
+end
+
+fun testFunction(x, y)
+    if quz > 100:
+        quzMore()
+    else
+        quzLess()
+    end
+    
+    tf = 52345
+    
+    print x
+    print y
+    print tf
+end
+
+testFunction(bar, 300)
 
 

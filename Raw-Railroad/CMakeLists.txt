@@ -5,7 +5,8 @@ find_package(FLEX)
 
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        .
+        AstParts
 )
 
 BISON_TARGET(
@@ -41,6 +42,15 @@ add_executable(
         
         AssignExpr.cpp
         AssignExpr.h
+        
+        AstParts/FuncType.cpp
+        AstParts/FuncType.h
+        
+        AstParts/DefineType.cpp
+        AstParts/DefineType.h
+        
+        AstParts/ArgType.cpp
+        AstParts/ArgType.h
         
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}

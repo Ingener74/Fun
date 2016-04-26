@@ -4,12 +4,18 @@
 #include <iostream>
 #include <unordered_map>
 
+class FuncType;
+class Expr;
+
 class MyAst {
 public:
     MyAst();
     virtual ~MyAst();
 
     void parse(std::istream& input);
+
+    void functionDefinition(FuncType* func);
+    void expressionDefinition(Expr* func);
 
     void addVariable(const std::string& id, int value);
 
