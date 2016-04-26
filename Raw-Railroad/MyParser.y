@@ -68,7 +68,7 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %type <func_type> func
 // %type <define_type> define
 %type <arg_type> arg
-%type <import> arg
+%type <import> import_type
 
 %param{ 
     MyLexer& myLexer
