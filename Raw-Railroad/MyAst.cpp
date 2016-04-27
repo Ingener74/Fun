@@ -22,6 +22,10 @@ void MyAst::parse(std::istream& input) {
     }
 }
 
+void MyAst::importLibrary(Import* import) {
+    cout << __PRETTY_FUNCTION__ << " " << import->getImport() << endl;
+}
+
 void MyAst::functionDefinition(FuncType* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }

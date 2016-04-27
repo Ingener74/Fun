@@ -6,6 +6,7 @@
 
 class FuncType;
 class Expr;
+class Import;
 
 class MyAst {
 public:
@@ -14,7 +15,7 @@ public:
 
     void parse(std::istream& input);
 
-    void importLibrary(const std::string& id);
+    void importLibrary(Import*);
 
     void functionDefinition(FuncType* func);
     void expressionDefinition(Expr* func);

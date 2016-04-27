@@ -41,7 +41,7 @@ void yyerror(const char* );
     Import* import_type;
 }
 
-%destructor { delete $$; } <str> <import_type> // <define_type> <expr_type> <func_type> <arg_type>
+%destructor { delete $$; } <str> <import_type> <expr_type> // <define_type>  <func_type> <arg_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -50,18 +50,18 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token <num> NUM
 %token <str> ID
 %token EOL
-%token <chr> ASSIGN "="
+%token ASSIGN "="
 
 %token LPAREN "("
 %token RPAREN ")"
 %token COMMA ","
 
-%token IMPORT
+%token IMPORT "import"
 %token PRINT
 %token FUN
 %token END
 
-// %type <expr_type> expr
+%type <expr_type> expr
 // %type <func_type> func
 // %type <define_type> define
 // %type <arg_type> arg
@@ -83,21 +83,28 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %start root;
 
 root
-    : import
+    : %empty 
+    | import root { myAst->importLibrary($1); }
+    | expr root
+    ;
 
 import
-    : "import" ID EOL { $$ = new Import(*$2); cout << $2 << endl; }
+    : "import" ID EOL { $$ = new Import(*$2); }
+    ;
+    
+expr
+    : ID "=" NUM EOL { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
     ;
 
 %%
 
 #include <MyLexer.h>
 
-int yylex(myparser::parser::semantic_type* yylval, MyLexer& myLexer){
+int yylex(myparser::parser::semantic_type* yylval, MyLexer& myLexer) {
     return myLexer.yylex(yylval);
 }
 
-void myparser::parser::error(const std::string& message){
+void myparser::parser::error(const std::string& message) {
     cerr << "error: " << message << endl;
 }
 

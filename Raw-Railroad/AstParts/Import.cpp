@@ -3,8 +3,8 @@
 
 using namespace std;
 
-Import::Import(const string& library) {
-    cout << __PRETTY_FUNCTION__ << library << endl;
+Import::Import(const string& library) :
+        m_import(library) {
 }
 
 Import::~Import() {
