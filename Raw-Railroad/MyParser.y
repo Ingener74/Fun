@@ -57,9 +57,9 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token COMMA ","
 
 %token IMPORT "import"
-%token PRINT
-%token FUN
-%token END
+%token PRINT "print"
+%token FUN "fun"
+%token END "end"
 
 %type <expr_type> expr
 // %type <func_type> func
