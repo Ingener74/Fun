@@ -14,6 +14,8 @@ public:
 
     void parse(std::istream& input);
 
+    void importLibrary(const std::string& id);
+
     void functionDefinition(FuncType* func);
     void expressionDefinition(Expr* func);
 

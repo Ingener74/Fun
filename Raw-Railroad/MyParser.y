@@ -1,15 +1,11 @@
 %require "3.0.4"
 %skeleton "lalr1.cc"
 
-/* %defines */
-
 %debug
 %define api.namespace {myparser}
 
 %code requires{
 class MyLexer;
-
-//class MyAst;
 
 #include "MyAst.h"
 
@@ -21,6 +17,7 @@ class MyLexer;
 #include "FuncType.h"
 #include "DefineType.h"
 #include "ArgType.h"
+#include "Import.h"
 }
 
 %{
@@ -41,10 +38,10 @@ void yyerror(const char* );
     FuncType* func_type;
     DefineType* define_type;
     ArgType* arg_type;
-    Import* import;
+    Import* import_type;
 }
 
-%destructor { delete $$; /* string destructor */ } <str> <expr_type> <func_type> <arg_type> <import> // <define_type>  
+%destructor { delete $$; } <str> <import_type> // <define_type> <expr_type> <func_type> <arg_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -64,11 +61,11 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token FUN
 %token END
 
-%type <expr_type> expr
-%type <func_type> func
+// %type <expr_type> expr
+// %type <func_type> func
 // %type <define_type> define
-%type <arg_type> arg
-%type <import> import_type
+// %type <arg_type> arg
+%type <import_type> import
 
 %param{ 
     MyLexer& myLexer
@@ -86,38 +83,10 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %start root;
 
 root
-    : %empty
-    | root imports
-    | root defines
-    | root line
-    ;
+    : import
 
-imports
-    : IMPORT ID EOL {  }
-    | imports
-    ;
-
-defines
-    : func defines  { myAst->functionDefinition($1); }
-    | expr defines { myAst->functionDefinition($1); }
-    ;
-
-func
-    : FUN ID "(" arg ")" expr END { $$ = new FuncType($2, $4, $6); }
-    ;
-
-arg
-    : ID "," arg   { $$ = new IdExpr($1); }
-    ;
-
-line
-    : EOL
-    | expr EOL { /* cout << $1->toString() << endl; */ }
-    ;
-
-expr
-    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); myAst->addVariable(*$1, $3); }
-    | PRINT ID { myAst->printVariable(*$2); }
+import
+    : "import" ID EOL { $$ = new Import(*$2); cout << $2 << endl; }
     ;
 
 %%

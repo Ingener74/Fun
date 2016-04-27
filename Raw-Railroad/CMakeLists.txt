@@ -52,6 +52,9 @@ add_executable(
         AstParts/ArgType.cpp
         AstParts/ArgType.h
         
+        AstParts/Import.cpp
+        AstParts/Import.h
+        
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
 )
