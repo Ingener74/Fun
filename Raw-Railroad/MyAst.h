@@ -4,7 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 
-class FuncType;
+class Function;
 class Expr;
 class Import;
 class Print;
@@ -19,7 +19,7 @@ public:
     void importLibrary(Import*);
     void printId(Print*);
 
-    void functionDefinition(FuncType* func);
+    void functionDefinition(Function* func);
     void expressionDefinition(Expr* func);
 
     void addVariable(const std::string& id, int value);

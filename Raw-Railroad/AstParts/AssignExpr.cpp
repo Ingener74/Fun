@@ -15,7 +15,7 @@ AssignExpr::~AssignExpr() {
 
 std::string AssignExpr::toString() const {
     stringstream ss;
-    ss << m_id << " = " << m_value;
+    ss << m_id << " = " << m_value->getResult();
     return ss.str();
 }
 

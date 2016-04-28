@@ -28,7 +28,7 @@ void MyAst::importLibrary(Import* import) {
     cout << __PRETTY_FUNCTION__ << " " << import->getImport() << endl;
 }
 
-void MyAst::functionDefinition(FuncType* func) {
+void MyAst::functionDefinition(Function* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }
 

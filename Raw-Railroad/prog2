@@ -11,9 +11,14 @@ quuuuz = 123
 print foo
 
 fun test1 ( bla1 )
+    t1 = 100500
+    t2 = 42
 end
 
-fun test2 ( bla2, bla3, bla4 )
+fun test2 (bla2, bla3, bla4)
+end
+
+fun test3 (bla5, bla6, bla7, bla8)
 end
 
 fun quzMore()

@@ -16,15 +16,16 @@ class MyLexer;
 #include "IdExpr.h"
 #include "NumExpr.h"
 
-#include "FuncType.h"
+#include "Function.h"
 #include "DefineType.h"
-#include "ArgType.h"
+#include "Args.h"
 #include "Import.h"
 #include "Print.h"
 #include "Plus.h"
 #include "Minus.h"
 #include "Mul.h"
 #include "Div.h"
+#include "FunctionStatements.h"
 }
 
 %{
@@ -42,14 +43,15 @@ void yyerror(const char* );
     std::string* str;
     char chr;
     Expr* expr_type;
-    FuncType* func_type;
+    Function* func_type;
     DefineType* define_type;
-    ArgType* arg_type;
+    Args* arg_type;
     Import* import_type;
     Print* print_type;
+    FunctionStatements* func_sttmnt_type;
 }
 
-%destructor { delete $$; } <str> <import_type> <expr_type> <print_type> <func_type> <arg_type>// <define_type>  
+%destructor { delete $$; } <str> <import_type> <expr_type> <print_type> <func_type> <arg_type> <func_sttmnt_type>// <define_type>  
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -77,9 +79,11 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %type <expr_type> expr
 %type <func_type> func
 // %type <define_type> define
-%type <arg_type> arg
+%type <arg_type> func_arg
 %type <import_type> import
 %type <print_type> print
+
+%type <func_sttmnt_type> func_sttmts
 
 %param{ 
     MyLexer& myLexer
@@ -112,6 +116,21 @@ import
     : "import" ID { $$ = new Import(*$2); }
     ;
     
+func
+    : "fun" ID "(" func_arg ")" func_sttmts "end" { /* cout << "func def " << endl; */ $$ = new Function(*$2, $4, $6); }
+    ;
+
+func_arg
+    : ID              { /* cout << "arg 2 def " << endl; */ $$ = new Args(*$1); }
+    | func_arg "," ID { /* cout << "arg 1 def " << endl; */ $1->addArg(*$3); }
+    ;
+
+func_sttmts
+    : %empty           { /* cout << "expression" << endl; */   $$ = new FunctionStatements(); }
+    | expr             { /* cout << "expression 1" << endl; */ $$ = new FunctionStatements($1); }
+    | func_sttmts expr { /* cout << "expression 2" << endl; */ $1->addExpression($2); }
+    ;
+
 expr
     : ID "=" expr { $$ = new AssignExpr(*$1, $3); }
     | expr "+" expr { $$ = new Plus($1, $3); }
@@ -123,16 +142,6 @@ expr
 
 print
     : "print" ID { $$ = new Print(*$2); }
-    ;
-
-func
-    : "fun" ID "(" arg ")" "end" { cout << "func def " << endl; $$ = new FuncType(*$2, $4); }
-    | "fun" ID "(" ID ")" "end" { cout << "func def " << endl; $$ = new FuncType(*$2, *$4); }
-    ;
-
-arg
-    : arg "," ID   { cout << "arg 1 def " << endl; $$ = new ArgType(*$3); $1->setTest(); }
-    | ID         { cout << "arg 2 def " << endl; $$ = new ArgType(*$1); }
     ;
 
 %%

@@ -22,10 +22,8 @@ FLEX_TARGET(
 
 ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
-add_executable(
+add_library(
         Raw-Railroad
-        
-        main.cpp
         
         MyAst.cpp
         MyAst.h
@@ -45,14 +43,14 @@ add_executable(
         AstParts/AssignExpr.cpp
         AstParts/AssignExpr.h
         
-        AstParts/FuncType.cpp
-        AstParts/FuncType.h
+        AstParts/Function.cpp
+        AstParts/Function.h
         
         AstParts/DefineType.cpp
         AstParts/DefineType.h
         
-        AstParts/ArgType.cpp
-        AstParts/ArgType.h
+        AstParts/Args.cpp
+        AstParts/Args.h
         
         AstParts/Import.cpp
         AstParts/Import.h
@@ -71,6 +69,9 @@ add_executable(
         
         AstParts/Div.cpp
         AstParts/Div.h
+        
+        AstParts/FunctionStatements.cpp
+        AstParts/FunctionStatements.h
         
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}

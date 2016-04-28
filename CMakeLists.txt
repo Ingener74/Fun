@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
+
+include_directories(
+    Raw-Railroad
+    Raw-Railroad/AstParts
+)
+
 if(MSVC)
 else()
     add_definitions(-std=c++11)
@@ -24,13 +30,28 @@ if(ENABLE_RARE_CRYSTAL)
 endif()
 
 
+option(ENABLE_DREADED_BACKPACK "Enable Dreaded-Backpack" OFF)
+if(ENABLE_DREADED_BACKPACK)
+    add_subdirectory(Dreaded-Backpack)
+endif()
+
+
 option(ENABLE_RAW_RAILROAD "Enable Raw-Railroad" ON)
 if(ENABLE_RAW_RAILROAD)
     add_subdirectory(Raw-Railroad)
 endif()
 
 
-option(ENABLE_DREADED_BACKPACK "Enable Dreaded-Backpack" OFF)
-if(ENABLE_DREADED_BACKPACK)
-    add_subdirectory(Dreaded-Backpack)
+option(ENABLE_DANCING_COMIC "Enable Dancing-Comic" OFF)
+if(ENABLE_DANCING_COMIC)
+    add_subdirectory(Dancing-Comic)
 endif()
+
+
+option(ENABLE_LIQUID_METAPHOR "Enable Liquid-Metaphor" ON)
+if(ENABLE_LIQUID_METAPHOR)
+    add_subdirectory(Liquid-Metaphor)
+endif()
+
+
+
