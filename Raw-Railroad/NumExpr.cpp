@@ -16,3 +16,10 @@ std::string NumExpr::toString() const {
     ss << m_num;
     return ss.str();
 }
+
+void NumExpr::visit(MyAst* ast) {
+}
+
+int NumExpr::getResult() {
+    return m_num;
+}

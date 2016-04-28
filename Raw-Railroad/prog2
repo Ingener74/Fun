@@ -2,7 +2,7 @@ import Jupiter
 import So
 import Dll
 
-foo = 42
+foo = 42 + 21 - 3 * 2
 bar = 54
 
 quz = 65

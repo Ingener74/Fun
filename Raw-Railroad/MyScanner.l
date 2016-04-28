@@ -48,6 +48,10 @@ int nnn1 = 0;
 }
 
 "="  return myparser::parser::token::ASSIGN;
+"+"  { yylval->chr = yytext[0]; return myparser::parser::token::PLUS; }
+"-"  { yylval->chr = yytext[0]; return myparser::parser::token::MINUS; }
+"*"  { yylval->chr = yytext[0]; return myparser::parser::token::MUL; }
+"/"  { yylval->chr = yytext[0]; return myparser::parser::token::DIV; }
 
 [ \t\n] ;
 

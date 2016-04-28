@@ -6,7 +6,7 @@
 
 using namespace std;
 
-AssignExpr::AssignExpr(const std::string& id, int value) :
+AssignExpr::AssignExpr(const std::string& id, Expr* value) :
     m_id(id), m_value(value) {
 }
 
@@ -20,5 +20,7 @@ std::string AssignExpr::toString() const {
 }
 
 void AssignExpr::visit(MyAst* ast) {
-    ast->addVariable(m_id, m_value);
+    int result = m_value->getResult();
+    cout << __PRETTY_FUNCTION__ << " " << result << endl;
+    ast->addVariable(m_id, result);
 }

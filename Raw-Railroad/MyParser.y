@@ -19,6 +19,10 @@ class MyLexer;
 #include "ArgType.h"
 #include "Import.h"
 #include "Print.h"
+#include "Plus.h"
+#include "Minus.h"
+#include "Mul.h"
+#include "Div.h"
 }
 
 %{
@@ -52,7 +56,12 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token <num> NUM
 %token <str> ID
 %token EOL
+
 %token ASSIGN "="
+%token <chr> PLUS "+"
+%token <chr> MINUS "-"
+%token <chr> MUL "*"
+%token <chr> DIV "/"
 
 %token LPAREN "("
 %token RPAREN ")"
@@ -81,6 +90,10 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
     // Initial code
 };
 
+%left "="
+%left "+" "-"
+%left "*" "/"
+
 %%
 
 %start root;
@@ -97,7 +110,12 @@ import
     ;
     
 expr
-    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
+    : ID "=" expr { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
+    | expr "+" expr { $$ = new Plus($1, $3); cout << "plus " << $1 << " " << $3 << endl; }
+    | expr "-" expr { $$ = new Minus($1, $3); cout << "minus " << $1 << " " << $3 << endl; }
+    | expr "*" expr { $$ = new Mul($1, $3); cout << "mul  " << $1 << " " << $3 << endl; }
+    | expr "/" expr { $$ = new Div($1, $3); cout << "div  " << $1 << " " << $3 << endl; }
+    | NUM { $$ = new NumExpr($1); }
     ;
 
 print

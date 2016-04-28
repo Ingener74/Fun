@@ -15,4 +15,8 @@ public:
 
     virtual void visit(MyAst*) {
     }
+
+    virtual int getResult(){
+        return 0;
+    }
 };
