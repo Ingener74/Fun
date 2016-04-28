@@ -2,13 +2,19 @@ import Jupiter
 import So
 import Dll
 
-foo = 42 + 21 - 3 * 2
+foo = 42 + 21 - 3 * 2 / 3
 bar = 54
 
 quz = 65
 quuuuz = 123
 
 print foo
+
+fun test1 ( bla1 )
+end
+
+fun test2 ( bla2, bla3 )
+end
 
 fun quzMore()
     print foo

@@ -12,10 +12,12 @@ MyAst::MyAst() {
 MyAst::~MyAst() {
 }
 
-void MyAst::parse(std::istream& input) {
+void MyAst::parse(std::istream& input, bool debug) {
     try {
         MyLexer myLexer(&input);
         myparser::parser prsr(myLexer, this);
+        if(debug)
+            prsr.set_debug_level(1);
         prsr.parse();
     } catch (const std::exception& e) {
         cerr << "error: " << e.what() << endl;

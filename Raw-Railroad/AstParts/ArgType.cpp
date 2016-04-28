@@ -1,6 +1,11 @@
+#include <iostream>
 #include "ArgType.h"
 
-ArgType::ArgType() {
+using namespace std;
+
+ArgType::ArgType(const std::string& id) :
+    m_id(id) {
+    cout << __PRETTY_FUNCTION__ << " " << id << endl;
 }
 
 ArgType::~ArgType() {

@@ -14,7 +14,7 @@ public:
     MyAst();
     virtual ~MyAst();
 
-    void parse(std::istream& input);
+    void parse(std::istream& input, bool debug);
 
     void importLibrary(Import*);
     void printId(Print*);

@@ -14,7 +14,11 @@ int main(int argc, char* argv[]) {
         ifstream file(argv[1]);
 
         MyAst ast;
-        ast.parse(file);
+
+        if(argc > 2)
+            ast.parse(file, true);
+        else
+            ast.parse(file, false);
 
         return 0;
     } catch (const std::exception& e) {

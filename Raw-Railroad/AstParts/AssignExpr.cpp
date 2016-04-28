@@ -20,7 +20,5 @@ std::string AssignExpr::toString() const {
 }
 
 void AssignExpr::visit(MyAst* ast) {
-    int result = m_value->getResult();
-    cout << __PRETTY_FUNCTION__ << " " << result << endl;
-    ast->addVariable(m_id, result);
+    ast->addVariable(m_id, m_value->getResult());
 }

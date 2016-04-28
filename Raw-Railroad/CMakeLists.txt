@@ -26,22 +26,24 @@ add_executable(
         Raw-Railroad
         
         main.cpp
+        
         MyAst.cpp
         MyAst.h
         
         MyLexer.cpp
+        MyLexer.h
         
-        Expr.cpp
-        Expr.h
+        AstParts/Expr.cpp
+        AstParts/Expr.h
         
-        IdExpr.cpp
-        IdExpr.h
+        AstParts/IdExpr.cpp
+        AstParts/IdExpr.h
         
-        NumExpr.cpp
-        NumExpr.h
+        AstParts/NumExpr.cpp
+        AstParts/NumExpr.h
         
-        AssignExpr.cpp
-        AssignExpr.h
+        AstParts/AssignExpr.cpp
+        AstParts/AssignExpr.h
         
         AstParts/FuncType.cpp
         AstParts/FuncType.h
