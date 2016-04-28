@@ -28,6 +28,15 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 int nnn1 = 0;
 %}
 
+"import" return myparser::parser::token::IMPORT;
+"print" return myparser::parser::token::PRINT;
+"fun" return myparser::parser::token::FUN;
+"end" return myparser::parser::token::END;
+
+"(" return myparser::parser::token::LPAREN;
+")" return myparser::parser::token::RPAREN;
+"," return myparser::parser::token::COMMA;
+
 {DIGIT} {
     yylval->num = atoi(yytext); 
     return myparser::parser::token::NUM; 
@@ -39,9 +48,12 @@ int nnn1 = 0;
 }
 
 "="  return myparser::parser::token::ASSIGN;
-"\n" return myparser::parser::token::EOL;
+"+"  { yylval->chr = yytext[0]; return myparser::parser::token::PLUS; }
+"-"  { yylval->chr = yytext[0]; return myparser::parser::token::MINUS; }
+"*"  { yylval->chr = yytext[0]; return myparser::parser::token::MUL; }
+"/"  { yylval->chr = yytext[0]; return myparser::parser::token::DIV; }
 
-[ \t] ;
+[ \t\n] ;
 
 . { cerr << "Invalid symbol " << yytext << endl; }
 

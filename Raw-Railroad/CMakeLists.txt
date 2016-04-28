@@ -5,7 +5,8 @@ find_package(FLEX)
 
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        .
+        AstParts
 )
 
 BISON_TARGET(
@@ -21,26 +22,56 @@ FLEX_TARGET(
 
 ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 
-add_executable(
+add_library(
         Raw-Railroad
         
-        main.cpp
         MyAst.cpp
         MyAst.h
         
         MyLexer.cpp
+        MyLexer.h
         
-        Expr.cpp
-        Expr.h
+        AstParts/Expr.cpp
+        AstParts/Expr.h
         
-        IdExpr.cpp
-        IdExpr.h
+        AstParts/IdExpr.cpp
+        AstParts/IdExpr.h
         
-        NumExpr.cpp
-        NumExpr.h
+        AstParts/NumExpr.cpp
+        AstParts/NumExpr.h
         
-        AssignExpr.cpp
-        AssignExpr.h
+        AstParts/AssignExpr.cpp
+        AstParts/AssignExpr.h
+        
+        AstParts/Function.cpp
+        AstParts/Function.h
+        
+        AstParts/DefineType.cpp
+        AstParts/DefineType.h
+        
+        AstParts/Args.cpp
+        AstParts/Args.h
+        
+        AstParts/Import.cpp
+        AstParts/Import.h
+        
+        AstParts/Print.cpp
+        AstParts/Print.h
+        
+        AstParts/Plus.cpp
+        AstParts/Plus.h
+        
+        AstParts/Minus.cpp
+        AstParts/Minus.h
+        
+        AstParts/Mul.cpp
+        AstParts/Mul.h
+        
+        AstParts/Div.cpp
+        AstParts/Div.h
+        
+        AstParts/FunctionStatements.cpp
+        AstParts/FunctionStatements.h
         
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}

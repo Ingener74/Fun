@@ -1,7 +1,48 @@
-foo = 42
+import Jupiter
+import So
+import Dll
+
+foo = 42 + 21 - 3 * 2 / 3
 bar = 54
 
 quz = 65
 quuuuz = 123
+
+print foo
+
+fun test1 ( bla1 )
+    t1 = 100500
+    t2 = 42
+end
+
+fun test2 (bla2, bla3, bla4)
+end
+
+fun test3 (bla5, bla6, bla7, bla8)
+end
+
+fun quzMore()
+    print foo
+end
+
+fun quzLess()
+    print quuuuz
+end
+
+fun testFunction(x, y)
+    if quz > 100:
+        quzMore()
+    else
+        quzLess()
+    end
+    
+    tf = 52345
+    
+    print x
+    print y
+    print tf
+end
+
+testFunction(bar, 300)
 
 
