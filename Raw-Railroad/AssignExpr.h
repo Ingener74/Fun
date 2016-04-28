@@ -11,6 +11,8 @@ public:
 
     virtual std::string toString() const ;
 
+    virtual void visit(MyAst*);
+
 private:
     std::string m_id;
     int m_value;

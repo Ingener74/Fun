@@ -55,6 +55,9 @@ add_executable(
         AstParts/Import.cpp
         AstParts/Import.h
         
+        AstParts/Print.cpp
+        AstParts/Print.h
+        
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}
 )

@@ -18,6 +18,7 @@ class MyLexer;
 #include "DefineType.h"
 #include "ArgType.h"
 #include "Import.h"
+#include "Print.h"
 }
 
 %{
@@ -39,9 +40,10 @@ void yyerror(const char* );
     DefineType* define_type;
     ArgType* arg_type;
     Import* import_type;
+    Print* print_type;
 }
 
-%destructor { delete $$; } <str> <import_type> <expr_type> // <define_type>  <func_type> <arg_type>
+%destructor { delete $$; } <str> <import_type> <expr_type> <print_type>// <define_type>  <func_type> <arg_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , MyLexer&);
@@ -66,6 +68,7 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 // %type <define_type> define
 // %type <arg_type> arg
 %type <import_type> import
+%type <print_type> print
 
 %param{ 
     MyLexer& myLexer
@@ -84,8 +87,10 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 
 root
     : %empty 
-    | import root { myAst->importLibrary($1); }
-    | expr root
+    | root import { myAst->importLibrary($2); }
+    | root expr   { $2->visit(myAst); }
+    | root print  { myAst->printId($2); }
+    | root EOL 
     ;
 
 import
@@ -95,6 +100,9 @@ import
 expr
     : ID "=" NUM EOL { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
     ;
+
+print
+    : "print" ID EOL { $$ = new Print(*$2); }
 
 %%
 

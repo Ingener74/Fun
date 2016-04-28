@@ -30,6 +30,10 @@ void MyAst::functionDefinition(FuncType* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }
 
+void MyAst::printId(Print* print) {
+    printVariable(print->getId());
+}
+
 void MyAst::expressionDefinition(Expr* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }
@@ -43,3 +47,4 @@ void MyAst::addVariable(const std::string& id, int value) {
 void MyAst::printVariable(const std::string& id) {
     cout << m_variables[id] << endl;
 }
+
