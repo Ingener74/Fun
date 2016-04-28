@@ -13,3 +13,7 @@ ArgType::~ArgType() {
 
 void ArgType::addArg(IdExpr*) {
 }
+
+void ArgType::setTest() {
+    cout << __PRETTY_FUNCTION__ << " " << m_id << endl;
+}

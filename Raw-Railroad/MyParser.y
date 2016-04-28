@@ -131,7 +131,7 @@ func
     ;
 
 arg
-    : ID "," arg { cout << "arg 1 def " << endl; $$ = new ArgType(*$1); }
+    : arg "," ID   { cout << "arg 1 def " << endl; $$ = new ArgType(*$3); $1->setTest(); }
     | ID         { cout << "arg 2 def " << endl; $$ = new ArgType(*$1); }
     ;
 

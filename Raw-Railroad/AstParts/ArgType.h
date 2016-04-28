@@ -11,6 +11,8 @@ public:
 
     void addArg(IdExpr*);
 
+    void setTest();
+
     const std::string& getId() const {
         return m_id;
     }

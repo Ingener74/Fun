@@ -13,7 +13,7 @@ print foo
 fun test1 ( bla1 )
 end
 
-fun test2 ( bla2, bla3 )
+fun test2 ( bla2, bla3, bla4 )
 end
 
 fun quzMore()
