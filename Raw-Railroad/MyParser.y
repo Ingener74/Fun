@@ -90,19 +90,19 @@ root
     | root import { myAst->importLibrary($2); }
     | root expr   { $2->visit(myAst); }
     | root print  { myAst->printId($2); }
-    | root EOL 
     ;
 
 import
-    : "import" ID EOL { $$ = new Import(*$2); }
+    : "import" ID { $$ = new Import(*$2); }
     ;
     
 expr
-    : ID "=" NUM EOL { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
+    : ID "=" NUM { $$ = new AssignExpr(*$1, $3); cout << "assign " << *$1 << " " << $3 << endl; }
     ;
 
 print
-    : "print" ID EOL { $$ = new Print(*$2); }
+    : "print" ID { $$ = new Print(*$2); }
+    ;
 
 %%
 

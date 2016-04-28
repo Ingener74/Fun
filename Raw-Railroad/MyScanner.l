@@ -48,9 +48,8 @@ int nnn1 = 0;
 }
 
 "="  return myparser::parser::token::ASSIGN;
-"\n" return myparser::parser::token::EOL;
 
-[ \t] ;
+[ \t\n] ;
 
 . { cerr << "Invalid symbol " << yytext << endl; }
 
