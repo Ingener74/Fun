@@ -30,7 +30,7 @@ else()
 	add_executable(DancingComic ${DancingComic_SOURCES})
 endif()
 
-target_link_libraries(DancingComic Qt5::Widgets Qt5::Core)
+target_link_libraries(DancingComic Qt5::Widgets Qt5::Core Raw-Railroad)
 
 install(TARGETS DancingComic DESTINATION bin)
 

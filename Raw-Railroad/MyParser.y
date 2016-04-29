@@ -121,14 +121,14 @@ func
     ;
 
 func_arg
-    : ID              { /* cout << "arg 2 def " << endl; */ $$ = new Args(*$1); }
-    | func_arg "," ID { /* cout << "arg 1 def " << endl; */ $1->addArg(*$3); }
+    : ID              { $$ = new Args(*$1); }
+    | func_arg "," ID { $1->addArg(*$3); }
     ;
 
 func_sttmts
-    : %empty           { /* cout << "expression" << endl; */   $$ = new FunctionStatements(); }
-    | expr             { /* cout << "expression 1" << endl; */ $$ = new FunctionStatements($1); }
-    | func_sttmts expr { /* cout << "expression 2" << endl; */ $1->addExpression($2); }
+    : %empty           { $$ = new FunctionStatements(); }
+    | expr             { $$ = new FunctionStatements($1); }
+    | func_sttmts expr { $1->addExpression($2); }
     ;
 
 expr

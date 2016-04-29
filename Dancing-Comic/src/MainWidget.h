@@ -18,8 +18,9 @@ public:
 
     virtual void keyPressEvent(QKeyEvent *);
 
-private:
-
 public slots:
+    void run();
 
+private:
+    std::streambuf* m_cout_buffer = nullptr, * m_cerr_buffer = nullptr, *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
 };
