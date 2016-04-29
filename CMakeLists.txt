@@ -30,12 +30,6 @@ if(ENABLE_RARE_CRYSTAL)
 endif()
 
 
-option(ENABLE_DREADED_BACKPACK "Enable Dreaded-Backpack" OFF)
-if(ENABLE_DREADED_BACKPACK)
-    add_subdirectory(Dreaded-Backpack)
-endif()
-
-
 option(ENABLE_RAW_RAILROAD "Enable Raw-Railroad" ON)
 if(ENABLE_RAW_RAILROAD)
     add_subdirectory(Raw-Railroad)

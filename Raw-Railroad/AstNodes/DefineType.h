@@ -5,8 +5,8 @@
  *      Author: pavel
  */
 
-#ifndef RAW_RAILROAD_ASTPARTS_DEFINETYPE_H_
-#define RAW_RAILROAD_ASTPARTS_DEFINETYPE_H_
+#ifndef RAW_RAILROAD_ASTNODES_DEFINETYPE_H_
+#define RAW_RAILROAD_ASTNODES_DEFINETYPE_H_
 
 class DefineType {
 public:
@@ -14,4 +14,4 @@ public:
     virtual ~DefineType();
 };
 
-#endif /* RAW_RAILROAD_ASTPARTS_DEFINETYPE_H_ */
+#endif /* RAW_RAILROAD_ASTNODES_DEFINETYPE_H_ */

@@ -1,14 +1,19 @@
 #pragma once
 
-#include <Expr.h>
+#include <AstNodes/Expr.h>
 #include <string>
 
-class Mul: public Expr {
+
+class Fun1Ast;
+
+class Plus: public Expr {
 public:
-    Mul(Expr* lhs, Expr* rhs);
-    virtual ~Mul();
+    Plus(Expr*, Expr*);
+    virtual ~Plus();
 
     virtual std::string toString() const ;
+
+    virtual void visit(Fun1Ast*);
 
     virtual int getResult();
 

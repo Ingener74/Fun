@@ -5,7 +5,7 @@
  *      Author: pavel
  */
 
-#include "DefineType.h"
+#include <AstNodes/DefineType.h>
 
 DefineType::DefineType() {
     // TODO Auto-generated constructor stub

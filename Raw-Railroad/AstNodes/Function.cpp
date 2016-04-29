@@ -1,10 +1,9 @@
-#include <Expr.h>
-#include "Function.h"
-
+#include <AstNodes/Args.h>
+#include <AstNodes/Expr.h>
+#include <AstNodes/Function.h>
+#include <AstNodes/FunctionStatements.h>
 #include <iostream>
 
-#include "Args.h"
-#include "FunctionStatements.h"
 
 using namespace std;
 

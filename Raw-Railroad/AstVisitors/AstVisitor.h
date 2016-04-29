@@ -6,6 +6,8 @@ class AstVisitor {
 public:
     AstVisitor();
     virtual ~AstVisitor();
+
+    void visit(class AstNode*);
 };
 
 }

@@ -1,8 +1,8 @@
 
+#include <AstNodes/Div.h>
 #include <iostream>
 #include <sstream>
 
-#include "Div.h"
 
 using namespace std;
 

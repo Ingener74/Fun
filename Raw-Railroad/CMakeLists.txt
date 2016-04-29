@@ -6,7 +6,7 @@ find_package(FLEX)
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
         .
-        AstParts
+        AstNodes
         AstVisitors
 )
 
@@ -32,47 +32,50 @@ add_library(
         MyLexer.cpp
         MyLexer.h
         
-        AstParts/Expr.cpp
-        AstParts/Expr.h
+        Utils.cpp
+        Utils.h
         
-        AstParts/IdExpr.cpp
-        AstParts/IdExpr.h
+        AstNodes/Expr.cpp
+        AstNodes/Expr.h
         
-        AstParts/NumExpr.cpp
-        AstParts/NumExpr.h
+        AstNodes/IdExpr.cpp
+        AstNodes/IdExpr.h
         
-        AstParts/AssignExpr.cpp
-        AstParts/AssignExpr.h
+        AstNodes/NumExpr.cpp
+        AstNodes/NumExpr.h
         
-        AstParts/Function.cpp
-        AstParts/Function.h
+        AstNodes/AssignExpr.cpp
+        AstNodes/AssignExpr.h
         
-        AstParts/DefineType.cpp
-        AstParts/DefineType.h
+        AstNodes/Function.cpp
+        AstNodes/Function.h
         
-        AstParts/Args.cpp
-        AstParts/Args.h
+        AstNodes/DefineType.cpp
+        AstNodes/DefineType.h
         
-        AstParts/Import.cpp
-        AstParts/Import.h
+        AstNodes/Args.cpp
+        AstNodes/Args.h
         
-        AstParts/Print.cpp
-        AstParts/Print.h
+        AstNodes/Import.cpp
+        AstNodes/Import.h
         
-        AstParts/Plus.cpp
-        AstParts/Plus.h
+        AstNodes/Print.cpp
+        AstNodes/Print.h
         
-        AstParts/Minus.cpp
-        AstParts/Minus.h
+        AstNodes/Plus.cpp
+        AstNodes/Plus.h
         
-        AstParts/Mul.cpp
-        AstParts/Mul.h
+        AstNodes/Minus.cpp
+        AstNodes/Minus.h
         
-        AstParts/Div.cpp
-        AstParts/Div.h
+        AstNodes/Mul.cpp
+        AstNodes/Mul.h
         
-        AstParts/FunctionStatements.cpp
-        AstParts/FunctionStatements.h
+        AstNodes/Div.cpp
+        AstNodes/Div.h
+        
+        AstNodes/FunctionStatements.cpp
+        AstNodes/FunctionStatements.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

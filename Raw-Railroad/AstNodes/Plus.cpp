@@ -1,7 +1,7 @@
+#include <AstNodes/Plus.h>
 #include <Fun1Ast.h>
 #include <sstream>
 
-#include "Plus.h"
 
 using namespace std;
 

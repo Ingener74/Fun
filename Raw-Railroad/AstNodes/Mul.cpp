@@ -1,7 +1,7 @@
+#include <AstNodes/Mul.h>
 #include <iostream>
 #include <sstream>
 
-#include "Mul.h"
 
 using namespace std;
 

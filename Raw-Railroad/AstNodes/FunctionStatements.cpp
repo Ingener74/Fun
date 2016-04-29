@@ -1,4 +1,4 @@
-#include "FunctionStatements.h"
+#include <AstNodes/FunctionStatements.h>
 
 FunctionStatements::FunctionStatements(Expr* expr) {
     if (expr)
