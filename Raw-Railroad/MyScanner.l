@@ -29,6 +29,12 @@ int nnn1 = 0;
 %}
 
 "import" return myparser::parser::token::IMPORT;
+"if" return myparser::parser::token::IF;
+"else" return myparser::parser::token::ELSE;
+"for" return myparser::parser::token::FOR;
+"in" return myparser::parser::token::IN;
+"while" return myparser::parser::token::WHILE;
+"do" return myparser::parser::token::DO;
 "print" return myparser::parser::token::PRINT;
 "fun" return myparser::parser::token::FUN;
 "end" return myparser::parser::token::END;

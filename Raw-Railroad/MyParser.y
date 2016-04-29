@@ -1,15 +1,14 @@
 %require "3.0.4"
 %skeleton "lalr1.cc"
 
-// %debug
-%define parse.trace
+%debug
 
 %define api.namespace {myparser}
 
 %code requires{
 class MyLexer;
 
-#include "MyAst.h"
+#include "Fun1Ast.h"
 
 #include "Expr.h"
 #include "AssignExpr.h"
@@ -29,13 +28,9 @@ class MyLexer;
 }
 
 %{
-
 #include <iostream>
-
 using namespace std;
-
 void yyerror(const char* );
-
 %}
 
 %union{
@@ -71,6 +66,12 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 %token RPAREN ")"
 %token COMMA ","
 
+%token IF "if"
+%token ELSE "else"
+%token FOR "for"
+%token IN "in"
+%token WHILE "while"
+%token DO "do"
 %token IMPORT "import"
 %token PRINT "print"
 %token FUN "fun"
@@ -89,7 +90,7 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
     MyLexer& myLexer
 };
 
-%parse-param { MyAst* myAst };
+%parse-param { Fun1Ast* ast };
 
 %initial-action
 {
@@ -106,10 +107,10 @@ int yylex(myparser::parser::semantic_type* , MyLexer&);
 
 root
     : %empty 
-    | root import { myAst->importLibrary($2); }
-    | root expr   { $2->visit(myAst); }
-    | root print  { myAst->printId($2); }
-    | root func   { myAst->functionDefinition($2); }
+    | root import { ast->importLibrary($2); }
+    | root expr   { $2->visit(ast); }
+    | root print  { ast->printId($2); }
+    | root func   { ast->functionDefinition($2); }
     ;
 
 import
@@ -117,7 +118,7 @@ import
     ;
     
 func
-    : "fun" ID "(" func_arg ")" func_sttmts "end" { /* cout << "func def " << endl; */ $$ = new Function(*$2, $4, $6); }
+    : "fun" ID "(" func_arg ")" func_sttmts "end" { $$ = new Function(*$2, $4, $6); }
     ;
 
 func_arg
