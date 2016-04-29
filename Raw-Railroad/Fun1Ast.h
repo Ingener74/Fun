@@ -9,12 +9,16 @@ class Expr;
 class Import;
 class Print;
 
-class MyAst {
+class Fun1Ast {
 public:
-    MyAst();
-    virtual ~MyAst();
+    Fun1Ast();
+    virtual ~Fun1Ast();
 
     void parse(std::istream& input, bool debug);
+
+    void compile();
+
+    void run();
 
     void importLibrary(Import*);
     void printId(Print*);

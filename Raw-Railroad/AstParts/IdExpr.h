@@ -1,12 +1,12 @@
 #pragma once
 
+#include <Expr.h>
 #include <string>
-#include "Expr.h"
 
-class IdExpr: public Expr {
+class IdExpression: public Expr {
 public:
-    IdExpr(const std::string& id);
-    virtual ~IdExpr();
+    IdExpression(const std::string& id);
+    virtual ~IdExpression();
 
     virtual std::string toString() const ;
 private:

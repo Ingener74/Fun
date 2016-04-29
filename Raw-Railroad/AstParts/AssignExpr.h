@@ -1,8 +1,8 @@
 #pragma once
 
+#include <Expr.h>
 #include <string>
 
-#include "Expr.h"
 
 class AssignExpr : public Expr {
 public:
@@ -11,7 +11,7 @@ public:
 
     virtual std::string toString() const ;
 
-    virtual void visit(MyAst*);
+    virtual void visit(Fun1Ast*);
 
     virtual int getResult(){
         return m_value->getResult();

@@ -7,6 +7,7 @@ include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
         .
         AstParts
+        AstVisitors
 )
 
 BISON_TARGET(
@@ -25,8 +26,8 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 add_library(
         Raw-Railroad
         
-        MyAst.cpp
-        MyAst.h
+        Fun1Ast.cpp
+        Fun1Ast.h
         
         MyLexer.cpp
         MyLexer.h
@@ -72,6 +73,15 @@ add_library(
         
         AstParts/FunctionStatements.cpp
         AstParts/FunctionStatements.h
+        
+        AstVisitors/AstVisitor.cpp
+        AstVisitors/AstVisitor.h
+        AstVisitors/CompileVisitor.cpp
+        AstVisitors/CompileVisitor.h
+        AstVisitors/ExecutionVisitor.cpp
+        AstVisitors/ExecutionVisitor.h
+        AstVisitors/PrintVisitor.cpp
+        AstVisitors/PrintVisitor.h
         
         ${BISON_MyParser_OUTPUTS}
         ${FLEX_MyScanner_OUTPUTS}

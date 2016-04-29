@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Expr.h"
+#include <Expr.h>
 
 class NumExpr: public Expr {
 public:
@@ -9,7 +9,7 @@ public:
 
     virtual std::string toString() const;
 
-    virtual void visit(MyAst*);
+    virtual void visit(Fun1Ast*);
 
     virtual int getResult();
 

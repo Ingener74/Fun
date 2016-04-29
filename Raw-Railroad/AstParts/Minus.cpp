@@ -1,6 +1,6 @@
+#include <Fun1Ast.h>
 #include <sstream>
 
-#include "MyAst.h"
 #include "Minus.h"
 
 using namespace std;

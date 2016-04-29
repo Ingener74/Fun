@@ -2,7 +2,7 @@
 
 #include <string>
 
-class MyAst;
+class Fun1Ast;
 
 class Expr {
 public:
@@ -13,7 +13,7 @@ public:
         return "";
     }
 
-    virtual void visit(MyAst*) {
+    virtual void visit(Fun1Ast*) {
     }
 
     virtual int getResult(){

@@ -1,6 +1,6 @@
+#include <Fun1Ast.h>
 #include <sstream>
 
-#include "MyAst.h"
 #include "Plus.h"
 
 using namespace std;
@@ -18,7 +18,7 @@ std::string Plus::toString() const {
     return ss.str();
 }
 
-void Plus::visit(MyAst* ast) {
+void Plus::visit(Fun1Ast* ast) {
 }
 
 int Plus::getResult() {

@@ -1,18 +1,18 @@
 #include <assert.h>
+#include <Fun1Ast.h>
 
 #include <MyParser.hpp>
 #include "MyLexer.h"
-#include "MyAst.h"
 
 using namespace std;
 
-MyAst::MyAst() {
+Fun1Ast::Fun1Ast() {
 }
 
-MyAst::~MyAst() {
+Fun1Ast::~Fun1Ast() {
 }
 
-void MyAst::parse(std::istream& input, bool debug) {
+void Fun1Ast::parse(std::istream& input, bool debug) {
     try {
         MyLexer myLexer(&input);
         myparser::parser prsr(myLexer, this);
@@ -24,29 +24,35 @@ void MyAst::parse(std::istream& input, bool debug) {
     }
 }
 
-void MyAst::importLibrary(Import* import) {
+void Fun1Ast::compile() {
+}
+
+void Fun1Ast::run() {
+}
+
+void Fun1Ast::importLibrary(Import* import) {
     cout << __PRETTY_FUNCTION__ << " " << import->getImport() << endl;
 }
 
-void MyAst::functionDefinition(Function* func) {
+void Fun1Ast::functionDefinition(Function* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }
 
-void MyAst::printId(Print* print) {
+void Fun1Ast::printId(Print* print) {
     printVariable(print->getId());
 }
 
-void MyAst::expressionDefinition(Expr* func) {
+void Fun1Ast::expressionDefinition(Expr* func) {
     cout << __PRETTY_FUNCTION__ << endl;
 }
 
-void MyAst::addVariable(const std::string& id, int value) {
+void Fun1Ast::addVariable(const std::string& id, int value) {
     auto erased = m_variables.erase(id);
     auto res = m_variables.insert(make_pair(id, value));
     assert(res.second);
 }
 
-void MyAst::printVariable(const std::string& id) {
+void Fun1Ast::printVariable(const std::string& id) {
     cout << m_variables[id] << endl;
 }
 

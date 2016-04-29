@@ -1,10 +1,10 @@
 #pragma once
 
+#include <Expr.h>
 #include <string>
 
-#include "Expr.h"
 
-class MyAst;
+class Fun1Ast;
 
 class Plus: public Expr {
 public:
@@ -13,7 +13,7 @@ public:
 
     virtual std::string toString() const ;
 
-    virtual void visit(MyAst*);
+    virtual void visit(Fun1Ast*);
 
     virtual int getResult();
 

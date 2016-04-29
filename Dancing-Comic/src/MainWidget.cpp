@@ -8,16 +8,15 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QMessageBox>
 
-#include <MyAst.h>
-
 #include "MainWidget.h"
+#include <Fun1Ast.h>
 
 using namespace std;
 
 class TextEditStreambuf: public streambuf {
 public:
     TextEditStreambuf(QTextEdit* te) :
-        m_buffer(1 << 12), m_te(te) {
+        m_buffer(1 << 16), m_te(te) {
         setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
     }
 
@@ -25,21 +24,23 @@ public:
     }
 
     virtual int sync() {
-        for (auto& i : m_buffer) {
-            if (i == '\n')
-                i = ' ';
-        }
-        if (m_buffer.data()[0] == 0)
-            return 0;
-        m_te->append(QString::fromStdString(string(m_buffer.data())));
-        for (auto& i : m_buffer)
-            i = 0;
-        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
+        m_te->setPlainText(QString::fromStdString(string(m_buffer.data())));
+//        for (auto& i : m_buffer) {
+//            if (i == '\n')
+//                i = ' ';
+//        }
+//        if (m_buffer.data()[0] == 0)
+//            return 0;
+//        m_te->append(QString::fromStdString(string(m_buffer.data())));
+//        for (auto& i : m_buffer)
+//            i = 0;
+//        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
         return 0;
     }
 
-protected:
     vector<char> m_buffer;
+
+protected:
     QTextEdit* m_te = nullptr;
 };
 
@@ -84,6 +85,6 @@ void MainWidget::run() {
 
     ss << codeTextEdit->toPlainText().toStdString();
 
-    MyAst ast;
+    Fun1Ast ast;
     ast.parse(ss, debugCheckBox->isChecked());
 }

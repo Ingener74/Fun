@@ -1,10 +1,10 @@
 #pragma once
 
+#include <Expr.h>
 #include <string>
 
-#include "Expr.h"
 
-class MyAst;
+class Fun1Ast;
 
 class Minus: public Expr {
 public:

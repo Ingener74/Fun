@@ -1,8 +1,8 @@
+#include <Fun1Ast.h>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
 
-#include "MyAst.h"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
         ifstream file(argv[1]);
 
-        MyAst ast;
+        Fun1Ast ast;
 
         if(argc > 2)
             ast.parse(file, true);

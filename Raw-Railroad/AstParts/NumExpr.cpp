@@ -1,6 +1,6 @@
+#include <NumExpr.h>
 #include <iostream>
 #include <sstream>
-#include "NumExpr.h"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ std::string NumExpr::toString() const {
     return ss.str();
 }
 
-void NumExpr::visit(MyAst* ast) {
+void NumExpr::visit(Fun1Ast* ast) {
 }
 
 int NumExpr::getResult() {
