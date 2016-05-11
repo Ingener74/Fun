@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/fonts/DroidSansMono.ttf</normaloff>:/fonts/DroidSansMono.ttf</iconset>
+    <normaloff>:/main/icon.png</normaloff>:/main/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>

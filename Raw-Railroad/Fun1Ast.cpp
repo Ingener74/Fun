@@ -31,11 +31,10 @@ void Fun1Ast::run() {
 }
 
 void Fun1Ast::importLibrary(Import* import) {
-    cout << __PRETTY_FUNCTION__ << " " << import->getImport() << endl;
+	cout << import->getImport() << endl;
 }
 
 void Fun1Ast::functionDefinition(Function* func) {
-    cout << __PRETTY_FUNCTION__ << endl;
 }
 
 void Fun1Ast::printId(Print* print) {
@@ -43,7 +42,6 @@ void Fun1Ast::printId(Print* print) {
 }
 
 void Fun1Ast::expressionDefinition(Expr* func) {
-    cout << __PRETTY_FUNCTION__ << endl;
 }
 
 void Fun1Ast::addVariable(const std::string& id, int value) {

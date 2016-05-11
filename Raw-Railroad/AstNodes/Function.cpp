@@ -9,8 +9,8 @@ using namespace std;
 
 Function::Function(const std::string& id, Args* args,
         FunctionStatements* statements) {
-    cout << __PRETTY_FUNCTION__ << " " << id << " (";
-    for (const auto &i : args->getArgs())
+	cout << id << " (";
+	for (const auto &i : args->getArgs())
         cout << i << ", ";
     cout << ") {" << endl;
     for (const auto& i : statements->getExpressions())

@@ -7,6 +7,7 @@ include_directories(
 )
 
 if(MSVC)
+	add_definitions(/DYY_NO_UNISTD_H)
 else()
     add_definitions(-std=c++11)
 endif()
