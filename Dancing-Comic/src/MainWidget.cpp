@@ -25,16 +25,6 @@ public:
 
     virtual int sync() {
         m_te->setPlainText(QString::fromStdString(string(m_buffer.data())));
-//        for (auto& i : m_buffer) {
-//            if (i == '\n')
-//                i = ' ';
-//        }
-//        if (m_buffer.data()[0] == 0)
-//            return 0;
-//        m_te->append(QString::fromStdString(string(m_buffer.data())));
-//        for (auto& i : m_buffer)
-//            i = 0;
-//        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
         return 0;
     }
 
