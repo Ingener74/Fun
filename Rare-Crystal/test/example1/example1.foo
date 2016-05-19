@@ -1,5 +1,0 @@
-foo = 42
-bar = 24
-baz = foo + bar
-print baz
-

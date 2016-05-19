@@ -2,9 +2,8 @@
 
 #include <memory>
 
+#include <QtCore/QSettings>
 #include <QtWidgets/QWidget>
-#include <QtCore/QFutureWatcher>
-#include <QtGui/QImage>
 
 #include "ui_mainwidget.h"
 
@@ -17,10 +16,11 @@ public:
     virtual ~MainWidget();
 
     virtual void keyPressEvent(QKeyEvent *);
+    virtual void closeEvent(QCloseEvent *);
 
-public slots:
-    void run();
+    Q_SLOT void run();
 
 private:
     std::streambuf* m_cout_buffer = nullptr, * m_cerr_buffer = nullptr, *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
+    QSettings m_settings;
 };

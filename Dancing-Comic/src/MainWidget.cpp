@@ -1,17 +1,21 @@
 #include <iostream>
 #include <sstream>
 
+#include <QtCore/QTimer>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QFontDatabase>
-#include <QtCore/QTimer>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QMessageBox>
 
 #include "MainWidget.h"
-#include <Fun1Ast.h>
+
+#include <FunAst.h>
+#include <AstVisitors/PrintVisitor.h>
+#include <AstNodes/Scope.h>
 
 using namespace std;
+using namespace fun;
 
 class TextEditStreambuf: public streambuf {
 public:
@@ -37,6 +41,10 @@ protected:
 MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     QWidget(parent, f) {
     setupUi(this);
+
+    QSettings settings("Venus.Games", "Dancing-Comic");
+    restoreGeometry(settings.value("geom").toByteArray());
+    splitter->restoreState(settings.value("splitter").toByteArray());
 
     int id = QFontDatabase::addApplicationFont(":/fonts/DroidSansMono.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
@@ -70,11 +78,20 @@ void MainWidget::keyPressEvent(QKeyEvent* e) {
     }
 }
 
+void MainWidget::closeEvent(QCloseEvent*) {
+    QSettings settings("Venus.Games", "Dancing-Comic");
+    settings.setValue("geom", saveGeometry());
+    settings.setValue("splitter", splitter->saveState());
+}
+
 void MainWidget::run() {
     stringstream ss;
 
     ss << codeTextEdit->toPlainText().toStdString();
 
-    Fun1Ast ast;
+    FunAst ast;
     ast.parse(ss, debugCheckBox->isChecked());
+
+    PrintVisitor pv;
+    ast.getScope()->accept(&pv);
 }

@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 
 include_directories(
-    Raw-Railroad
-    Raw-Railroad/AstParts
+    Fun
 )
 
 if(MSVC)
@@ -25,15 +24,9 @@ if(ENABLE_TAINTED_BULLDOZER)
 endif()
 
 
-option(ENABLE_RARE_CRYSTAL "Enable Rare-Crystal" OFF)
-if(ENABLE_RARE_CRYSTAL)
-    add_subdirectory(Rare-Crystal)
-endif()
-
-
-option(ENABLE_RAW_RAILROAD "Enable Raw-Railroad" ON)
-if(ENABLE_RAW_RAILROAD)
-    add_subdirectory(Raw-Railroad)
+option(ENABLE_FUN "Enable Fun" ON)
+if(ENABLE_FUN)
+    add_subdirectory(Fun)
 endif()
 
 

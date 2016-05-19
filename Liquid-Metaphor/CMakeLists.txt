@@ -4,4 +4,4 @@ project(Liquid-Metaphor)
 
 add_executable(Liquid-Metaphor main.cpp)
 
-target_link_libraries(Liquid-Metaphor Raw-Railroad)
+target_link_libraries(Liquid-Metaphor Fun)

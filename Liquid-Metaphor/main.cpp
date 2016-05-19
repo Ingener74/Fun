@@ -1,10 +1,13 @@
-#include <Fun1Ast.h>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
 
+#include <FunAst.h>
+#include <AstVisitors/PrintVisitor.h>
+#include <AstNodes/Scope.h>
 
 using namespace std;
+using namespace fun;
 
 int main(int argc, char* argv[]) {
     try {
@@ -13,12 +16,16 @@ int main(int argc, char* argv[]) {
 
         ifstream file(argv[1]);
 
-        Fun1Ast ast;
+        FunAst ast;
 
-        if(argc > 2)
+        if (argc > 2)
             ast.parse(file, true);
         else
             ast.parse(file, false);
+
+        PrintVisitor pv;
+
+        ast.getScope()->accept(&pv);
 
         return 0;
     } catch (const std::exception& e) {
