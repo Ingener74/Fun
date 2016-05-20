@@ -42,4 +42,5 @@ fun testFunction(x, y)
     print tf
 end
 
-test(100, 200)
+testFunction(100, 200)
+
