@@ -38,6 +38,12 @@ add_library(
         AstNodes/AstNode.cpp
         AstNodes/AstNode.h
         
+        AstNodes/Declaration.cpp
+        AstNodes/Declaration.h
+        
+        AstNodes/Id.cpp
+        AstNodes/Id.h
+        
         AstNodes/Statement.cpp
         AstNodes/Statement.h
         
@@ -52,9 +58,6 @@ add_library(
         
         AstNodes/Expression.cpp
         AstNodes/Expression.h
-        
-        AstNodes/IdExpression.cpp
-        AstNodes/IdExpression.h
         
         AstNodes/Integer.cpp
         AstNodes/Integer.h

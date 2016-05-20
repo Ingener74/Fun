@@ -22,7 +22,7 @@ public:
     virtual void visit(class Assign*){}
     virtual void visit(class BinaryOp*){}
     virtual void visit(class Call*){}
-    virtual void visit(class IdExpression*){}
+    virtual void visit(class Id*){}
     virtual void visit(class Integer*){}
 };
 

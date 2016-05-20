@@ -20,7 +20,7 @@ class FunLexer;
 #include "Expression.h"
 #include "ExpressionList.h"
 #include "Assign.h"
-#include "IdExpression.h"
+#include "Id.h"
 #include "Integer.h"
 #include "BinaryOp.h"
 #include "Call.h"
@@ -38,18 +38,19 @@ void yyerror(const char* );
     std::string* str;
     char chr;
     
-    fun::Expression* expr_type;
+    fun::Scope* scope_type;
+    fun::ExpressionList* expr_list_type;
     fun::Function* func_type;
     fun::ArgumentList* arg_type;
     fun::Import* import_type;
     fun::Print* print_type;
     fun::If* if_type;
+    fun::Id* id_type;
     
-    fun::Scope* scope_type;
-    fun::ExpressionList* expr_list_type;
+    fun::Expression* expr_type;
 }
 
-%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type>
+%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , FunLexer&);
@@ -82,6 +83,7 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token FUN "fun"
 %token END "end"
 
+%type <id_type> id
 %type <expr_type> expr
 %type <func_type> func
 %type <arg_type> func_arg
@@ -89,7 +91,6 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %type <print_type> print
 
 %type <scope_type> scope
-%type <func_sttmnt_type> func_sttmts
 %type <if_type> if
 
 %type <expr_list_type> expr_list
@@ -122,30 +123,34 @@ scope
     | scope if     { $1->addStatement($2); }
     ;
 
-import
-    : "import" ID { $$ = new fun::Import(*$2); }
+id
+    : ID { $$ = new fun::Id(*$1); }
     ;
-    
+
+import
+    : "import" id { $$ = new fun::Import($2); }
+    ;
+
 func
-    : "fun" ID "(" func_arg ")" scope "end" { $$ = new fun::Function(*$2, $4, $6); }
+    : "fun" id "(" func_arg ")" scope "end" { $$ = new fun::Function($2, $4, $6); }
     ;
 
 func_arg
     : %empty          { $$ = new fun::ArgumentList(); }
-    | ID              { $$ = new fun::ArgumentList(*$1); }
-    | func_arg "," ID { $1->addArg(*$3); }
+    | id              { $$ = new fun::ArgumentList($1); }
+    | func_arg "," id { $1->addArg($3); }
     ;
 
 expr
-    : ID "=" expr { $$ = new fun::Assign(*$1, $3); }
+    : id "=" expr { $$ = new fun::Assign($1, $3); }
     | expr "+" expr { $$ = new fun::BinaryOp(fun::BinaryOp::PLUS, $1, $3); }
     | expr "-" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MINUS, $1, $3); }
     | expr "*" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MULTIPLY, $1, $3); }
     | expr "/" expr { $$ = new fun::BinaryOp(fun::BinaryOp::DIVIDE, $1, $3); }
     | expr ">" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MORE, $1, $3); }
     | NUM { $$ = new fun::Integer($1); }
-    | ID { $$ = new fun::IdExpression(*$1); }
-    | ID "(" expr_list ")" { $$ = new fun::Call(*$1, $3); }
+    | id 
+    | id "(" expr_list ")" { $$ = new fun::Call($1, $3); }
     ;
 
 expr_list

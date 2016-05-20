@@ -1,23 +1,23 @@
 #pragma once
 
-#include <string>
 #include <vector>
 #include <AstNodes/AstNode.h>
 
 namespace fun {
 
+class Id;
 class AstVisitor;
 
 class ArgumentList: public AstNode {
 public:
-    ArgumentList(const std::string& arg = {});
+    ArgumentList(Id* = nullptr);
     virtual ~ArgumentList();
 
     void accept(AstVisitor*);
 
-    void addArg(const std::string& arg);
+    void addArg(Id*);
 
-    std::vector<std::string> m_args;
+    std::vector<Id*> m_args;
 };
 
 }

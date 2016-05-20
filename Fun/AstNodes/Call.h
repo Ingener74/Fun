@@ -1,23 +1,21 @@
 #pragma once
 
-#include <string>
 #include <AstNodes/Expression.h>
-
-class AstVisitor;
 
 namespace fun {
 
-class ArgumentList;
+class Id;
 class ExpressionList;
+class AstVisitor;
 
 class Call: public Expression {
 public:
-    Call(const std::string& id, ExpressionList*);
+    Call(Id*, ExpressionList*);
     virtual ~Call();
 
     virtual void accept(AstVisitor*);
 
-    std::string m_id;
+    Id* m_id = nullptr;
     ExpressionList* m_expressionList = nullptr;
 };
 

@@ -1,14 +1,13 @@
-
-#include <AstNodes/ArgumentList.h>
 #include "AstVisitors/AstVisitor.h"
-#include <iostream>
+#include "AstNodes/Id.h"
+#include "AstNodes/ArgumentList.h"
 
 namespace fun {
 
 using namespace std;
 
-ArgumentList::ArgumentList(const std::string& arg) {
-    if(!arg.empty())
+ArgumentList::ArgumentList(Id* arg) {
+    if (arg)
         m_args.push_back(arg);
 }
 
@@ -19,7 +18,7 @@ void ArgumentList::accept(AstVisitor* visitor) {
     visitor->visit(this);
 }
 
-void ArgumentList::addArg(const std::string& arg) {
+void ArgumentList::addArg(Id* arg) {
     m_args.push_back(arg);
 }
 

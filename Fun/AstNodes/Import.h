@@ -1,22 +1,22 @@
 #pragma once
 
 #include <AstNodes/Statement.h>
-#include <string>
 
 namespace fun {
 
 using namespace std;
 
+class Id;
 class AstVisitor;
 
 class Import: public Statement {
 public:
-    Import(const std::string& library);
+    Import(Id*);
     virtual ~Import();
 
     virtual void accept(AstVisitor*);
 
-    std::string m_import;
+    Id* m_import;
 };
 
 }

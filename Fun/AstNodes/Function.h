@@ -1,22 +1,22 @@
 #pragma once
 
 #include <AstNodes/Statement.h>
-#include <string>
 
 namespace fun {
 
 class ArgumentList;
+class Id;
 class AstVisitor;
 class Scope;
 
 class Function: public Statement {
 public:
-    Function(const std::string& id, ArgumentList*, Scope*);
+    Function(Id*, ArgumentList*, Scope*);
     virtual ~Function();
 
     virtual void accept(AstVisitor*);
 
-    std::string m_id;
+    Id* m_id;
     ArgumentList* m_arguments;
     Scope* m_scope;
 };
