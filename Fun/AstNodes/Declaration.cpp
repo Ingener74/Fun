@@ -1,4 +1,4 @@
-#include <AstNodes/Declaration.h>
+#include "AstNodes/Declaration.h"
 
 namespace fun {
 

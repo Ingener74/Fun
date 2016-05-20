@@ -90,8 +90,7 @@ void MainWidget::run() {
     ss << codeTextEdit->toPlainText().toStdString();
 
     FunAst ast;
-    ast.parse(ss, debugCheckBox->isChecked());
-
     PrintVisitor pv;
-    ast.getRoot()->accept(&pv);
+    ast.setResultVisitor(&pv);
+    ast.parse(ss, debugCheckBox->isChecked());
 }
