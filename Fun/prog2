@@ -28,10 +28,11 @@ fun quzLess()
 end
 
 fun testFunction(x, y)
+    quz_res
     if quz > 100:
-        quzMore()
+        quz_res = quzMore(x)
     else
-        quzLess()
+        quz_res = quzLess(y)
     end
     
     tf = 52345
@@ -41,6 +42,4 @@ fun testFunction(x, y)
     print tf
 end
 
-testFunction(bar, 300)
-
-
+test(100, 200)

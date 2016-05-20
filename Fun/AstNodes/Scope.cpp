@@ -8,6 +8,8 @@ Scope::Scope(StatementNode* statement) {
 }
 
 Scope::~Scope() {
+    if (m_resultAstVisitor)
+        accept(m_resultAstVisitor);
 }
 
 void Scope::accept(AstVisitor* visitor) {

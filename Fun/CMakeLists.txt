@@ -74,8 +74,14 @@ add_library(
         AstNodes/Div.cpp
         AstNodes/Div.h
         
-        AstNodes/FunctionStatements.cpp
-        AstNodes/FunctionStatements.h
+        AstNodes/MoreExpr.cpp
+        AstNodes/MoreExpr.h
+        
+        AstNodes/Call.cpp
+        AstNodes/Call.h
+        
+        AstNodes/ExprList.cpp
+        AstNodes/ExprList.h
         
         AstNodes/AstNode.cpp
         AstNodes/AstNode.h
@@ -85,6 +91,9 @@ add_library(
         
         AstNodes/StatementNode.cpp
         AstNodes/StatementNode.h
+        
+        AstNodes/IfStatement.cpp
+        AstNodes/IfStatement.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

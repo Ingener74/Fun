@@ -11,6 +11,7 @@ class Expr;
 class Import;
 class Print;
 class Scope;
+class AstVisitor;
 
 class FunAst {
 public:
@@ -19,23 +20,20 @@ public:
 
     void parse(std::istream& input, bool debug);
 
-    void pushScope(Scope*);
-    Scope* getScope();
+    void setRoot(Scope*);
+    Scope* getRoot();
 
-    void importLibrary(Import*);
-    void printId(Print*);
+    AstVisitor* getResultVisitor() {
+        return m_resultVisitor;
+    }
 
-    void functionDefinition(Function* func);
-    void expressionDefinition(Expr* func);
-
-    void addVariable(const std::string& id, int value);
-
-    void printVariable(const std::string& id);
+    void setResultVisitor(AstVisitor* resultVisitor = nullptr) {
+        m_resultVisitor = resultVisitor;
+    }
 
 private:
-    std::unordered_map<std::string, int> m_variables;
-
     Scope* m_scope = nullptr;
+    AstVisitor* m_resultVisitor = nullptr;
 };
 
 }

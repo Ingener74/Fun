@@ -3,8 +3,8 @@
 
 namespace fun {
 
-Print::Print(const std::string& id) :
-    m_id(id) {
+Print::Print(Expr* expr) :
+    m_expr(expr) {
 }
 
 Print::~Print() {

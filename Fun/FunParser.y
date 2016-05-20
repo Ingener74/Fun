@@ -26,7 +26,11 @@ class FunLexer;
 #include "Minus.h"
 #include "Mul.h"
 #include "Div.h"
-#include "FunctionStatements.h"
+#include "MoreExpr.h"
+#include "Call.h"
+#include "ExprList.h"
+
+#include "IfStatement.h"
 }
 
 %{
@@ -45,12 +49,13 @@ void yyerror(const char* );
     fun::Args* arg_type;
     fun::Import* import_type;
     fun::Print* print_type;
-    fun::FunctionStatements* func_sttmnt_type;
+    fun::IfStatement* if_type;
     
     fun::Scope* scope_type;
+    fun::ExprList* expr_list_type;
 }
 
-%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <func_sttmnt_type>// <define_type>  
+%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , FunLexer&);
@@ -65,7 +70,9 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token <chr> MINUS "-"
 %token <chr> MUL "*"
 %token <chr> DIV "/"
+%token <chr> MORE ">"
 
+%token COLON  ":"
 %token LPAREN "("
 %token RPAREN ")"
 %token COMMA ","
@@ -83,14 +90,15 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 
 %type <expr_type> expr
 %type <func_type> func
-// %type <define_type> define
 %type <arg_type> func_arg
 %type <import_type> import
 %type <print_type> print
 
-%type <func_sttmnt_type> func_sttmts
-
 %type <scope_type> scope
+%type <func_sttmnt_type> func_sttmts
+%type <if_type> if
+
+%type <expr_list_type> expr_list
 
 %param{ 
     FunLexer& myLexer
@@ -112,11 +120,12 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %start scope;
 
 scope
-    : %empty       { $$ = new fun::Scope(); ast->pushScope($$); }
+    : %empty       { $$ = new fun::Scope(); ast->setRoot($$); }
     | scope import { $1->addStatement($2); }
     | scope expr   { $1->addStatement($2); }
     | scope print  { $1->addStatement($2); }
     | scope func   { $1->addStatement($2); }
+    | scope if     { $1->addStatement($2); }
     ;
 
 import
@@ -124,18 +133,13 @@ import
     ;
     
 func
-    : "fun" ID "(" func_arg ")" func_sttmts "end" { $$ = new fun::Function(*$2, $4, $6); }
+    : "fun" ID "(" func_arg ")" scope "end" { $$ = new fun::Function(*$2, $4, $6); }
     ;
 
 func_arg
-    : ID              { $$ = new fun::Args(*$1); }
+    : %empty          { $$ = new fun::Args(); }
+    | ID              { $$ = new fun::Args(*$1); }
     | func_arg "," ID { $1->addArg(*$3); }
-    ;
-
-func_sttmts
-    : %empty           { $$ = new fun::FunctionStatements(); }
-    | expr             { $$ = new fun::FunctionStatements($1); }
-    | func_sttmts expr { $1->addExpression($2); }
     ;
 
 expr
@@ -144,11 +148,25 @@ expr
     | expr "-" expr { $$ = new fun::Minus($1, $3); }
     | expr "*" expr { $$ = new fun::Mul($1, $3); }
     | expr "/" expr { $$ = new fun::Div($1, $3); }
+    | expr ">" expr { $$ = new fun::MoreExpr($1, $3); }
     | NUM { $$ = new fun::NumExpr($1); }
+    | ID { $$ = new fun::IdExpression(*$1); }
+    | ID "(" expr_list ")" { $$ = new fun::Call(*$1, $3); }
+    ;
+
+expr_list
+    : %empty             { $$ = new fun::ExprList(); }
+    | expr               { $$ = new fun::ExprList($1); }
+    | expr "," expr_list { $3->addExpression($1); }
     ;
 
 print
-    : "print" ID { $$ = new fun::Print(*$2); }
+    : "print" expr { $$ = new fun::Print($2); }
+    ;
+
+if
+    : "if" expr ":" scope "end"               { $$ = new fun::IfStatement($2, $4); }
+    | "if" expr ":" scope "else" scope "end"  { $$ = new fun::IfStatement($2, $4, $6); }
     ;
 
 %%

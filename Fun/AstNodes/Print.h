@@ -5,19 +5,17 @@
 
 namespace fun {
 
+class Expr;
+
 class Print: public StatementNode {
 public:
-    Print(const std::string& id);
+    Print(Expr*);
     virtual ~Print();
-
-    const std::string& getId() const {
-        return m_id;
-    }
 
     void accept(AstVisitor*);
 
 private:
-    std::string m_id;
+    Expr* m_expr;
 };
 
 }

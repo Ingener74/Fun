@@ -15,6 +15,17 @@ public:
     void accept(AstVisitor*);
 
     void addStatement(StatementNode*);
+
+    AstVisitor* getResultAstVisitor() {
+        return m_resultAstVisitor;
+    }
+
+    void setResultAstVisitor(AstVisitor* resultAstVisitor = nullptr) {
+        m_resultAstVisitor = resultAstVisitor;
+    }
+
+private:
+    AstVisitor* m_resultAstVisitor = nullptr;
 };
 
 }

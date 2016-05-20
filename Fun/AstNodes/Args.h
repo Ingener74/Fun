@@ -2,13 +2,18 @@
 
 #include <string>
 #include <vector>
+#include <AstNodes/AstNode.h>
 
 namespace fun {
 
-class Args {
+class AstVisitor;
+
+class Args: public AstNode {
 public:
-    Args(const std::string& arg);
+    Args(const std::string& arg = {});
     virtual ~Args();
+
+    void accept(AstVisitor*);
 
     void addArg(const std::string& arg);
 

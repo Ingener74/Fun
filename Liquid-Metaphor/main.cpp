@@ -18,14 +18,11 @@ int main(int argc, char* argv[]) {
 
         FunAst ast;
 
-        if (argc > 2)
-            ast.parse(file, true);
-        else
-            ast.parse(file, false);
-
         PrintVisitor pv;
 
-        ast.getScope()->accept(&pv);
+        ast.setResultVisitor(&pv);
+
+        ast.parse(file, argc > 2);
 
         return 0;
     } catch (const std::exception& e) {

@@ -1,3 +1,5 @@
+
+#include "AstVisitors/AstVisitor.h"
 #include "AstNodes/Args.h"
 
 #include <iostream>
@@ -7,10 +9,17 @@ namespace fun {
 using namespace std;
 
 Args::Args(const std::string& arg) {
-    m_args.push_back(arg);
+    if(!arg.empty())
+        m_args.push_back(arg);
 }
 
 Args::~Args() {
+}
+
+void Args::accept(AstVisitor* visitor) {
+    visitor->visit(this);
+    for (auto& n : m_nodes)
+        n->accept(visitor);
 }
 
 void Args::addArg(const std::string& arg) {

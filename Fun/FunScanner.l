@@ -39,6 +39,7 @@ int nnn1 = 0;
 "fun" return myparser::parser::token::FUN;
 "end" return myparser::parser::token::END;
 
+":" return myparser::parser::token::COLON;
 "(" return myparser::parser::token::LPAREN;
 ")" return myparser::parser::token::RPAREN;
 "," return myparser::parser::token::COMMA;
@@ -58,6 +59,7 @@ int nnn1 = 0;
 "-"  { yylval->chr = yytext[0]; return myparser::parser::token::MINUS; }
 "*"  { yylval->chr = yytext[0]; return myparser::parser::token::MUL; }
 "/"  { yylval->chr = yytext[0]; return myparser::parser::token::DIV; }
+">"  { yylval->chr = yytext[0]; return myparser::parser::token::MORE; }
 
 [ \t\n] ;
 

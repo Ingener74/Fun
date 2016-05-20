@@ -7,12 +7,12 @@ namespace fun {
 
 class Args;
 class AstVisitor;
-class FunctionStatements;
+class Scope;
 
 class Function: public StatementNode {
 public:
-    Function(const std::string& id, Args*, FunctionStatements*);
-    virtual ~Function() = default;
+    Function(const std::string& id, Args*, Scope*);
+    virtual ~Function();
 
     void accept(AstVisitor*);
 };

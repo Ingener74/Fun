@@ -93,5 +93,5 @@ void MainWidget::run() {
     ast.parse(ss, debugCheckBox->isChecked());
 
     PrintVisitor pv;
-    ast.getScope()->accept(&pv);
+    ast.getRoot()->accept(&pv);
 }
