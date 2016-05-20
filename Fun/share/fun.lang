@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Author: Shnaider Pavel  <shnaider.pavel.1086@yandex.ru>
+ Copyright (C) 2016-2016 Shnaider Pavel  <shnaider.pavel.1086@yandex.ru>
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Library General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public
+ License along with this library; if not, write to the
+ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ Boston, MA 02111-1307, USA.
+
+-->
+<language id="fun" _name="Fun" _section="Others" version="1.0">
+  <metadata>
+    <property name="mimetypes">text/x-fun</property>
+    <property name="globs">*.fun</property>
+    <property name="line-comment-start">#</property>
+  </metadata>
+
+  <styles>
+    <!--FIXME make it better names, and make them translatable -->
+    <style id="keyword" _name="keyword" map-to="def:keyword"/>
+    <style id="token-type" _name="token-type" map-to="def:type"/>
+    <style id="rule" _name="rule" map-to="def:identifier"/>
+  </styles>
+
+  <definitions>
+    <context id="options" style-ref="keyword">
+      <keyword>fun</keyword>
+      <keyword>if</keyword>
+      <keyword>else</keyword>
+      <keyword>end</keyword>
+      <keyword>import</keyword>
+      <keyword>for</keyword>
+      <keyword>in</keyword>
+      <keyword>while</keyword>
+      <keyword>do</keyword>
+      <keyword>print</keyword>
+    </context>
+  </definitions>
+</language>
