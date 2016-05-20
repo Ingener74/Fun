@@ -6,6 +6,7 @@
 %define api.namespace {myparser}
 
 %code requires{
+
 class FunLexer;
 
 #include "FunAst.h"
@@ -34,20 +35,21 @@ void yyerror(const char* );
 %}
 
 %union{
-    int num;
-    std::string* str;
-    char chr;
+    int                   num;
+    double                real;
+    long long int         integer;
+    std::string*          str;
+    char                  chr;
     
-    fun::Scope* scope_type;
-    fun::ExpressionList* expr_list_type;
-    fun::Function* func_type;
-    fun::ArgumentList* arg_type;
-    fun::Import* import_type;
-    fun::Print* print_type;
-    fun::If* if_type;
-    fun::Id* id_type;
-    
-    fun::Expression* expr_type;
+    fun::Scope*           scope_type;
+    fun::ExpressionList*  expr_list_type;
+    fun::Function*        func_type;
+    fun::ArgumentList*    arg_type;
+    fun::Import*          import_type;
+    fun::Print*           print_type;
+    fun::If*              if_type;
+    fun::Id*              id_type;    
+    fun::Expression*      expr_type;
 }
 
 %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type>
@@ -56,44 +58,43 @@ void yyerror(const char* );
 int yylex(myparser::parser::semantic_type* , FunLexer&);
 }
 
-%token <num> NUM
-%token <str> ID
+%token <num>              NUM
+%token <str>              ID
 %token EOL
 
-%token ASSIGN "="
-%token <chr> PLUS "+"
-%token <chr> MINUS "-"
-%token <chr> MUL "*"
-%token <chr> DIV "/"
-%token <chr> MORE ">"
+%token ASSIGN             "="
+%token <chr> PLUS         "+"
+%token <chr> MINUS        "-"
+%token <chr> MUL          "*"
+%token <chr> DIV          "/"
+%token <chr> MORE         ">"
 
-%token COLON  ":"
-%token LPAREN "("
-%token RPAREN ")"
-%token COMMA ","
+%token COLON              ":"
+%token LPAREN             "("
+%token RPAREN             ")"
+%token COMMA              ","
 
-%token IF "if"
-%token ELSE "else"
-%token FOR "for"
-%token IN "in"
-%token WHILE "while"
-%token DO "do"
-%token IMPORT "import"
-%token PRINT "print"
-%token FUN "fun"
-%token END "end"
+%token IMPORT             "import"
+%token IF                 "if"
+%token ELSE               "else"
+%token FOR                "for"
+%token IN                 "in"
+%token WHILE              "while"
+%token DO                 "do"
+%token FUN                "fun"
+%token PRINT              "print"
+%token RETURN             "ret"
+%token END                "end"
 
-%type <id_type> id
-%type <expr_type> expr
-%type <func_type> func
-%type <arg_type> func_arg
-%type <import_type> import
-%type <print_type> print
-
-%type <scope_type> scope
-%type <if_type> if
-
-%type <expr_list_type> expr_list
+%type <id_type>           id
+%type <expr_type>         expr
+%type <func_type>         func
+%type <arg_type>          func_arg
+%type <import_type>       import
+%type <print_type>        print
+%type <scope_type>        scope
+%type <if_type>           if
+%type <expr_list_type>    expr_list
 
 %param{ 
     FunLexer& myLexer
