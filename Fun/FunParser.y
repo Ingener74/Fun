@@ -39,7 +39,6 @@ void yyerror(const char* );
     double                real;
     long long int         integer;
     std::string*          str;
-    char                  chr;
     
     fun::Scope*           scope_type;
     fun::ExpressionList*  expr_list_type;
@@ -63,11 +62,27 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token EOL
 
 %token ASSIGN             "="
-%token <chr> PLUS         "+"
-%token <chr> MINUS        "-"
-%token <chr> MUL          "*"
-%token <chr> DIV          "/"
-%token <chr> MORE         ">"
+
+%token ADD                "+"
+%token ADD_ASSIGN         "+="
+
+%token SUB                "-"
+%token SUB_ASSIGN         "-="
+
+%token MUL                "*"
+%token MUL_ASSIGN         "*="
+
+%token DIV                "/"
+%token DIV_ASSIGN         "/="
+
+%token MOD                "%"
+%token MOD_ASSIGN         "%="
+
+%token MORE               ">"
+%token MORE_EQUAL         ">="
+
+%token LESS               "<"
+%token LESS_EQUAL         "<="
 
 %token COLON              ":"
 %token LPAREN             "("
@@ -137,27 +152,36 @@ func
     ;
 
 func_arg
-    : %empty          { $$ = new fun::ArgumentList(); }
-    | id              { $$ = new fun::ArgumentList($1); }
-    | func_arg "," id { $1->addArg($3); }
+    : %empty                 { $$ = new fun::ArgumentList(); }
+    | id                     { $$ = new fun::ArgumentList($1); }
+    | func_arg "," id        { $1->addArg($3); }
     ;
 
 expr
-    : id "=" expr { $$ = new fun::Assign($1, $3); }
-    | expr "+" expr { $$ = new fun::BinaryOp(fun::BinaryOp::PLUS, $1, $3); }
-    | expr "-" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MINUS, $1, $3); }
-    | expr "*" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MULTIPLY, $1, $3); }
-    | expr "/" expr { $$ = new fun::BinaryOp(fun::BinaryOp::DIVIDE, $1, $3); }
-    | expr ">" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MORE, $1, $3); }
-    | NUM { $$ = new fun::Integer($1); }
+    : id "=" expr            { $$ = new fun::Assign($1, $3); }
+    | expr "+" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::ADD, $1, $3); }
+    | expr "+=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::ADD_ASSIGN, $1, $3); }
+    | expr "-" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::SUB, $1, $3); }
+    | expr "-=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::SUB_ASSIGN, $1, $3); }
+    | expr "*" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MUL, $1, $3); }
+    | expr "*=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MUL_ASSIGN, $1, $3); }
+    | expr "/" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::DIV, $1, $3); }
+    | expr "/=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::DIV_ASSIGN, $1, $3); }
+    | expr "%" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MOD, $1, $3); }
+    | expr "%=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MOD_ASSIGN, $1, $3); }
+    | expr ">" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MORE, $1, $3); }
+    | expr ">=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::LESS, $1, $3); }
+    | expr "<=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::LESS_EQUAL, $1, $3); }
+    | NUM                    { $$ = new fun::Integer($1); }
     | id 
-    | id "(" expr_list ")" { $$ = new fun::Call($1, $3); }
+    | id "(" expr_list ")"   { $$ = new fun::Call($1, $3); }
     ;
 
 expr_list
-    : %empty             { $$ = new fun::ExpressionList(); }
-    | expr               { $$ = new fun::ExpressionList($1); }
-    | expr "," expr_list { $3->addExpression($1); }
+    : %empty                 { $$ = new fun::ExpressionList(); }
+    | expr                   { $$ = new fun::ExpressionList($1); }
+    | expr "," expr_list     { $3->addExpression($1); }
     ;
 
 print

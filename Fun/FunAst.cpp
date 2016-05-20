@@ -29,9 +29,9 @@ void FunAst::parse(istream& input, bool debug) {
 }
 
 void FunAst::setRoot(Scope* scope) {
-    if (!m_scope){
+    if (!m_scope) {
         m_scope = scope;
-        if(m_resultVisitor)
+        if (m_resultVisitor)
             m_scope->setResultAstVisitor(m_resultVisitor);
     }
 }

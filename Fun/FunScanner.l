@@ -55,11 +55,27 @@ int nnn1 = 0;
 }
 
 "="  return myparser::parser::token::ASSIGN;
-"+"  { yylval->chr = yytext[0]; return myparser::parser::token::PLUS; }
-"-"  { yylval->chr = yytext[0]; return myparser::parser::token::MINUS; }
-"*"  { yylval->chr = yytext[0]; return myparser::parser::token::MUL; }
-"/"  { yylval->chr = yytext[0]; return myparser::parser::token::DIV; }
-">"  { yylval->chr = yytext[0]; return myparser::parser::token::MORE; }
+
+"+"   { return myparser::parser::token::ADD;         }
+"+="  { return myparser::parser::token::ADD_ASSIGN;  }
+
+"-"   { return myparser::parser::token::SUB;         }
+"-="  { return myparser::parser::token::SUB_ASSIGN;  }
+
+"*"   { return myparser::parser::token::MUL;         }
+"*="  { return myparser::parser::token::MUL_ASSIGN;  }
+
+"/"   { return myparser::parser::token::DIV;         }
+"/="  { return myparser::parser::token::DIV_ASSIGN;  }
+
+"%"   { return myparser::parser::token::MOD;         }
+"%="  { return myparser::parser::token::MOD_ASSIGN;  }
+
+">"   { return myparser::parser::token::MORE;        }
+">="  { return myparser::parser::token::MORE_EQUAL;  }
+
+"<"   { return myparser::parser::token::LESS;        }
+"<="  { return myparser::parser::token::LESS_EQUAL;  }
 
 [ \t\n] ;
 

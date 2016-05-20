@@ -7,7 +7,14 @@ namespace fun {
 class BinaryOp: public Expression {
 public:
     enum Op {
-        PLUS, MINUS, MULTIPLY, DIVIDE, MORE, LESS,
+        ADD, ADD_ASSIGN,
+        SUB, SUB_ASSIGN,
+        MUL, MUL_ASSIGN,
+        DIV, DIV_ASSIGN,
+        MOD, MOD_ASSIGN,
+        MORE, MORE_EQUAL,
+        LESS, LESS_EQUAL,
+
     };
 
     BinaryOp(Op, Expression*, Expression*);
