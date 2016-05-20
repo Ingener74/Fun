@@ -1,6 +1,6 @@
 #include <iostream>
 #include "AstNodes/Import.h"
-#include "AstNodes/AssignExpr.h"
+#include "AstNodes/Assign.h"
 #include "AstVisitors/PrintVisitor.h"
 
 namespace fun {
@@ -14,11 +14,15 @@ PrintVisitor::~PrintVisitor() {
 }
 
 void PrintVisitor::visit(Import* import) {
-    cout << "Import " << import->getImport() << endl;
+    cout << "Import " << import->m_import << endl;
 }
 
-void PrintVisitor::visit(AssignExpr* expr) {
-    cout << "Assign " << expr->getId() << " = " << expr->getResult() << endl;
+void PrintVisitor::visit(Assign* expr) {
+    cout << "Assign " << endl;
+}
+
+void PrintVisitor::visit(class Print* print) {
+    cout << "Print " << endl;
 }
 
 }

@@ -1,20 +1,24 @@
 #pragma once
 
+#include <AstNodes/Statement.h>
 #include <string>
-#include <AstNodes/StatementNode.h>
 
 namespace fun {
 
-class Args;
+class ArgumentList;
 class AstVisitor;
 class Scope;
 
-class Function: public StatementNode {
+class Function: public Statement {
 public:
-    Function(const std::string& id, Args*, Scope*);
+    Function(const std::string& id, ArgumentList*, Scope*);
     virtual ~Function();
 
-    void accept(AstVisitor*);
+    virtual void accept(AstVisitor*);
+
+    std::string m_id;
+    ArgumentList* m_arguments;
+    Scope* m_scope;
 };
 
 }

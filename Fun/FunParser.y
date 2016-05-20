@@ -11,26 +11,20 @@ class FunLexer;
 #include "FunAst.h"
 
 #include "Scope.h"
-
-#include "Expr.h"
-#include "AssignExpr.h"
-#include "IdExpr.h"
-#include "NumExpr.h"
-
 #include "Function.h"
-#include "DefineType.h"
-#include "Args.h"
+#include "ArgumentList.h"
 #include "Import.h"
 #include "Print.h"
-#include "Plus.h"
-#include "Minus.h"
-#include "Mul.h"
-#include "Div.h"
-#include "MoreExpr.h"
-#include "Call.h"
-#include "ExprList.h"
+#include "If.h"
 
-#include "IfStatement.h"
+#include "Expression.h"
+#include "ExpressionList.h"
+#include "Assign.h"
+#include "IdExpression.h"
+#include "Integer.h"
+#include "BinaryOp.h"
+#include "Call.h"
+
 }
 
 %{
@@ -43,16 +37,16 @@ void yyerror(const char* );
     int num;
     std::string* str;
     char chr;
-    fun::Expr* expr_type;
+    
+    fun::Expression* expr_type;
     fun::Function* func_type;
-    DefineType* define_type;
-    fun::Args* arg_type;
+    fun::ArgumentList* arg_type;
     fun::Import* import_type;
     fun::Print* print_type;
-    fun::IfStatement* if_type;
+    fun::If* if_type;
     
     fun::Scope* scope_type;
-    fun::ExprList* expr_list_type;
+    fun::ExpressionList* expr_list_type;
 }
 
 %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type>
@@ -137,26 +131,26 @@ func
     ;
 
 func_arg
-    : %empty          { $$ = new fun::Args(); }
-    | ID              { $$ = new fun::Args(*$1); }
+    : %empty          { $$ = new fun::ArgumentList(); }
+    | ID              { $$ = new fun::ArgumentList(*$1); }
     | func_arg "," ID { $1->addArg(*$3); }
     ;
 
 expr
-    : ID "=" expr { $$ = new fun::AssignExpr(*$1, $3); }
-    | expr "+" expr { $$ = new fun::Plus($1, $3); }
-    | expr "-" expr { $$ = new fun::Minus($1, $3); }
-    | expr "*" expr { $$ = new fun::Mul($1, $3); }
-    | expr "/" expr { $$ = new fun::Div($1, $3); }
-    | expr ">" expr { $$ = new fun::MoreExpr($1, $3); }
-    | NUM { $$ = new fun::NumExpr($1); }
+    : ID "=" expr { $$ = new fun::Assign(*$1, $3); }
+    | expr "+" expr { $$ = new fun::BinaryOp(fun::BinaryOp::PLUS, $1, $3); }
+    | expr "-" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MINUS, $1, $3); }
+    | expr "*" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MULTIPLY, $1, $3); }
+    | expr "/" expr { $$ = new fun::BinaryOp(fun::BinaryOp::DIVIDE, $1, $3); }
+    | expr ">" expr { $$ = new fun::BinaryOp(fun::BinaryOp::MORE, $1, $3); }
+    | NUM { $$ = new fun::Integer($1); }
     | ID { $$ = new fun::IdExpression(*$1); }
     | ID "(" expr_list ")" { $$ = new fun::Call(*$1, $3); }
     ;
 
 expr_list
-    : %empty             { $$ = new fun::ExprList(); }
-    | expr               { $$ = new fun::ExprList($1); }
+    : %empty             { $$ = new fun::ExpressionList(); }
+    | expr               { $$ = new fun::ExpressionList($1); }
     | expr "," expr_list { $3->addExpression($1); }
     ;
 
@@ -165,8 +159,8 @@ print
     ;
 
 if
-    : "if" expr ":" scope "end"               { $$ = new fun::IfStatement($2, $4); }
-    | "if" expr ":" scope "else" scope "end"  { $$ = new fun::IfStatement($2, $4, $6); }
+    : "if" expr ":" scope "end"               { $$ = new fun::If($2, $4); }
+    | "if" expr ":" scope "else" scope "end"  { $$ = new fun::If($2, $4, $6); }
     ;
 
 %%

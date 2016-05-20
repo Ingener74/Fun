@@ -4,13 +4,17 @@
 
 namespace fun {
 
+class Import;
+class Assign;
+
 class PrintVisitor: public AstVisitor {
 public:
     PrintVisitor();
     virtual ~PrintVisitor();
 
-    void visit(class Import*);
-    void visit(class AssignExpr*);
+    virtual void visit(class Import*);
+    virtual void visit(class Assign*);
+    virtual void visit(class Print*);
 };
 
 }

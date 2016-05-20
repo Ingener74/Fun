@@ -35,26 +35,35 @@ add_library(
         Utils.cpp
         Utils.h
         
-        AstNodes/Expr.cpp
-        AstNodes/Expr.h
+        AstNodes/AstNode.cpp
+        AstNodes/AstNode.h
         
-        AstNodes/IdExpr.cpp
-        AstNodes/IdExpr.h
+        AstNodes/Statement.cpp
+        AstNodes/Statement.h
         
-        AstNodes/NumExpr.cpp
-        AstNodes/NumExpr.h
+        AstNodes/Scope.cpp
+        AstNodes/Scope.h
         
-        AstNodes/AssignExpr.cpp
-        AstNodes/AssignExpr.h
+        AstNodes/If.cpp
+        AstNodes/If.h
         
         AstNodes/Function.cpp
         AstNodes/Function.h
         
-        AstNodes/DefineType.cpp
-        AstNodes/DefineType.h
+        AstNodes/Expression.cpp
+        AstNodes/Expression.h
         
-        AstNodes/Args.cpp
-        AstNodes/Args.h
+        AstNodes/IdExpression.cpp
+        AstNodes/IdExpression.h
+        
+        AstNodes/Integer.cpp
+        AstNodes/Integer.h
+        
+        AstNodes/Assign.cpp
+        AstNodes/Assign.h
+        
+        AstNodes/ArgumentList.cpp
+        AstNodes/ArgumentList.h
         
         AstNodes/Import.cpp
         AstNodes/Import.h
@@ -62,38 +71,14 @@ add_library(
         AstNodes/Print.cpp
         AstNodes/Print.h
         
-        AstNodes/Plus.cpp
-        AstNodes/Plus.h
-        
-        AstNodes/Minus.cpp
-        AstNodes/Minus.h
-        
-        AstNodes/Mul.cpp
-        AstNodes/Mul.h
-        
-        AstNodes/Div.cpp
-        AstNodes/Div.h
-        
-        AstNodes/MoreExpr.cpp
-        AstNodes/MoreExpr.h
+        AstNodes/BinaryOp.cpp
+        AstNodes/BinaryOp.h
         
         AstNodes/Call.cpp
         AstNodes/Call.h
         
-        AstNodes/ExprList.cpp
-        AstNodes/ExprList.h
-        
-        AstNodes/AstNode.cpp
-        AstNodes/AstNode.h
-        
-        AstNodes/Scope.cpp
-        AstNodes/Scope.h
-        
-        AstNodes/StatementNode.cpp
-        AstNodes/StatementNode.h
-        
-        AstNodes/IfStatement.cpp
-        AstNodes/IfStatement.h
+        AstNodes/ExpressionList.cpp
+        AstNodes/ExpressionList.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

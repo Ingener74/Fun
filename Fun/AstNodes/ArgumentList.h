@@ -8,19 +8,15 @@ namespace fun {
 
 class AstVisitor;
 
-class Args: public AstNode {
+class ArgumentList: public AstNode {
 public:
-    Args(const std::string& arg = {});
-    virtual ~Args();
+    ArgumentList(const std::string& arg = {});
+    virtual ~ArgumentList();
 
     void accept(AstVisitor*);
 
     void addArg(const std::string& arg);
 
-    const std::string& getArg(size_t index) const;
-    const std::vector<std::string>& getArgs() const;
-
-private:
     std::vector<std::string> m_args;
 };
 

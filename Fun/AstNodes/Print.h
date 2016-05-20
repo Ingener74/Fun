@@ -1,21 +1,20 @@
 #pragma once
 
+#include <AstNodes/Statement.h>
 #include <string>
-#include <AstNodes/StatementNode.h>
 
 namespace fun {
 
-class Expr;
+class Expression;
 
-class Print: public StatementNode {
+class Print: public Statement {
 public:
-    Print(Expr*);
+    Print(Expression*);
     virtual ~Print();
 
-    void accept(AstVisitor*);
+    virtual void accept(AstVisitor*);
 
-private:
-    Expr* m_expr;
+    Expression* m_expr;
 };
 
 }

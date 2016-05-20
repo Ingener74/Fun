@@ -7,7 +7,7 @@
 namespace fun {
 
 class Function;
-class Expr;
+class Expression;
 class Import;
 class Print;
 class Scope;

@@ -1,20 +1,21 @@
 #pragma once
 
+#include <vector>
 #include "AstNode.h"
 
 namespace fun {
 
-class StatementNode;
+class Statement;
 class AstVisitor;
 
 class Scope: public AstNode {
 public:
-    Scope(StatementNode* = nullptr);
+    Scope(Statement* = nullptr);
     virtual ~Scope();
 
-    void accept(AstVisitor*);
+    virtual void accept(AstVisitor*);
 
-    void addStatement(StatementNode*);
+    void addStatement(Statement*);
 
     AstVisitor* getResultAstVisitor() {
         return m_resultAstVisitor;
@@ -26,6 +27,8 @@ public:
 
 private:
     AstVisitor* m_resultAstVisitor = nullptr;
+
+    std::vector<Statement*> m_statements;
 };
 
 }

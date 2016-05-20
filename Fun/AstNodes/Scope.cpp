@@ -1,10 +1,10 @@
-#include "AstNodes/StatementNode.h"
+#include <AstNodes/Statement.h>
 #include "AstVisitors/AstVisitor.h"
 #include "AstNodes/Scope.h"
 
 namespace fun {
 
-Scope::Scope(StatementNode* statement) {
+Scope::Scope(Statement* statement) {
 }
 
 Scope::~Scope() {
@@ -14,12 +14,12 @@ Scope::~Scope() {
 
 void Scope::accept(AstVisitor* visitor) {
     visitor->visit(this);
-    for (auto& n : m_nodes)
+    for (auto& n : m_statements)
         n->accept(visitor);
 }
 
-void Scope::addStatement(StatementNode* statement) {
-    m_nodes.push_back(statement);
+void Scope::addStatement(Statement* statement) {
+    m_statements.push_back(statement);
 }
 
 }

@@ -16,8 +16,6 @@ Import::~Import() {
 
 void Import::accept(AstVisitor* visitor) {
     visitor->visit(this);
-    for (auto& n : m_nodes)
-        n->accept(visitor);
 }
 
 }

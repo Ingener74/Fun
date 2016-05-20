@@ -1,5 +1,4 @@
-#include "AstNodes/Args.h"
-#include "AstNodes/ExprList.h"
+#include <AstNodes/ExpressionList.h>
 #include "AstVisitors/AstVisitor.h"
 #include "AstNodes/Call.h"
 
@@ -7,18 +6,16 @@ namespace fun {
 
 using namespace std;
 
-Call::Call(const std::string& id, ExprList* args) {
-    if (args)
-        m_nodes.push_back(args);
+Call::Call(const std::string& id, ExpressionList* args) :
+    m_id(id), m_expressionList(args) {
 }
 
 Call::~Call() {
 }
 
-void Call::accept(AstVisitor* visitor) {
-    visitor->visit(this);
-    for (auto& n : m_nodes)
-        n->accept(visitor);
+void Call::accept(AstVisitor* v) {
+    v->visit(this);
+    m_expressionList->accept(v);
 }
 
 }

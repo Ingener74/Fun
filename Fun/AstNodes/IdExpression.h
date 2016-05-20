@@ -1,17 +1,17 @@
 #pragma once
 
+#include <AstNodes/Expression.h>
 #include <string>
-#include "AstNodes/Expr.h"
 
 namespace fun {
 
-class IdExpression: public Expr {
+class IdExpression: public Expression {
 public:
     IdExpression(const std::string& id);
     virtual ~IdExpression();
 
-    virtual std::string toString() const;
-private:
+    virtual void accept(AstVisitor*);
+
     std::string m_id;
 };
 
