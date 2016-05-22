@@ -11,12 +11,14 @@ class FunLexer;
 
 #include "FunAst.h"
 
+#include "Statement.h"
 #include "Scope.h"
 #include "Function.h"
 #include "ArgumentList.h"
 #include "Import.h"
 #include "Print.h"
 #include "If.h"
+#include "While.h"
 
 #include "Expression.h"
 #include "ExpressionList.h"
@@ -41,17 +43,19 @@ void yyerror(const char* );
     std::string*          str;
     
     fun::Scope*           scope_type;
+    fun::Statement*       statement_type;
     fun::ExpressionList*  expr_list_type;
     fun::Function*        func_type;
     fun::ArgumentList*    arg_type;
     fun::Import*          import_type;
     fun::Print*           print_type;
     fun::If*              if_type;
+    fun::While*           while_type;
     fun::Id*              id_type;    
     fun::Expression*      expr_type;
 }
 
-%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type>
+%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
 
 %code{
 int yylex(myparser::parser::semantic_type* , FunLexer&);
@@ -101,14 +105,16 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token RETURN             "ret"
 %token END                "end"
 
+%type <scope_type>        scope
+%type <statement_type>    statement
 %type <id_type>           id
 %type <expr_type>         expr
 %type <func_type>         func
 %type <arg_type>          func_arg
 %type <import_type>       import
 %type <print_type>        print
-%type <scope_type>        scope
 %type <if_type>           if
+%type <while_type>        while
 %type <expr_list_type>    expr_list
 
 %param{ 
@@ -131,12 +137,17 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %start scope;
 
 scope
-    : %empty       { $$ = new fun::Scope(); ast->setRoot($$); }
-    | scope import { $1->addStatement($2); }
-    | scope expr   { $1->addStatement($2); }
-    | scope print  { $1->addStatement($2); }
-    | scope func   { $1->addStatement($2); }
-    | scope if     { $1->addStatement($2); }
+    : %empty          { $$ = new fun::Scope(); ast->setRoot($$); }
+    | scope statement { $1->addStatement($2); }
+    | scope expr      { $1->addStatement($2); }
+    ;
+
+statement
+    : import
+    | print 
+    | func
+    | if
+    | while
     ;
 
 id
@@ -144,7 +155,7 @@ id
     ;
 
 import
-    : "import" id { $$ = new fun::Import($2); }
+    : "import" id             { $$ = new fun::Import($2); }
     ;
 
 func
@@ -191,6 +202,10 @@ print
 if
     : "if" expr ":" scope "end"               { $$ = new fun::If($2, $4); }
     | "if" expr ":" scope "else" scope "end"  { $$ = new fun::If($2, $4, $6); }
+    ;
+
+while
+    : "while" expr ":" scope "end" { $$ = new fun::While($2, $4); }
     ;
 
 %%

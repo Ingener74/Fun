@@ -53,6 +53,9 @@ add_library(
         AstNodes/If.cpp
         AstNodes/If.h
         
+        AstNodes/While.cpp
+        AstNodes/While.h
+        
         AstNodes/Function.cpp
         AstNodes/Function.h
         

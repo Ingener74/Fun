@@ -24,6 +24,13 @@ fun quzMore()
 end
 
 fun quzLess()
+
+    i = 10
+    
+    while i > 0:
+        print i
+    end
+
     print quuuuz
 end
 
