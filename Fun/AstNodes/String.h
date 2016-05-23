@@ -1,23 +1,25 @@
 #pragma once
 
+#include <string>
+
 #include <AstNodes/Terminal.h>
 
 namespace fun {
 
 class AstVisitor;
 
-class Integer: public Terminal {
+class String: public Terminal {
 public:
-    Integer(long long);
-    virtual ~Integer();
+    String(const std::string& value);
+    virtual ~String();
 
     virtual void accept(AstVisitor*);
 
     virtual Type getType() const {
-        return Terminal::Integer;
+        return Terminal::String;
     }
 
-    long long m_integer;
+    std::string m_value;
 };
 
 }

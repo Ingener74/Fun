@@ -8,6 +8,14 @@ bar = 54
 quz = 65
 quuuuz = 123
 
+piConstant = 3.1415
+
+hasHead = true
+
+hasThirdLeg = false
+
+loremImsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+
 print foo
 
 fun test1 ( bla1 )

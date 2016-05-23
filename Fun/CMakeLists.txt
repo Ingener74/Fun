@@ -62,12 +62,6 @@ add_library(
         AstNodes/Expression.cpp
         AstNodes/Expression.h
         
-        AstNodes/Integer.cpp
-        AstNodes/Integer.h
-        
-        AstNodes/Real.cpp
-        AstNodes/Real.h
-        
         AstNodes/Assign.cpp
         AstNodes/Assign.h
         
@@ -88,6 +82,21 @@ add_library(
         
         AstNodes/ExpressionList.cpp
         AstNodes/ExpressionList.h
+        
+        AstNodes/Terminal.cpp
+        AstNodes/Terminal.h
+        
+        AstNodes/Integer.cpp
+        AstNodes/Integer.h
+        
+        AstNodes/Real.cpp
+        AstNodes/Real.h
+        
+        AstNodes/Boolean.cpp
+        AstNodes/Boolean.h
+        
+        AstNodes/String.cpp
+        AstNodes/String.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

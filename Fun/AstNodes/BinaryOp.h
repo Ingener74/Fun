@@ -14,7 +14,6 @@ public:
         MOD, MOD_ASSIGN,
         MORE, MORE_EQUAL,
         LESS, LESS_EQUAL,
-
     };
 
     BinaryOp(Op, Expression*, Expression*);

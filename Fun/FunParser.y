@@ -26,6 +26,8 @@ class FunLexer;
 #include "Id.h"
 #include "Integer.h"
 #include "Real.h"
+#include "Boolean.h"
+#include "String.h"
 #include "BinaryOp.h"
 #include "Call.h"
 
@@ -64,6 +66,7 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token <integer>          INTEGER
 %token <real>             REAL
 %token <str>              ID
+%token <str>              STRING
 %token EOL
 
 %token ASSIGN             "="
@@ -105,6 +108,8 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token PRINT              "print"
 %token RETURN             "ret"
 %token END                "end"
+%token TRUE               "true"
+%token FALSE              "false"
 
 %type <scope_type>        scope
 %type <statement_type>    statement
@@ -187,6 +192,9 @@ expr
     | expr "<=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::LESS_EQUAL, $1, $3); }
     | INTEGER                { $$ = new fun::Integer($1); }
     | REAL                   { $$ = new fun::Real($1); }
+    | TRUE                   { $$ = new fun::Boolean(true); }
+    | FALSE                  { $$ = new fun::Boolean(false); }
+    | STRING                 { $$ = new fun::String(*$1); }
     | id 
     | id "(" expr_list ")"   { $$ = new fun::Call($1, $3); }
     ;

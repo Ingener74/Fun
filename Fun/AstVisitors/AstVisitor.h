@@ -25,6 +25,9 @@ public:
     virtual void visit(class Call*){}
     virtual void visit(class Id*){}
     virtual void visit(class Integer*){}
+    virtual void visit(class Real*){}
+    virtual void visit(class Boolean*){}
+    virtual void visit(class String*){}
 };
 
 }

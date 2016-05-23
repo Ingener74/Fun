@@ -13,9 +13,12 @@
 #include "AstNodes/BinaryOp.h"
 #include "AstNodes/Call.h"
 #include "AstNodes/Integer.h"
+#include "AstNodes/Real.h"
+#include "AstNodes/Boolean.h"
+#include "AstNodes/String.h"
 #include "AstNodes/Import.h"
 #include "AstNodes/Id.h"
-
+#include "Utils.h"
 #include "AstVisitors/PrintVisitor.h"
 
 namespace fun {
@@ -35,10 +38,10 @@ void PrintVisitor::visit(ExpressionList* node) {
 }
 
 void PrintVisitor::visit(Scope* node) {
-    if (m_scopes.top() == node)
-        m_scopes.pop();
-    else
-        m_scopes.push(node);
+//    if (m_scopes.top() == node)
+//        m_scopes.pop();
+//    else
+//        m_scopes.push(node);
 }
 
 void PrintVisitor::visit(Function* node) {
@@ -61,10 +64,54 @@ void PrintVisitor::visit(Expression* node) {
 }
 
 void PrintVisitor::visit(Assign* node) {
-    cout << getTabs() << "assign " << endl;
 }
 
 void PrintVisitor::visit(BinaryOp* node) {
+    fassert(m_terminals.size() >= 2, "not enogth terminals");
+    switch (node->m_operation) {
+    case BinaryOp::ADD: {
+        break;
+    }
+    case BinaryOp::ADD_ASSIGN: {
+        break;
+    }
+    case BinaryOp::SUB: {
+        break;
+    }
+    case BinaryOp::SUB_ASSIGN: {
+        break;
+    }
+    case BinaryOp::MUL: {
+        break;
+    }
+    case BinaryOp::MUL_ASSIGN: {
+        break;
+    }
+    case BinaryOp::DIV: {
+        break;
+    }
+    case BinaryOp::DIV_ASSIGN: {
+        break;
+    }
+    case BinaryOp::MOD: {
+        break;
+    }
+    case BinaryOp::MOD_ASSIGN: {
+        break;
+    }
+    case BinaryOp::MORE: {
+        break;
+    }
+    case BinaryOp::MORE_EQUAL: {
+        break;
+    }
+    case BinaryOp::LESS: {
+        break;
+    }
+    case BinaryOp::LESS_EQUAL: {
+        break;
+    }
+    }
 }
 
 void PrintVisitor::visit(Call* node) {
@@ -74,6 +121,19 @@ void PrintVisitor::visit(Id* node) {
 }
 
 void PrintVisitor::visit(Integer* node) {
+    cout << node->m_integer << endl;
+}
+
+void PrintVisitor::visit(Real* node) {
+    cout << node->m_real << endl;
+}
+
+void PrintVisitor::visit(Boolean* node) {
+    cout << std::boolalpha << node->m_value << endl;
+}
+
+void PrintVisitor::visit(String* node) {
+    cout << node->m_value << endl;
 }
 
 std::string PrintVisitor::getTabs() const {

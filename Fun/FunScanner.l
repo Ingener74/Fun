@@ -38,6 +38,8 @@ int nnn1 = 0;
 "print" return myparser::parser::token::PRINT;
 "fun" return myparser::parser::token::FUN;
 "end" return myparser::parser::token::END;
+"true" return myparser::parser::token::TRUE;
+"false" return myparser::parser::token::FALSE;
 
 ":" return myparser::parser::token::COLON;
 "(" return myparser::parser::token::LPAREN;
@@ -57,6 +59,11 @@ int nnn1 = 0;
 {ID} {
     yylval->str = new string(yytext);
     return myparser::parser::token::ID;
+}
+
+["][^"]*["] {
+    yylval->str = new string(yytext + 1, yyleng - 2);
+    return myparser::parser::token::STRING;
 }
 
 "="  return myparser::parser::token::ASSIGN;

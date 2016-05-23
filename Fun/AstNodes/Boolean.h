@@ -6,18 +6,18 @@ namespace fun {
 
 class AstVisitor;
 
-class Integer: public Terminal {
+class Boolean: public Terminal {
 public:
-    Integer(long long);
-    virtual ~Integer();
+    Boolean(bool value);
+    virtual ~Boolean();
 
     virtual void accept(AstVisitor*);
 
     virtual Type getType() const {
-        return Terminal::Integer;
+        return Terminal::Boolean;
     }
 
-    long long m_integer;
+    bool m_value;
 };
 
 }

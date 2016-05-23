@@ -1,15 +1,19 @@
 #pragma once
 
-#include <AstNodes/Expression.h>
+#include <AstNodes/Terminal.h>
 
 namespace fun {
 
-class Real: public Expression {
+class Real: public Terminal {
 public:
     Real(double);
     virtual ~Real();
 
     virtual void accept(AstVisitor*);
+
+    virtual Type getType() const {
+        return Terminal::Real;
+    }
 
     double m_real;
 };

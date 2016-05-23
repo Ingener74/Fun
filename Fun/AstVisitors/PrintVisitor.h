@@ -6,6 +6,8 @@
 
 namespace fun {
 
+class Terminal;
+
 class PrintVisitor: public AstVisitor {
 public:
     PrintVisitor();
@@ -27,9 +29,12 @@ public:
     virtual void visit(class Call*);
     virtual void visit(class Id*);
     virtual void visit(class Integer*);
+    virtual void visit(class Real*);
+    virtual void visit(class Boolean*);
+    virtual void visit(class String*);
 
 private:
-    std::stack<Integer*> m_integers;
+    std::stack<Terminal*> m_terminals;
     std::stack<Scope*> m_scopes;
 
     std::string getTabs() const;
