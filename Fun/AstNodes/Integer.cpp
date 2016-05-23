@@ -8,8 +8,8 @@ namespace fun {
 
 using namespace std;
 
-Integer::Integer(int num) :
-    m_num(num) {
+Integer::Integer(long long integer) :
+    m_integer(integer) {
 }
 
 Integer::~Integer() {

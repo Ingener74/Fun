@@ -65,6 +65,9 @@ add_library(
         AstNodes/Integer.cpp
         AstNodes/Integer.h
         
+        AstNodes/Real.cpp
+        AstNodes/Real.h
+        
         AstNodes/Assign.cpp
         AstNodes/Assign.h
         

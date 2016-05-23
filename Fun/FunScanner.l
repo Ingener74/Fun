@@ -19,7 +19,7 @@ using namespace std;
 
 %option yyclass="MyLexer"
 
-DIGIT    [0-9]*
+DIGIT    [0-9]
 ID       [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
@@ -44,9 +44,14 @@ int nnn1 = 0;
 ")" return myparser::parser::token::RPAREN;
 "," return myparser::parser::token::COMMA;
 
-{DIGIT} {
-    yylval->num = atoi(yytext); 
-    return myparser::parser::token::NUM; 
+{DIGIT}+ {
+    yylval->integer = atoi(yytext); 
+    return myparser::parser::token::INTEGER;
+}
+
+{DIGIT}+"."{DIGIT}* {
+    yylval->real = atof(yytext); 
+    return myparser::parser::token::REAL;
 }
 
 {ID} {

@@ -25,6 +25,7 @@ class FunLexer;
 #include "Assign.h"
 #include "Id.h"
 #include "Integer.h"
+#include "Real.h"
 #include "BinaryOp.h"
 #include "Call.h"
 
@@ -37,9 +38,8 @@ void yyerror(const char* );
 %}
 
 %union{
-    int                   num;
-    double                real;
     long long int         integer;
+    double                real;
     std::string*          str;
     
     fun::Scope*           scope_type;
@@ -61,7 +61,8 @@ void yyerror(const char* );
 int yylex(myparser::parser::semantic_type* , FunLexer&);
 }
 
-%token <num>              NUM
+%token <integer>          INTEGER
+%token <real>             REAL
 %token <str>              ID
 %token EOL
 
@@ -163,9 +164,9 @@ func
     ;
 
 func_arg
-    : %empty                 { $$ = new fun::ArgumentList(); }
+    : %empty                 { $$ = new fun::ArgumentList();   }
     | id                     { $$ = new fun::ArgumentList($1); }
-    | func_arg "," id        { $1->addArg($3); }
+    | func_arg "," id        { $1->addArg($3);                 }
     ;
 
 expr
@@ -184,7 +185,8 @@ expr
     | expr ">=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MORE_EQUAL, $1, $3); }
     | expr "<" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::LESS, $1, $3); }
     | expr "<=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::LESS_EQUAL, $1, $3); }
-    | NUM                    { $$ = new fun::Integer($1); }
+    | INTEGER                { $$ = new fun::Integer($1); }
+    | REAL                   { $$ = new fun::Real($1); }
     | id 
     | id "(" expr_list ")"   { $$ = new fun::Call($1, $3); }
     ;

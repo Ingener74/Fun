@@ -8,12 +8,12 @@ class AstVisitor;
 
 class Integer: public Expression {
 public:
-    Integer(int);
+    Integer(long long);
     virtual ~Integer();
 
     virtual void accept(AstVisitor*);
 
-    int m_num;
+    long long m_integer;
 };
 
 }

@@ -25,10 +25,11 @@ public:
         m_resultAstVisitor = resultAstVisitor;
     }
 
+    std::vector<Statement*> m_statements;
+
 private:
     AstVisitor* m_resultAstVisitor = nullptr;
 
-    std::vector<Statement*> m_statements;
 };
 
 }

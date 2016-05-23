@@ -16,6 +16,7 @@ void Scope::accept(AstVisitor* visitor) {
     visitor->visit(this);
     for (auto& n : m_statements)
         n->accept(visitor);
+    visitor->visit(this);
 }
 
 void Scope::addStatement(Statement* statement) {

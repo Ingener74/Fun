@@ -1,9 +1,6 @@
-#include "FunAst.h"
-
-#include <assert.h>
-#include <FunParser.hpp>
-
+#include "FunParser.hpp"
 #include "FunLexer.h"
+#include "FunAst.h"
 
 namespace fun {
 
