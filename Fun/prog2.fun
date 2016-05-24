@@ -1,3 +1,6 @@
+# Test Fun language script
+# 
+
 import Jupiter
 import So
 import Dll
@@ -55,7 +58,15 @@ fun testFunction(x, y)
     print x
     print y
     print tf
+    
+    ret quz_res
 end
 
 testFunction(100, 200)
 
+# class TestClass
+#     m_test = 100
+#     fun init(test)
+#         self.m_test = test
+#     end
+# end

@@ -3,6 +3,8 @@
 
  Author: Shnaider Pavel  <shnaider.pavel.1086@yandex.ru>
  Copyright (C) 2016-2016 Shnaider Pavel  <shnaider.pavel.1086@yandex.ru>
+ 
+ https://developer.gnome.org/gtksourceview/stable/lang-tutorial.html
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -20,7 +22,7 @@
  Boston, MA 02111-1307, USA.
 
 -->
-<language id="fun" _name="Fun" _section="Others" version="1.0">
+<language id="fun" _name="Fun" _section="Other" version="1.0">
   <metadata>
     <property name="mimetypes">text/x-fun</property>
     <property name="globs">*.fun</property>
@@ -28,14 +30,11 @@
   </metadata>
 
   <styles>
-    <!--FIXME make it better names, and make them translatable -->
-    <style id="keyword" _name="keyword" map-to="def:keyword"/>
-    <style id="token-type" _name="token-type" map-to="def:type"/>
-    <style id="rule" _name="rule" map-to="def:identifier"/>
+    <style id="keyword" _name="Keyword" map-to="def:keyword"/>
   </styles>
 
   <definitions>
-    <context id="options" style-ref="keyword">
+    <context id="keyword" style-ref="keyword">
       <keyword>fun</keyword>
       <keyword>if</keyword>
       <keyword>else</keyword>

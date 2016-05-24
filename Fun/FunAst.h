@@ -1,9 +1,12 @@
 #pragma once
 
 #include <istream>
+#include <vector>
+#include <memory>
 
 namespace fun {
 
+class AstNode;
 class Function;
 class Expression;
 class Import;
@@ -29,9 +32,18 @@ public:
         m_resultVisitor = resultVisitor;
     }
 
+    template<typename T, typename ... Args>
+    T* createNode(Args&& ... args) {
+        std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
+        m_nodes.push_back(std::move(node));
+        return node.get();
+    }
+
 private:
     Scope* m_scope = nullptr;
     AstVisitor* m_resultVisitor = nullptr;
+
+    std::vector<std::unique_ptr<AstNode>> m_nodes;
 };
 
 }

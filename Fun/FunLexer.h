@@ -14,9 +14,9 @@ public:
     FunLexer(std::istream*);
     virtual ~FunLexer();
 
-    int yylex(myparser::parser::semantic_type* yylval);
+    int yylex(fun::FunParser::semantic_type* yylval);
 
 private:
     int yylex();
-    myparser::parser::semantic_type* yylval = nullptr;
+    fun::FunParser::semantic_type* yylval = nullptr;
 };

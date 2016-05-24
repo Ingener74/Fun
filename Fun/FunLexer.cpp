@@ -7,7 +7,7 @@ FunLexer::FunLexer(std::istream* in)
 FunLexer::~FunLexer(){
 }
 
-int FunLexer::yylex(myparser::parser::semantic_type* yylval){
+int FunLexer::yylex(fun::FunParser::semantic_type* yylval){
     this->yylval = yylval;
     return yylex();
 }

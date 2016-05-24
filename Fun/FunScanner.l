@@ -17,7 +17,7 @@ using namespace std;
 %option c++
 %option noyywrap
 
-%option yyclass="MyLexer"
+%option yyclass="FunLexer"
 
 DIGIT    [0-9]
 ID       [a-zA-Z_][a-zA-Z_0-9]*
@@ -28,66 +28,69 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 int nnn1 = 0;
 %}
 
-"import" return myparser::parser::token::IMPORT;
-"if" return myparser::parser::token::IF;
-"else" return myparser::parser::token::ELSE;
-"for" return myparser::parser::token::FOR;
-"in" return myparser::parser::token::IN;
-"while" return myparser::parser::token::WHILE;
-"do" return myparser::parser::token::DO;
-"print" return myparser::parser::token::PRINT;
-"fun" return myparser::parser::token::FUN;
-"end" return myparser::parser::token::END;
-"true" return myparser::parser::token::TRUE;
-"false" return myparser::parser::token::FALSE;
+"import"  return fun::FunParser::token::IMPORT;
+"if"      return fun::FunParser::token::IF;
+"else"    return fun::FunParser::token::ELSE;
+"for"     return fun::FunParser::token::FOR;
+"in"      return fun::FunParser::token::IN;
+"while"   return fun::FunParser::token::WHILE;
+"do"      return fun::FunParser::token::DO;
+"print"   return fun::FunParser::token::PRINT;
+"fun"     return fun::FunParser::token::FUN;
+"ret"     return fun::FunParser::token::RETURN;
+"end"     return fun::FunParser::token::END;
+"true"    return fun::FunParser::token::TRUE;
+"false"   return fun::FunParser::token::FALSE;
 
-":" return myparser::parser::token::COLON;
-"(" return myparser::parser::token::LPAREN;
-")" return myparser::parser::token::RPAREN;
-"," return myparser::parser::token::COMMA;
+":"       return fun::FunParser::token::COLON;
+"("       return fun::FunParser::token::LPAREN;
+")"       return fun::FunParser::token::RPAREN;
+","       return fun::FunParser::token::COMMA;
 
 {DIGIT}+ {
     yylval->integer = atoi(yytext); 
-    return myparser::parser::token::INTEGER;
+    return fun::FunParser::token::INTEGER;
 }
 
 {DIGIT}+"."{DIGIT}* {
     yylval->real = atof(yytext); 
-    return myparser::parser::token::REAL;
+    return fun::FunParser::token::REAL;
 }
 
 {ID} {
     yylval->str = new string(yytext);
-    return myparser::parser::token::ID;
+    return fun::FunParser::token::ID;
 }
 
 ["][^"]*["] {
     yylval->str = new string(yytext + 1, yyleng - 2);
-    return myparser::parser::token::STRING;
+    return fun::FunParser::token::STRING;
 }
 
-"="  return myparser::parser::token::ASSIGN;
+[#][^#\n]*[\n] { /* comment*/ }
 
-"+"   { return myparser::parser::token::ADD;         }
-"+="  { return myparser::parser::token::ADD_ASSIGN;  }
+"="   return fun::FunParser::token::ASSIGN;
 
-"-"   { return myparser::parser::token::SUB;         }
-"-="  { return myparser::parser::token::SUB_ASSIGN;  }
+"+"   return fun::FunParser::token::ADD;
+"+="  return fun::FunParser::token::ADD_ASSIGN;
 
-"*"   { return myparser::parser::token::MUL;         }
-"*="  { return myparser::parser::token::MUL_ASSIGN;  }
+"-"   return fun::FunParser::token::SUB;
+"-="  return fun::FunParser::token::SUB_ASSIGN;
 
-"/"   { return myparser::parser::token::DIV;         }
-"/="  { return myparser::parser::token::DIV_ASSIGN;  }
+"*"   return fun::FunParser::token::MUL;
+"*="  return fun::FunParser::token::MUL_ASSIGN;
 
-"%"   { return myparser::parser::token::MOD;         }
-"%="  { return myparser::parser::token::MOD_ASSIGN;  }
+"/"   return fun::FunParser::token::DIV;
+"/="  return fun::FunParser::token::DIV_ASSIGN;
 
-">"   { return myparser::parser::token::MORE;        }
-">="  { return myparser::parser::token::MORE_EQUAL;  }
+"%"   return fun::FunParser::token::MOD;
+"%="  return fun::FunParser::token::MOD_ASSIGN;
 
-"<"   { return myparser::parser::token::LESS;        }
-"<="  { return myparser::parser::token::LESS_EQUAL;  }
+">"   return fun::FunParser::token::MORE;
+">="  return fun::FunParser::token::MORE_EQUAL;
+
+"<"   return fun::FunParser::token::LESS;
+"<="  return fun::FunParser::token::LESS_EQUAL;
 
 [ \t\n] ;
 

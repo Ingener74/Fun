@@ -15,7 +15,7 @@ FunAst::~FunAst() {
 void FunAst::parse(istream& input, bool debug) {
     try {
         FunLexer myLexer(&input);
-        myparser::parser prsr(myLexer, this);
+        FunParser prsr(myLexer, this);
 
         if (debug)
             prsr.set_debug_level(1);

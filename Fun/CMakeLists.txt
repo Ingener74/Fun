@@ -59,6 +59,9 @@ add_library(
         AstNodes/Function.cpp
         AstNodes/Function.h
         
+        AstNodes/Return.cpp
+        AstNodes/Return.h
+        
         AstNodes/Expression.cpp
         AstNodes/Expression.h
         

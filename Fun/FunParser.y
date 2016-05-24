@@ -3,7 +3,8 @@
 
 %debug
 
-%define api.namespace {myparser}
+%define api.namespace {fun}
+%define parser_class_name{FunParser}
 
 %code requires{
 
@@ -19,6 +20,7 @@ class FunLexer;
 #include "Print.h"
 #include "If.h"
 #include "While.h"
+#include "Return.h"
 
 #include "Expression.h"
 #include "ExpressionList.h"
@@ -44,23 +46,24 @@ void yyerror(const char* );
     double                real;
     std::string*          str;
     
-    fun::Scope*           scope_type;
-    fun::Statement*       statement_type;
-    fun::ExpressionList*  expr_list_type;
-    fun::Function*        func_type;
-    fun::ArgumentList*    arg_type;
-    fun::Import*          import_type;
-    fun::Print*           print_type;
-    fun::If*              if_type;
-    fun::While*           while_type;
-    fun::Id*              id_type;    
-    fun::Expression*      expr_type;
+    Scope*           scope_type;
+    Statement*       statement_type;
+    ExpressionList*  expr_list_type;
+    Function*        func_type;
+    ArgumentList*    arg_type;
+    Import*          import_type;
+    Print*           print_type;
+    If*              if_type;
+    While*           while_type;
+    Return*          return_type;
+    Id*              id_type;    
+    Expression*      expr_type;
 }
 
-%destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
+// %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
 
 %code{
-int yylex(myparser::parser::semantic_type* , FunLexer&);
+int yylex(fun::FunParser::semantic_type* , FunLexer&);
 }
 
 %token <integer>          INTEGER
@@ -110,6 +113,7 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %token END                "end"
 %token TRUE               "true"
 %token FALSE              "false"
+%token CLASS              "class"
 
 %type <scope_type>        scope
 %type <statement_type>    statement
@@ -121,6 +125,7 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %type <print_type>        print
 %type <if_type>           if
 %type <while_type>        while
+%type <return_type>       ret
 %type <expr_list_type>    expr_list
 
 %param{ 
@@ -143,7 +148,7 @@ int yylex(myparser::parser::semantic_type* , FunLexer&);
 %start scope;
 
 scope
-    : %empty          { $$ = new fun::Scope(); ast->setRoot($$); }
+    : %empty          { $$ = new Scope(); ast->setRoot($$); }
     | scope statement { $1->addStatement($2); }
     | scope expr      { $1->addStatement($2); }
     ;
@@ -154,79 +159,85 @@ statement
     | func
     | if
     | while
+    | ret
     ;
 
 id
-    : ID { $$ = new fun::Id(*$1); }
+    : ID { $$ = new Id(*$1); }
     ;
 
 import
-    : "import" id             { $$ = new fun::Import($2); }
+    : "import" id             { $$ = new Import($2); }
     ;
 
 func
-    : "fun" id "(" func_arg ")" scope "end" { $$ = new fun::Function($2, $4, $6); }
+    : "fun" id "(" func_arg ")" scope "end" { $$ = new Function($2, $4, $6); }
     ;
 
 func_arg
-    : %empty                 { $$ = new fun::ArgumentList();   }
-    | id                     { $$ = new fun::ArgumentList($1); }
-    | func_arg "," id        { $1->addArg($3);                 }
+    : %empty                 { $$ = new ArgumentList();   }
+    | id                     { $$ = new ArgumentList($1); }
+    | func_arg "," id        { $1->addArg($3);            }
+    ;
+
+ret
+    : "ret" { $$ = new Return(); }
+    | "ret" expr { $$ = new Return($2); }
     ;
 
 expr
-    : id "=" expr            { $$ = new fun::Assign($1, $3); }
-    | expr "+" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::ADD, $1, $3); }
-    | expr "+=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::ADD_ASSIGN, $1, $3); }
-    | expr "-" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::SUB, $1, $3); }
-    | expr "-=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::SUB_ASSIGN, $1, $3); }
-    | expr "*" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MUL, $1, $3); }
-    | expr "*=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MUL_ASSIGN, $1, $3); }
-    | expr "/" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::DIV, $1, $3); }
-    | expr "/=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::DIV_ASSIGN, $1, $3); }
-    | expr "%" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MOD, $1, $3); }
-    | expr "%=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MOD_ASSIGN, $1, $3); }
-    | expr ">" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::MORE, $1, $3); }
-    | expr ">=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr          { $$ = new fun::BinaryOp(fun::BinaryOp::LESS, $1, $3); }
-    | expr "<=" expr         { $$ = new fun::BinaryOp(fun::BinaryOp::LESS_EQUAL, $1, $3); }
-    | INTEGER                { $$ = new fun::Integer($1); }
-    | REAL                   { $$ = new fun::Real($1); }
-    | TRUE                   { $$ = new fun::Boolean(true); }
-    | FALSE                  { $$ = new fun::Boolean(false); }
-    | STRING                 { $$ = new fun::String(*$1); }
+    : id "=" expr            { $$ = new Assign($1, $3);                         }
+    | expr "+" expr          { $$ = new BinaryOp(BinaryOp::ADD,        $1, $3); }
+    | expr "+=" expr         { $$ = new BinaryOp(BinaryOp::ADD_ASSIGN, $1, $3); }
+    | expr "-" expr          { $$ = new BinaryOp(BinaryOp::SUB,        $1, $3); }
+    | expr "-=" expr         { $$ = new BinaryOp(BinaryOp::SUB_ASSIGN, $1, $3); }
+    | expr "*" expr          { $$ = new BinaryOp(BinaryOp::MUL,        $1, $3); }
+    | expr "*=" expr         { $$ = new BinaryOp(BinaryOp::MUL_ASSIGN, $1, $3); }
+    | expr "/" expr          { $$ = new BinaryOp(BinaryOp::DIV,        $1, $3); }
+    | expr "/=" expr         { $$ = new BinaryOp(BinaryOp::DIV_ASSIGN, $1, $3); }
+    | expr "%" expr          { $$ = new BinaryOp(BinaryOp::MOD,        $1, $3); }
+    | expr "%=" expr         { $$ = new BinaryOp(BinaryOp::MOD_ASSIGN, $1, $3); }
+    | expr ">" expr          { $$ = new BinaryOp(BinaryOp::MORE,       $1, $3); }
+    | expr ">=" expr         { $$ = new BinaryOp(BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr          { $$ = new BinaryOp(BinaryOp::LESS,       $1, $3); }
+    | expr "<=" expr         { $$ = new BinaryOp(BinaryOp::LESS_EQUAL, $1, $3); }
+    | INTEGER                { $$ = new Integer($1);                            }
+    | REAL                   { $$ = new Real($1);                               }
+    | TRUE                   { $$ = new Boolean(true);                          }
+    | FALSE                  { $$ = new Boolean(false);                         }
+    | STRING                 { $$ = new String(*$1);                            }
     | id 
-    | id "(" expr_list ")"   { $$ = new fun::Call($1, $3); }
+    | id "(" expr_list ")"   { $$ = new Call($1, $3);                           }
     ;
 
 expr_list
-    : %empty                 { $$ = new fun::ExpressionList(); }
-    | expr                   { $$ = new fun::ExpressionList($1); }
+    : %empty                 { $$ = new ExpressionList(); }
+    | expr                   { $$ = new ExpressionList($1); }
     | expr "," expr_list     { $3->addExpression($1); }
     ;
 
 print
-    : "print" expr { $$ = new fun::Print($2); }
+    : "print" expr { $$ = new Print($2); }
     ;
 
 if
-    : "if" expr ":" scope "end"               { $$ = new fun::If($2, $4); }
-    | "if" expr ":" scope "else" scope "end"  { $$ = new fun::If($2, $4, $6); }
+    : "if" expr ":" scope "end"               { $$ = new If($2, $4); }
+    | "if" expr ":" scope "else" scope "end"  { $$ = new If($2, $4, $6); }
     ;
 
 while
-    : "while" expr ":" scope "end" { $$ = new fun::While($2, $4); }
+    : "while" expr ":" scope "end" { $$ = new While($2, $4); }
     ;
 
 %%
 
 #include <FunLexer.h>
 
-int yylex(myparser::parser::semantic_type* yylval, FunLexer& myLexer) {
+int yylex(fun::FunParser::semantic_type* yylval, FunLexer& myLexer) {
     return myLexer.yylex(yylval);
 }
 
-void myparser::parser::error(const std::string& message) {
+void fun::FunParser::error(const std::string& message) {
     cerr << "error: " << message << endl;
 }
 
