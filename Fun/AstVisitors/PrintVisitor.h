@@ -13,8 +13,6 @@ public:
     PrintVisitor();
     virtual ~PrintVisitor();
 
-    virtual void visit(class ArgumentList*);
-    virtual void visit(class ExpressionList*);
     virtual void visit(class Scope*);
 
     virtual void visit(class Function*);

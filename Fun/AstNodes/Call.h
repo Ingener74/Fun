@@ -5,18 +5,18 @@
 namespace fun {
 
 class Id;
-class ExpressionList;
+class Expression;
 class AstVisitor;
 
 class Call: public Expression {
 public:
-    Call(Id*, ExpressionList*);
+    Call(Id*, Expression* = nullptr);
     virtual ~Call();
 
     virtual void accept(AstVisitor*);
 
     Id* m_id = nullptr;
-    ExpressionList* m_expressionList = nullptr;
+    Expression* m_arg = nullptr;
 };
 
 }

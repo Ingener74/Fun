@@ -8,6 +8,8 @@ class Expression: public Statement {
 public:
     Expression();
     virtual ~Expression();
+
+    Expression* m_next = nullptr;
 };
 
 }

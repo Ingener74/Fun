@@ -15,7 +15,6 @@ class FunLexer;
 #include "Statement.h"
 #include "Scope.h"
 #include "Function.h"
-#include "ArgumentList.h"
 #include "Import.h"
 #include "Print.h"
 #include "If.h"
@@ -23,7 +22,6 @@ class FunLexer;
 #include "Return.h"
 
 #include "Expression.h"
-#include "ExpressionList.h"
 #include "Assign.h"
 #include "Id.h"
 #include "Integer.h"
@@ -48,9 +46,7 @@ void yyerror(const char* );
     
     Scope*           scope_type;
     Statement*       statement_type;
-    ExpressionList*  expr_list_type;
     Function*        func_type;
-    ArgumentList*    arg_type;
     Import*          import_type;
     Print*           print_type;
     If*              if_type;
@@ -118,15 +114,15 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <scope_type>        scope
 %type <statement_type>    statement
 %type <id_type>           id
+%type <id_type>           ids
 %type <expr_type>         expr
+%type <expr_type>         exprs
 %type <func_type>         func
-%type <arg_type>          func_arg
 %type <import_type>       import
 %type <print_type>        print
 %type <if_type>           if
 %type <while_type>        while
 %type <return_type>       ret
-%type <expr_list_type>    expr_list
 
 %param{ 
     FunLexer& myLexer
@@ -162,22 +158,24 @@ statement
     | ret
     ;
 
-id
-    : ID { $$ = new Id(*$1); }
-    ;
-
 import
     : "import" id             { $$ = new Import($2); }
     ;
 
 func
-    : "fun" id "(" func_arg ")" scope "end" { $$ = new Function($2, $4, $6); }
+    : "fun" id "("     ")"       "end" { $$ = new Function($2); }
+    | "fun" id "(" ids ")"       "end" { $$ = new Function($2, $4); }
+    | "fun" id "("     ")" scope "end" { $$ = new Function($2, nullptr, $5); }
+    | "fun" id "(" ids ")" scope "end" { $$ = new Function($2, $4, $6); }
     ;
 
-func_arg
-    : %empty                 { $$ = new ArgumentList();   }
-    | id                     { $$ = new ArgumentList($1); }
-    | func_arg "," id        { $1->addArg($3);            }
+ids
+    : id                     { $$ = $1;                   }
+    | ids "," id             { $$ = $1; $1->m_next = $3;  }
+    ;
+
+id
+    : ID { $$ = new Id(*$1); }
     ;
 
 ret
@@ -207,13 +205,13 @@ expr
     | FALSE                  { $$ = new Boolean(false);                         }
     | STRING                 { $$ = new String(*$1);                            }
     | id 
-    | id "(" expr_list ")"   { $$ = new Call($1, $3);                           }
+    | id "("  ")"            { $$ = new Call($1);                               }
+    | id "(" exprs ")"       { $$ = new Call($1, $3);                           }
     ;
 
-expr_list
-    : %empty                 { $$ = new ExpressionList(); }
-    | expr                   { $$ = new ExpressionList($1); }
-    | expr "," expr_list     { $3->addExpression($1); }
+exprs
+    : expr                   { $$ = $1; }
+    | expr "," exprs         { $$ = $1; $3->m_next = $1; }
     ;
 
 print
@@ -221,7 +219,11 @@ print
     ;
 
 if
-    : "if" expr ":" scope "end"               { $$ = new If($2, $4); }
+    : "if" expr ":"       "end"               { $$ = new If($2); }
+    | "if" expr ":" scope "end"               { $$ = new If($2, $4); }
+    | "if" expr ":"       "else"       "end"  { $$ = new If($2); }
+    | "if" expr ":"       "else" scope "end"  { $$ = new If($2, nullptr, $5); }
+    | "if" expr ":" scope "else"       "end"  { $$ = new If($2, $4); }
     | "if" expr ":" scope "else" scope "end"  { $$ = new If($2, $4, $6); }
     ;
 

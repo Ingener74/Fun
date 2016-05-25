@@ -41,6 +41,7 @@ int nnn1 = 0;
 "end"     return fun::FunParser::token::END;
 "true"    return fun::FunParser::token::TRUE;
 "false"   return fun::FunParser::token::FALSE;
+"class"   return fun::FunParser::token::CLASS;
 
 ":"       return fun::FunParser::token::COLON;
 "("       return fun::FunParser::token::LPAREN;

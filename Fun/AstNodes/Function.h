@@ -4,20 +4,19 @@
 
 namespace fun {
 
-class ArgumentList;
 class Id;
 class AstVisitor;
 class Scope;
 
 class Function: public Statement {
 public:
-    Function(Id*, ArgumentList*, Scope*);
+    Function(Id*, Id* = nullptr, Scope* = nullptr);
     virtual ~Function();
 
     virtual void accept(AstVisitor*);
 
     Id* m_id;
-    ArgumentList* m_arguments;
+    Id* m_args;
     Scope* m_scope;
 };
 

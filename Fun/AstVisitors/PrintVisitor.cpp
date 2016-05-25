@@ -1,7 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include "AstNodes/ArgumentList.h"
-#include "AstNodes/ExpressionList.h"
 #include "AstNodes/Scope.h"
 #include "AstNodes/Statement.h"
 #include "AstNodes/Function.h"
@@ -29,12 +27,6 @@ PrintVisitor::PrintVisitor() {
 }
 
 PrintVisitor::~PrintVisitor() {
-}
-
-void PrintVisitor::visit(ArgumentList* node) {
-}
-
-void PrintVisitor::visit(ExpressionList* node) {
 }
 
 void PrintVisitor::visit(Scope* node) {
