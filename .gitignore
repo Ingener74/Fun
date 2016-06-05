@@ -39,3 +39,6 @@ build-msvc/
 /.cproject
 /.project
 Raw-Railroad/FlexLexer.h
+build-mingw/
+CMakeLists.txt.user
+Fun/FlexLexer.h
