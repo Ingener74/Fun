@@ -27,7 +27,8 @@ public:
     virtual ~TextEditStreambuf() {
     }
 
-    virtual int sync() {
+	int sync() override
+    {
         m_te->setPlainText(QString::fromStdString(string(m_buffer.data())));
         return 0;
     }

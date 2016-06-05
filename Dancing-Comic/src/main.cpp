@@ -1,14 +1,3 @@
-/*
- * main.cpp
- *
- *  Created on: Apr 27, 2016
- *      Author: pavel
- */
-
-#include <iostream>
-#include <stdexcept>
-
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
 
 #include "MainWidget.h"
