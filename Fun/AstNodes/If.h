@@ -10,7 +10,7 @@ class AstVisitor;
 
 class If: public Statement {
 public:
-    If(Expression* condition, Scope* then_scope, Scope* else_scope = nullptr);
+    If(Expression* condition, Scope* then_scope = nullptr, Scope* else_scope = nullptr);
     virtual ~If();
 
     void accept(AstVisitor*);

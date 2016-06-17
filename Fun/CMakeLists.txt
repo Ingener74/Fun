@@ -68,9 +68,6 @@ add_library(
         AstNodes/Assign.cpp
         AstNodes/Assign.h
         
-        AstNodes/ArgumentList.cpp
-        AstNodes/ArgumentList.h
-        
         AstNodes/Import.cpp
         AstNodes/Import.h
         
@@ -82,9 +79,6 @@ add_library(
         
         AstNodes/Call.cpp
         AstNodes/Call.h
-        
-        AstNodes/ExpressionList.cpp
-        AstNodes/ExpressionList.h
         
         AstNodes/Terminal.cpp
         AstNodes/Terminal.h
@@ -98,8 +92,8 @@ add_library(
         AstNodes/Boolean.cpp
         AstNodes/Boolean.h
         
-        AstNodes/String.cpp
-        AstNodes/String.h
+        AstNodes/StringTerm.cpp
+        AstNodes/StringTerm.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

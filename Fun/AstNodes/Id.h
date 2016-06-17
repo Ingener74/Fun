@@ -13,6 +13,8 @@ public:
 
     virtual void accept(AstVisitor*);
 
+    Id* m_next = nullptr;
+
     std::string m_id;
 };
 

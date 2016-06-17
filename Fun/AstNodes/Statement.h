@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AstNode.h"
+#include <AstNodes/AstNode.h>
 
 namespace fun {
 

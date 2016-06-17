@@ -65,8 +65,12 @@ end
 testFunction(100, 200)
 
 # class TestClass
-#     m_test = 100
 #     fun init(test)
 #         self.m_test = test
+#         self.copy("one hundred is ", 100)
+#     end
+#     copy = fun(arg1, arg2)
+#         print arg1 + arg2
 #     end
 # end
+

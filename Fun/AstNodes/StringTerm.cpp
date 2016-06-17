@@ -1,5 +1,5 @@
 #include "AstVisitors/AstVisitor.h"
-#include "AstNodes/String.h"
+#include "AstNodes/StringTerm.h"
 
 namespace fun {
 

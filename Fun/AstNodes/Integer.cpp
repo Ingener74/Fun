@@ -1,6 +1,3 @@
-#include <iostream>
-#include <sstream>
-
 #include "AstVisitors/AstVisitor.h"
 #include "AstNodes/Integer.h"
 
