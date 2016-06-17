@@ -27,7 +27,7 @@ class FunLexer;
 #include "Integer.h"
 #include "Real.h"
 #include "Boolean.h"
-#include "String.h"
+#include "StringTerm.h"
 #include "BinaryOp.h"
 #include "Call.h"
 

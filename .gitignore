@@ -42,3 +42,5 @@ Raw-Railroad/FlexLexer.h
 build-mingw/
 CMakeLists.txt.user
 Fun/FlexLexer.h
+/Debug/
+build1/

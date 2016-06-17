@@ -13,7 +13,7 @@
 #include "AstNodes/Integer.h"
 #include "AstNodes/Real.h"
 #include "AstNodes/Boolean.h"
-#include "AstNodes/String.h"
+#include "AstNodes/StringTerm.h"
 #include "AstNodes/Import.h"
 #include "AstNodes/Id.h"
 #include "Utils.h"

@@ -92,8 +92,8 @@ add_library(
         AstNodes/Boolean.cpp
         AstNodes/Boolean.h
         
-        AstNodes/String.cpp
-        AstNodes/String.h
+        AstNodes/StringTerm.cpp
+        AstNodes/StringTerm.h
         
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h

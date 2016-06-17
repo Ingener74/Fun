@@ -14,12 +14,12 @@ FunAst::~FunAst() {
 
 void FunAst::parse(istream& input, bool debug) {
     try {
-        FunLexer myLexer(&input);
-        FunParser prsr(myLexer, this);
+        FunLexer lexer(&input);
+        FunParser parser(lexer, this);
 
         if (debug)
-            prsr.set_debug_level(1);
-        prsr.parse();
+            parser.set_debug_level(1);
+        parser.parse();
 
         if (m_resultVisitor && m_scope)
             m_scope->accept(m_resultVisitor);

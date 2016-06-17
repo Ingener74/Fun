@@ -15,8 +15,8 @@ public:
     MainWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     virtual ~MainWidget();
 
-    virtual void keyPressEvent(QKeyEvent *);
-    virtual void closeEvent(QCloseEvent *);
+	void keyPressEvent(QKeyEvent *) override;
+	void closeEvent(QCloseEvent *) override;
 
     Q_SLOT void run();
 
