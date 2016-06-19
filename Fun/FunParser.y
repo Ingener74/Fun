@@ -11,7 +11,7 @@
 class FunLexer;
 
 #include "FunAst.h"
-#include "AstNode.h"
+#include "Nodes.h"
 
 }
 

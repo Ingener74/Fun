@@ -1,32 +1,32 @@
-#include "AstVisitors/AstVisitor.h"
-#include "AstNodes/AstNode.h"
+#include "Visitor.h"
+#include "Nodes.h"
 
 namespace fun {
 
-void Import::accept(AstVisitor* v) {
+void Import::accept(Visitor* v) {
     m_import->accept(v);
     v->visit(this);
 }
 
-void Scope::accept(AstVisitor* v) {
+void Scope::accept(Visitor* v) {
     v->visit(this);
     for (auto& n : m_statements)
         n->accept(v);
     v->visit(this);
 }
 
-void Return::accept(AstVisitor* v) {
+void Return::accept(Visitor* v) {
     if (m_expr)
         m_expr->accept(v);
     v->visit(this);
 }
 
-void Print::accept(AstVisitor* v) {
+void Print::accept(Visitor* v) {
     m_expr->accept(v);
     v->visit(this);
 }
 
-void Function::accept(AstVisitor* v) {
+void Function::accept(Visitor* v) {
     m_id->accept(v);
     if (m_args)
         m_args->accept(v);
@@ -35,7 +35,7 @@ void Function::accept(AstVisitor* v) {
     v->visit(this);
 }
 
-void If::accept(AstVisitor* v) {
+void If::accept(Visitor* v) {
     m_condition->accept(v);
     if (m_elseScope)
         m_elseScope->accept(v);
@@ -44,47 +44,47 @@ void If::accept(AstVisitor* v) {
     v->visit(this);
 }
 
-void While::accept(AstVisitor* v) {
+void While::accept(Visitor* v) {
     m_condition->accept(v);
     m_scope->accept(v);
     v->visit(this);
 }
 
-void Id::accept(AstVisitor* v) {
+void Id::accept(Visitor* v) {
     v->visit(this);
 }
 
-void Assign::accept(AstVisitor* v) {
+void Assign::accept(Visitor* v) {
     m_id->accept(v);
     m_value->accept(v);
     v->visit(this);
 }
 
-void BinaryOp::accept(AstVisitor* v) {
+void BinaryOp::accept(Visitor* v) {
     m_lhs->accept(v);
     m_rhs->accept(v);
     v->visit(this);
 }
 
-void Call::accept(AstVisitor* v) {
+void Call::accept(Visitor* v) {
     m_id->accept(v);
     m_arg->accept(v);
     v->visit(this);
 }
 
-void Integer::accept(AstVisitor* v) {
+void Integer::accept(Visitor* v) {
     v->visit(this);
 }
 
-void Real::accept(AstVisitor* v) {
+void Real::accept(Visitor* v) {
     v->visit(this);
 }
 
-void String::accept(AstVisitor* v) {
+void String::accept(Visitor* v) {
     v->visit(this);
 }
 
-void Boolean::accept(AstVisitor* v) {
+void Boolean::accept(Visitor* v) {
     v->visit(this);
 }
 

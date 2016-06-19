@@ -6,13 +6,13 @@
 
 namespace fun {
 
-class AstNode;
+class Node;
 class Function;
 class Expression;
 class Import;
 class Print;
 class Scope;
-class AstVisitor;
+class Visitor;
 
 class FunAst {
 public:
@@ -35,7 +35,7 @@ public:
 private:
     Scope* m_scope = nullptr;
 
-    std::vector<std::unique_ptr<AstNode>> m_nodes;
+    std::vector<std::unique_ptr<Node>> m_nodes;
 };
 
 }

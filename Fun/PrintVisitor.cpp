@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
-#include "AstNodes/AstNode.h"
+#include "Nodes.h"
 #include "Utils.h"
-#include "AstVisitors/PrintVisitor.h"
+#include "PrintVisitor.h"
 
 namespace fun {
 

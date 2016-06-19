@@ -11,8 +11,8 @@
 #include "MainWidget.h"
 
 #include <FunAst.h>
-#include <AstVisitors/PrintVisitor.h>
-#include <AstNodes/AstNode.h>
+#include <PrintVisitor.h>
+#include <Nodes.h>
 
 using namespace std;
 using namespace fun;

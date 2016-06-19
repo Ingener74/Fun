@@ -5,17 +5,17 @@
 
 namespace fun {
 
-class AstVisitor;
+class Visitor;
 
-class AstNode {
+class Node {
 public:
-	AstNode() = default;
-	virtual ~AstNode() = default;
+	Node() = default;
+	virtual ~Node() = default;
 
-	virtual void accept(AstVisitor*) = 0;
+	virtual void accept(Visitor*) = 0;
 };
 
-class Statement: public AstNode {
+class Statement: public Node {
 public:
 	Statement() = default;
 	virtual ~Statement() = default;
@@ -32,17 +32,17 @@ public:
 	}
 	virtual ~Import() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Id* m_import = nullptr;
 };
 
-class Scope: public AstNode {
+class Scope: public Node {
 public:
 	Scope(Statement* statement = nullptr) {}
 	virtual ~Scope() = default;
 
-	virtual void accept(AstVisitor*);
+	virtual void accept(Visitor*);
 
 	std::vector<Statement*> m_statements;
 };
@@ -56,7 +56,7 @@ public:
 	}
 	virtual ~Return() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Expression* m_expr = nullptr;
 };
@@ -68,7 +68,7 @@ public:
 	}
 	virtual ~Print() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Expression* m_expr = nullptr;
 };
@@ -80,7 +80,7 @@ public:
 	}
 	virtual ~Function() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Id* m_id = nullptr;
     Id* m_args = nullptr;
@@ -94,7 +94,7 @@ public:
 	}
 	virtual ~If() = default;
 
-	void accept(AstVisitor*);
+	void accept(Visitor*);
 
 	Expression* m_condition = nullptr;
 	Scope* m_thenScope = nullptr, *m_elseScope = nullptr;
@@ -107,13 +107,13 @@ public:
 	}
     virtual ~While() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Expression* m_condition = nullptr;
     Scope* m_scope = nullptr;
 };
 
-class Declaration: public AstNode {
+class Declaration: public Node {
 public:
 	Declaration() = default;
 	virtual ~Declaration() = default;
@@ -126,7 +126,7 @@ public:
 	}
 	virtual ~Id() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Id* m_next = nullptr;
 
@@ -148,7 +148,7 @@ public:
 	}
 	virtual ~Assign() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Id* m_id;
     Expression* m_value;
@@ -171,7 +171,7 @@ public:
 	}
 	virtual ~BinaryOp() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Op m_operation;
     Expression* m_lhs = nullptr, *m_rhs = nullptr;
@@ -184,7 +184,7 @@ public:
 	}
 	virtual ~Call() = default;
 
-    virtual void accept(AstVisitor*);
+    virtual void accept(Visitor*);
 
     Id* m_id = nullptr;
     Expression* m_arg = nullptr;
@@ -207,7 +207,7 @@ public:
 	Integer(long long integer) : m_integer(integer) {}
 	virtual ~Integer() = default;
 
-	virtual void accept(AstVisitor* visitor);
+	virtual void accept(Visitor* visitor);
 	virtual Type getType() const { return Terminal::Integer; }
 
 	long long m_integer;
@@ -218,7 +218,7 @@ public:
 	Real(double real) : m_real(real) {}
 	virtual ~Real() = default;
 
-	virtual void accept(AstVisitor* v);
+	virtual void accept(Visitor* v);
 	virtual Type getType() const { return Terminal::Real; }
 
 	double m_real;
@@ -229,7 +229,7 @@ public:
 	String(const std::string& value) : m_value(value) {}
 	virtual ~String() = default;
 
-	virtual void accept(AstVisitor* v);
+	virtual void accept(Visitor* v);
 	virtual Type getType() const { return Terminal::String; }
 
 	std::string m_value;
@@ -240,7 +240,7 @@ public:
 	Boolean(bool value) : m_value(value) {}
 	virtual ~Boolean() = default;
 
-	virtual void accept(AstVisitor*);
+	virtual void accept(Visitor*);
 	virtual Type getType() const { return Terminal::Boolean; }
 
 	bool m_value;

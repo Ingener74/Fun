@@ -3,8 +3,8 @@
 #include <stdexcept>
 
 #include <FunAst.h>
-#include <AstVisitors/PrintVisitor.h>
-#include <AstNodes/AstNode.h>
+#include <PrintVisitor.h>
+#include <Nodes.h>
 
 using namespace std;
 using namespace fun;
@@ -19,8 +19,6 @@ int main(int argc, char* argv[]) {
         FunAst ast;
 
         PrintVisitor pv;
-
-//        ast.setResultVisitor(&pv);
 
         ast.parse(file, argc > 2);
 

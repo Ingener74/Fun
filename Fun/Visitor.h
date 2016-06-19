@@ -2,12 +2,12 @@
 
 namespace fun {
 
-class AstVisitor {
+class Visitor {
 public:
-    AstVisitor();
-    virtual ~AstVisitor();
+    Visitor();
+    virtual ~Visitor();
 
-    virtual void visit(class AstNode*){}
+    virtual void visit(class Node*){}
     virtual void visit(class ArgumentList*){}
     virtual void visit(class ExpressionList*){}
     virtual void visit(class Scope*){}

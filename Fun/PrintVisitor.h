@@ -2,13 +2,13 @@
 
 #include <stack>
 
-#include <AstVisitors/AstVisitor.h>
+#include <Visitor.h>
 
 namespace fun {
 
 class Terminal;
 
-class PrintVisitor: public AstVisitor {
+class PrintVisitor: public Visitor {
 public:
     PrintVisitor();
     virtual ~PrintVisitor();

@@ -1,4 +1,4 @@
-#include "AstVisitors/CompileVisitor.h"
+#include "CompileVisitor.h"
 
 namespace fun {
 

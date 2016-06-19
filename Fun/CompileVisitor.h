@@ -1,10 +1,10 @@
 #pragma once
 
-#include "AstVisitors/AstVisitor.h"
+#include <Visitor.h>
 
 namespace fun {
 
-class CompileVisitor: public AstVisitor {
+class CompileVisitor: public Visitor {
 public:
     CompileVisitor();
     virtual ~CompileVisitor();

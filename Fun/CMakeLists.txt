@@ -35,20 +35,20 @@ add_library(
         Utils.cpp
         Utils.h
         
-        AstNodes/AstNode.cpp
-        AstNodes/AstNode.h
+        Nodes.cpp
+        Nodes.h
         
-        AstVisitors/AstVisitor.cpp
-        AstVisitors/AstVisitor.h
+        Visitor.cpp
+        Visitor.h
         
-        AstVisitors/CompileVisitor.cpp
-        AstVisitors/CompileVisitor.h
+        CompileVisitor.cpp
+        CompileVisitor.h
         
-        AstVisitors/ExecutionVisitor.cpp
-        AstVisitors/ExecutionVisitor.h
+        ExecutionVisitor.cpp
+        ExecutionVisitor.h
         
-        AstVisitors/PrintVisitor.cpp
-        AstVisitors/PrintVisitor.h
+        PrintVisitor.cpp
+        PrintVisitor.h
         
         ${BISON_FunParser_OUTPUTS}
         ${FLEX_FunScanner_OUTPUTS}
