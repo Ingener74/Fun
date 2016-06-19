@@ -4,7 +4,7 @@
 
 #include <FunAst.h>
 #include <AstVisitors/PrintVisitor.h>
-#include <AstNodes/Scope.h>
+#include <AstNodes/AstNode.h>
 
 using namespace std;
 using namespace fun;
@@ -20,9 +20,11 @@ int main(int argc, char* argv[]) {
 
         PrintVisitor pv;
 
-        ast.setResultVisitor(&pv);
+//        ast.setResultVisitor(&pv);
 
         ast.parse(file, argc > 2);
+
+        ast.getRoot()->accept(&pv);
 
         return 0;
     } catch (const std::exception& e) {

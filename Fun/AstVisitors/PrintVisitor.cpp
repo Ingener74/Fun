@@ -1,21 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "AstNodes/Scope.h"
-#include "AstNodes/Statement.h"
-#include "AstNodes/Function.h"
-#include "AstNodes/If.h"
-#include "AstNodes/While.h"
-#include "AstNodes/Print.h"
-#include "AstNodes/Expression.h"
-#include "AstNodes/Assign.h"
-#include "AstNodes/BinaryOp.h"
-#include "AstNodes/Call.h"
-#include "AstNodes/Integer.h"
-#include "AstNodes/Real.h"
-#include "AstNodes/Boolean.h"
-#include "AstNodes/StringTerm.h"
-#include "AstNodes/Import.h"
-#include "AstNodes/Id.h"
+#include "AstNodes/AstNode.h"
 #include "Utils.h"
 #include "AstVisitors/PrintVisitor.h"
 
@@ -30,7 +15,9 @@ PrintVisitor::~PrintVisitor() {
 }
 
 void PrintVisitor::visit(Scope* node) {
-//    if (m_scopes.top() == node)
+//    if (m_scopes.empty()) {
+//        m_scopes.push(node);
+//    } else if (m_scopes.top() == node)
 //        m_scopes.pop();
 //    else
 //        m_scopes.push(node);

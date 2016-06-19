@@ -12,7 +12,7 @@
 
 #include <FunAst.h>
 #include <AstVisitors/PrintVisitor.h>
-#include <AstNodes/Scope.h>
+#include <AstNodes/AstNode.h>
 
 using namespace std;
 using namespace fun;
@@ -92,6 +92,6 @@ void MainWidget::run() {
 
     FunAst ast;
     PrintVisitor pv;
-    ast.setResultVisitor(&pv);
     ast.parse(ss, debugCheckBox->isChecked());
+    ast.getRoot()->accept(&pv);
 }

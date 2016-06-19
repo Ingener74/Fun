@@ -11,25 +11,7 @@
 class FunLexer;
 
 #include "FunAst.h"
-
-#include "Statement.h"
-#include "Scope.h"
-#include "Function.h"
-#include "Import.h"
-#include "Print.h"
-#include "If.h"
-#include "While.h"
-#include "Return.h"
-
-#include "Expression.h"
-#include "Assign.h"
-#include "Id.h"
-#include "Integer.h"
-#include "Real.h"
-#include "Boolean.h"
-#include "StringTerm.h"
-#include "BinaryOp.h"
-#include "Call.h"
+#include "AstNode.h"
 
 }
 
@@ -144,9 +126,9 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %start scope;
 
 scope
-    : %empty          { $$ = new Scope(); ast->setRoot($$); }
-    | scope statement { $1->addStatement($2); }
-    | scope expr      { $1->addStatement($2); }
+    : %empty          { $$ = ast->createNode<Scope>(); ast->setRoot($$); }
+    | scope statement { $1->m_statements.push_back($2); }
+    | scope expr      { $1->m_statements.push_back($2); }
     ;
 
 statement
@@ -159,14 +141,14 @@ statement
     ;
 
 import
-    : "import" id             { $$ = new Import($2); }
+    : "import" id             { $$ = ast->createNode<Import>($2); }
     ;
 
 func
-    : "fun" id "("     ")"       "end" { $$ = new Function($2); }
-    | "fun" id "(" ids ")"       "end" { $$ = new Function($2, $4); }
-    | "fun" id "("     ")" scope "end" { $$ = new Function($2, nullptr, $5); }
-    | "fun" id "(" ids ")" scope "end" { $$ = new Function($2, $4, $6); }
+    : "fun" id "("     ")"       "end" { $$ = ast->createNode<Function>($2); }
+    | "fun" id "(" ids ")"       "end" { $$ = ast->createNode<Function>($2, $4); }
+    | "fun" id "("     ")" scope "end" { $$ = ast->createNode<Function>($2, nullptr, $5); }
+    | "fun" id "(" ids ")" scope "end" { $$ = ast->createNode<Function>($2, $4, $6); }
     ;
 
 ids
@@ -175,38 +157,38 @@ ids
     ;
 
 id
-    : ID { $$ = new Id(*$1); }
+    : ID { $$ = ast->createNode<Id>(*$1); }
     ;
 
 ret
-    : "ret" { $$ = new Return(); }
-    | "ret" expr { $$ = new Return($2); }
+    : "ret"      { $$ = ast->createNode<Return>(); }
+    | "ret" expr { $$ = ast->createNode<Return>($2); }
     ;
 
 expr
-    : id "=" expr            { $$ = new Assign($1, $3);                         }
-    | expr "+" expr          { $$ = new BinaryOp(BinaryOp::ADD,        $1, $3); }
-    | expr "+=" expr         { $$ = new BinaryOp(BinaryOp::ADD_ASSIGN, $1, $3); }
-    | expr "-" expr          { $$ = new BinaryOp(BinaryOp::SUB,        $1, $3); }
-    | expr "-=" expr         { $$ = new BinaryOp(BinaryOp::SUB_ASSIGN, $1, $3); }
-    | expr "*" expr          { $$ = new BinaryOp(BinaryOp::MUL,        $1, $3); }
-    | expr "*=" expr         { $$ = new BinaryOp(BinaryOp::MUL_ASSIGN, $1, $3); }
-    | expr "/" expr          { $$ = new BinaryOp(BinaryOp::DIV,        $1, $3); }
-    | expr "/=" expr         { $$ = new BinaryOp(BinaryOp::DIV_ASSIGN, $1, $3); }
-    | expr "%" expr          { $$ = new BinaryOp(BinaryOp::MOD,        $1, $3); }
-    | expr "%=" expr         { $$ = new BinaryOp(BinaryOp::MOD_ASSIGN, $1, $3); }
-    | expr ">" expr          { $$ = new BinaryOp(BinaryOp::MORE,       $1, $3); }
-    | expr ">=" expr         { $$ = new BinaryOp(BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr          { $$ = new BinaryOp(BinaryOp::LESS,       $1, $3); }
-    | expr "<=" expr         { $$ = new BinaryOp(BinaryOp::LESS_EQUAL, $1, $3); }
-    | INTEGER                { $$ = new Integer($1);                            }
-    | REAL                   { $$ = new Real($1);                               }
-    | TRUE                   { $$ = new Boolean(true);                          }
-    | FALSE                  { $$ = new Boolean(false);                         }
-    | STRING                 { $$ = new String(*$1);                            }
+    : id "=" expr            { $$ = ast->createNode<Assign>($1, $3);                         }
+    | expr "+" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::ADD,        $1, $3); }
+    | expr "+=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::ADD_ASSIGN, $1, $3); }
+    | expr "-" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::SUB,        $1, $3); }
+    | expr "-=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::SUB_ASSIGN, $1, $3); }
+    | expr "*" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::MUL,        $1, $3); }
+    | expr "*=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::MUL_ASSIGN, $1, $3); }
+    | expr "/" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::DIV,        $1, $3); }
+    | expr "/=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::DIV_ASSIGN, $1, $3); }
+    | expr "%" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::MOD,        $1, $3); }
+    | expr "%=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::MOD_ASSIGN, $1, $3); }
+    | expr ">" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::MORE,       $1, $3); }
+    | expr ">=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr          { $$ = ast->createNode<BinaryOp>(BinaryOp::LESS,       $1, $3); }
+    | expr "<=" expr         { $$ = ast->createNode<BinaryOp>(BinaryOp::LESS_EQUAL, $1, $3); }
+    | INTEGER                { $$ = ast->createNode<Integer>($1);                            }
+    | REAL                   { $$ = ast->createNode<Real>($1);                               }
+    | TRUE                   { $$ = ast->createNode<Boolean>(true);                          }
+    | FALSE                  { $$ = ast->createNode<Boolean>(false);                         }
+    | STRING                 { $$ = ast->createNode<String>(*$1);                            }
     | id 
-    | id "("  ")"            { $$ = new Call($1);                               }
-    | id "(" exprs ")"       { $$ = new Call($1, $3);                           }
+    | id "("  ")"            { $$ = ast->createNode<Call>($1);                               }
+    | id "(" exprs ")"       { $$ = ast->createNode<Call>($1, $3);                           }
     ;
 
 exprs
@@ -215,20 +197,20 @@ exprs
     ;
 
 print
-    : "print" expr { $$ = new Print($2); }
+    : "print" expr { $$ = ast->createNode<Print>($2); }
     ;
 
 if
-    : "if" expr ":"       "end"               { $$ = new If($2); }
-    | "if" expr ":" scope "end"               { $$ = new If($2, $4); }
-    | "if" expr ":"       "else"       "end"  { $$ = new If($2); }
-    | "if" expr ":"       "else" scope "end"  { $$ = new If($2, nullptr, $5); }
-    | "if" expr ":" scope "else"       "end"  { $$ = new If($2, $4); }
-    | "if" expr ":" scope "else" scope "end"  { $$ = new If($2, $4, $6); }
+    : "if" expr ":"       "end"               { $$ = ast->createNode<If>($2); }
+    | "if" expr ":" scope "end"               { $$ = ast->createNode<If>($2, $4); }
+    | "if" expr ":"       "else"       "end"  { $$ = ast->createNode<If>($2); }
+    | "if" expr ":"       "else" scope "end"  { $$ = ast->createNode<If>($2, nullptr, $5); }
+    | "if" expr ":" scope "else"       "end"  { $$ = ast->createNode<If>($2, $4); }
+    | "if" expr ":" scope "else" scope "end"  { $$ = ast->createNode<If>($2, $4, $6); }
     ;
 
 while
-    : "while" expr ":" scope "end" { $$ = new While($2, $4); }
+    : "while" expr ":" scope "end" { $$ = ast->createNode<While>($2, $4); }
     ;
 
 %%

@@ -24,24 +24,16 @@ public:
     void setRoot(Scope*);
     Scope* getRoot();
 
-    AstVisitor* getResultVisitor() {
-        return m_resultVisitor;
-    }
-
-    void setResultVisitor(AstVisitor* resultVisitor = nullptr) {
-        m_resultVisitor = resultVisitor;
-    }
-
     template<typename T, typename ... Args>
     T* createNode(Args&& ... args) {
         std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
+        T* result = node.get();
         m_nodes.push_back(std::move(node));
-        return node.get();
+        return result;
     }
 
 private:
     Scope* m_scope = nullptr;
-    AstVisitor* m_resultVisitor = nullptr;
 
     std::vector<std::unique_ptr<AstNode>> m_nodes;
 };

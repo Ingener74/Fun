@@ -24,8 +24,10 @@ set(DancingComic_SOURCES
 )
 
 if(WIN32)
-	list(APPEND DancingComic_SOURCES res/resources.rc)
-	add_executable(DancingComic WIN32 ${DancingComic_SOURCES})
+    if(MSVC)
+    	list(APPEND DancingComic_SOURCES res/resources.rc)
+    endif()
+    add_executable(DancingComic WIN32 ${DancingComic_SOURCES}) 
 else()
 	add_executable(DancingComic ${DancingComic_SOURCES})
 endif()

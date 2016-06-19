@@ -38,63 +38,6 @@ add_library(
         AstNodes/AstNode.cpp
         AstNodes/AstNode.h
         
-        AstNodes/Declaration.cpp
-        AstNodes/Declaration.h
-        
-        AstNodes/Id.cpp
-        AstNodes/Id.h
-        
-        AstNodes/Statement.cpp
-        AstNodes/Statement.h
-        
-        AstNodes/Scope.cpp
-        AstNodes/Scope.h
-        
-        AstNodes/If.cpp
-        AstNodes/If.h
-        
-        AstNodes/While.cpp
-        AstNodes/While.h
-        
-        AstNodes/Function.cpp
-        AstNodes/Function.h
-        
-        AstNodes/Return.cpp
-        AstNodes/Return.h
-        
-        AstNodes/Expression.cpp
-        AstNodes/Expression.h
-        
-        AstNodes/Assign.cpp
-        AstNodes/Assign.h
-        
-        AstNodes/Import.cpp
-        AstNodes/Import.h
-        
-        AstNodes/Print.cpp
-        AstNodes/Print.h
-        
-        AstNodes/BinaryOp.cpp
-        AstNodes/BinaryOp.h
-        
-        AstNodes/Call.cpp
-        AstNodes/Call.h
-        
-        AstNodes/Terminal.cpp
-        AstNodes/Terminal.h
-        
-        AstNodes/Integer.cpp
-        AstNodes/Integer.h
-        
-        AstNodes/Real.cpp
-        AstNodes/Real.h
-        
-        AstNodes/Boolean.cpp
-        AstNodes/Boolean.h
-        
-        AstNodes/StringTerm.cpp
-        AstNodes/StringTerm.h
-        
         AstVisitors/AstVisitor.cpp
         AstVisitors/AstVisitor.h
         
