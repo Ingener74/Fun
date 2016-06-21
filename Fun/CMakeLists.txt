@@ -26,9 +26,6 @@ ADD_FLEX_BISON_DEPENDENCY(FunScanner FunParser)
 add_library(
         Fun
         
-        FunAst.cpp
-        FunAst.h
-        
         FunLexer.cpp
         FunLexer.h
         
@@ -41,14 +38,14 @@ add_library(
         Visitor.cpp
         Visitor.h
         
-        CompileVisitor.cpp
-        CompileVisitor.h
+        Compiler.cpp
+        Compiler.h
         
-        ExecutionVisitor.cpp
-        ExecutionVisitor.h
+        Interpreter.cpp
+        Interpreter.h
         
-        PrintVisitor.cpp
-        PrintVisitor.h
+        Printer.cpp
+        Printer.h
         
         ${BISON_FunParser_OUTPUTS}
         ${FLEX_FunScanner_OUTPUTS}

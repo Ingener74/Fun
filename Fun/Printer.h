@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <string>
 
 #include <Visitor.h>
 
@@ -8,10 +9,10 @@ namespace fun {
 
 class Terminal;
 
-class PrintVisitor: public Visitor {
+class Printer: public Visitor {
 public:
-    PrintVisitor();
-    virtual ~PrintVisitor();
+    Printer();
+    virtual ~Printer();
 
     virtual void visit(class Scope*);
 

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 include_directories(
     Fun
+    ${CMAKE_BINARY_DIR}/Fun
 )
 
 if(MSVC)

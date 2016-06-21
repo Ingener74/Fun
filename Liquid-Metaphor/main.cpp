@@ -2,9 +2,9 @@
 #include <fstream>
 #include <stdexcept>
 
-#include <FunAst.h>
-#include <PrintVisitor.h>
+#include <FunLexer.h>
 #include <Nodes.h>
+#include <Printer.h>
 
 using namespace std;
 using namespace fun;
@@ -16,13 +16,14 @@ int main(int argc, char* argv[]) {
 
         ifstream file(argv[1]);
 
-        FunAst ast;
+        FunLexer lexer(&file);
+        FunParser parser(lexer);
+        parser.set_debug_level(argc > 2);
+        parser.parse();
 
-        PrintVisitor pv;
+        Printer pv;
 
-        ast.parse(file, argc > 2);
-
-        ast.getRoot()->accept(&pv);
+        Node::root->accept(&pv);
 
         return 0;
     } catch (const std::exception& e) {

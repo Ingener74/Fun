@@ -5,7 +5,7 @@
 
 %{
 
-#include <iostream>
+// #include <iostream>
 
 using namespace std;
 
@@ -44,6 +44,7 @@ int nnn1 = 0;
 "class"   return fun::FunParser::token::CLASS;
 
 ":"       return fun::FunParser::token::COLON;
+";"       return fun::FunParser::token::SEMICOLON;
 "("       return fun::FunParser::token::LPAREN;
 ")"       return fun::FunParser::token::RPAREN;
 ","       return fun::FunParser::token::COMMA;

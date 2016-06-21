@@ -1,20 +1,21 @@
+#include "Printer.h"
+
 #include <iostream>
 #include <sstream>
 #include "Nodes.h"
 #include "Utils.h"
-#include "PrintVisitor.h"
 
 namespace fun {
 
 using namespace std;
 
-PrintVisitor::PrintVisitor() {
+Printer::Printer() {
 }
 
-PrintVisitor::~PrintVisitor() {
+Printer::~Printer() {
 }
 
-void PrintVisitor::visit(Scope* node) {
+void Printer::visit(Scope* node) {
 //    if (m_scopes.empty()) {
 //        m_scopes.push(node);
 //    } else if (m_scopes.top() == node)
@@ -23,29 +24,29 @@ void PrintVisitor::visit(Scope* node) {
 //        m_scopes.push(node);
 }
 
-void PrintVisitor::visit(Function* node) {
+void Printer::visit(Function* node) {
 }
 
-void PrintVisitor::visit(If* node) {
+void Printer::visit(If* node) {
 }
 
-void PrintVisitor::visit(While* node) {
+void Printer::visit(While* node) {
 }
 
-void PrintVisitor::visit(Import* node) {
+void Printer::visit(Import* node) {
 }
 
-void PrintVisitor::visit(Print* node) {
+void Printer::visit(Print* node) {
     cout << getTabs() << "print " << endl;
 }
 
-void PrintVisitor::visit(Expression* node) {
+void Printer::visit(Expression* node) {
 }
 
-void PrintVisitor::visit(Assign* node) {
+void Printer::visit(Assign* node) {
 }
 
-void PrintVisitor::visit(BinaryOp* node) {
+void Printer::visit(BinaryOp* node) {
     fassert(m_terminals.size() >= 2, "not enogth terminals");
     switch (node->m_operation) {
     case BinaryOp::ADD: {
@@ -93,29 +94,29 @@ void PrintVisitor::visit(BinaryOp* node) {
     }
 }
 
-void PrintVisitor::visit(Call* node) {
+void Printer::visit(Call* node) {
 }
 
-void PrintVisitor::visit(Id* node) {
+void Printer::visit(Id* node) {
 }
 
-void PrintVisitor::visit(Integer* node) {
+void Printer::visit(Integer* node) {
     cout << node->m_integer << endl;
 }
 
-void PrintVisitor::visit(Real* node) {
+void Printer::visit(Real* node) {
     cout << node->m_real << endl;
 }
 
-void PrintVisitor::visit(Boolean* node) {
+void Printer::visit(Boolean* node) {
     cout << std::boolalpha << node->m_value << endl;
 }
 
-void PrintVisitor::visit(String* node) {
+void Printer::visit(String* node) {
     cout << node->m_value << endl;
 }
 
-std::string PrintVisitor::getTabs() const {
+std::string Printer::getTabs() const {
     return [=] {stringstream ss; for(size_t i = 0; i < m_scopes.size(); ++i)ss << "    "; return ss.str();}();
 }
 

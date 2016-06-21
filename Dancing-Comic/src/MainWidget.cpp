@@ -10,9 +10,9 @@
 
 #include "MainWidget.h"
 
-#include <FunAst.h>
-#include <PrintVisitor.h>
+#include <FunLexer.h>
 #include <Nodes.h>
+#include <Printer.h>
 
 using namespace std;
 using namespace fun;
@@ -90,8 +90,10 @@ void MainWidget::run() {
 
     ss << codeTextEdit->toPlainText().toStdString();
 
-    FunAst ast;
-    PrintVisitor pv;
-    ast.parse(ss, debugCheckBox->isChecked());
-    ast.getRoot()->accept(&pv);
+    FunLexer lexer(&ss);
+    FunParser parser(lexer);
+    parser.set_debug_level(debugCheckBox->isChecked());
+    parser.parse();
+    Printer pv;
+    Node::root->accept(&pv);
 }

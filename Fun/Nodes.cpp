@@ -3,6 +3,11 @@
 
 namespace fun {
 
+using namespace std;
+
+Node* Node::root = nullptr;
+vector<unique_ptr<Node>> Node::nodes;
+
 void Import::accept(Visitor* v) {
     m_import->accept(v);
     v->visit(this);
