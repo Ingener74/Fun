@@ -15,15 +15,6 @@ Printer::Printer() {
 Printer::~Printer() {
 }
 
-void Printer::visit(Scope* node) {
-//    if (m_scopes.empty()) {
-//        m_scopes.push(node);
-//    } else if (m_scopes.top() == node)
-//        m_scopes.pop();
-//    else
-//        m_scopes.push(node);
-}
-
 void Printer::visit(Function* node) {
 }
 
@@ -34,6 +25,7 @@ void Printer::visit(While* node) {
 }
 
 void Printer::visit(Import* node) {
+    cout << getTabs() << "import " << endl;
 }
 
 void Printer::visit(Print* node) {
@@ -98,26 +90,27 @@ void Printer::visit(Call* node) {
 }
 
 void Printer::visit(Id* node) {
+    cout << node->value << endl;
 }
 
 void Printer::visit(Integer* node) {
-    cout << node->m_integer << endl;
+    cout << node->value << endl;
 }
 
 void Printer::visit(Real* node) {
-    cout << node->m_real << endl;
+    cout << node->value << endl;
 }
 
 void Printer::visit(Boolean* node) {
-    cout << std::boolalpha << node->m_value << endl;
+    cout << std::boolalpha << node->value << endl;
 }
 
 void Printer::visit(String* node) {
-    cout << node->m_value << endl;
+    cout << node->value << endl;
 }
 
 std::string Printer::getTabs() const {
-    return [=] {stringstream ss; for(size_t i = 0; i < m_scopes.size(); ++i)ss << "    "; return ss.str();}();
+    return ""; // [=] {stringstream ss; for(size_t i = 0; i < m_scopes.size(); ++i)ss << "    "; return ss.str();}();
 }
 
 }

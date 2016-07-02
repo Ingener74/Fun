@@ -8,31 +8,32 @@ namespace fun {
 
 class Visitor;
 
-class Node {
+class Statement {
 public:
-    Node() = default;
-    virtual ~Node() = default;
+    Statement() = default;
+    virtual ~Statement() = default;
 
     virtual void accept(Visitor*) = 0;
+
+    Statement* nextStatement = nullptr;
 
     template<typename T, typename ... Args>
     static T* make(Args&& ... args) {
         std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
         T* result = node.get();
-        nodes.push_back(std::move(node));
+        statements.push_back(std::move(node));
         return result;
     }
 
-    static Node* root;
-    static std::vector<std::unique_ptr<Node>> nodes;
-};
+    static Statement* entryPoint;
+    static std::vector<std::unique_ptr<Statement>> statements;
 
-class Statement: public Node {
-public:
-    Statement() = default;
-    virtual ~Statement() = default;
+    static void clear();
 
-    Statement* nextStatement = nullptr;
+    static int apply(Visitor* v);
+
+protected:
+    static int apply(Statement* start, Visitor* v);
 };
 
 class Id;
@@ -40,24 +41,13 @@ class Id;
 class Import: public Statement {
 public:
     Import(Id* library) :
-            m_import(library) {
+            id(library) {
     }
     virtual ~Import() = default;
 
     virtual void accept(Visitor*);
 
-    Id* m_import = nullptr;
-};
-
-class Scope: public Node {
-public:
-    Scope(Statement* statement = nullptr) {
-    }
-    virtual ~Scope() = default;
-
-    virtual void accept(Visitor*);
-
-    std::vector<Statement*> m_statements;
+    Id* id = nullptr;
 };
 
 class Expression;
@@ -65,96 +55,95 @@ class Expression;
 class Return: public Statement {
 public:
     Return(Expression* expr = nullptr) :
-            m_expr(expr) {
+            expression(expr) {
     }
     virtual ~Return() = default;
 
     virtual void accept(Visitor*);
 
-    Expression* m_expr = nullptr;
+    Expression* expression = nullptr;
 };
 
 class Print: public Statement {
 public:
     Print(Expression* expr) :
-            m_expr(expr) {
+            expression(expr) {
     }
     virtual ~Print() = default;
 
     virtual void accept(Visitor*);
 
-    Expression* m_expr = nullptr;
+    Expression* expression = nullptr;
 };
 
 class Function: public Statement {
 public:
-    Function(Id* id, Id* args = nullptr, Scope* statements = nullptr) :
-            m_id(id), m_args(args), m_scope(statements) {
+    Function(Id* id, Id* args = nullptr, Statement* scope = nullptr) :
+            name(id), args(args), scope(scope) {
     }
     virtual ~Function() = default;
 
     virtual void accept(Visitor*);
 
-    Id* m_id = nullptr;
-    Id* m_args = nullptr;
-    Scope* m_scope = nullptr;
+    Id* name = nullptr;
+    Id* args = nullptr;
+    Statement* scope = nullptr;
 };
 
 class If: public Statement {
 public:
-    If(Expression* condition, Scope* then_scope = nullptr, Scope* else_scope = nullptr) :
-            m_condition(condition), m_thenScope(then_scope), m_elseScope(else_scope) {
+    If(Expression* condition, Statement* then_scope = nullptr, Statement* else_scope = nullptr) :
+            condition(condition), thenScope(then_scope), elseScope(else_scope) {
     }
     virtual ~If() = default;
 
     void accept(Visitor*);
 
-    Expression* m_condition = nullptr;
-    Scope* m_thenScope = nullptr, *m_elseScope = nullptr;
+    Expression* condition = nullptr;
+    Statement* thenScope = nullptr, *elseScope = nullptr;
 };
 
 class While: public Statement {
 public:
-    While(Expression* condition, Scope* scope) :
-            m_condition(condition), m_scope(scope) {
+    While(Expression* condition, Statement* scope) :
+            condition(condition), scope(scope) {
     }
     virtual ~While() = default;
 
     virtual void accept(Visitor*);
 
-    Expression* m_condition = nullptr;
-    Scope* m_scope = nullptr;
+    Expression* condition = nullptr;
+    Statement* scope = nullptr;
 };
 
 class For: public Statement {
 public:
-    For(Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment = nullptr, Scope* scope = nullptr) :
+    For(Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment = nullptr,
+            Statement* scope = nullptr) :
             initial(initial), condition(condition), increment(increment), scope(scope) {
     }
     virtual ~For() = default;
 
-    Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
-    Scope* scope = nullptr;
-};
-
-class Declaration: public Node {
-public:
-    Declaration() = default;
-    virtual ~Declaration() = default;
-};
-
-class Id: public Declaration/*, public Expression*/{
-public:
-    Id(const std::string& id) :
-            m_id(id) {
-    }
-    virtual ~Id() = default;
-
     virtual void accept(Visitor*);
 
-    Id* m_next = nullptr;
+    Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
+    Statement* scope = nullptr;
+};
 
-    std::string m_id;
+class Break: public Statement {
+public:
+    Break() = default;
+    virtual ~Break() = default;
+
+    virtual void accept(Visitor*);
+};
+
+class Continue: public Statement {
+public:
+    Continue() = default;
+    virtual ~Continue() = default;
+
+    virtual void accept(Visitor*);
 };
 
 class Expression: public Statement {
@@ -162,20 +151,38 @@ public:
     Expression() = default;
     virtual ~Expression() = default;
 
-    Expression* m_next = nullptr;
+    Expression* nextExpression = nullptr;
+
+    static void apply(Expression*, Visitor*);
+};
+
+class Id: public Expression {
+public:
+    Id(const std::string& value) :
+            value(value) {
+    }
+    virtual ~Id() = default;
+
+    virtual void accept(Visitor*);
+
+    Id* nextId = nullptr;
+
+    std::string value;
+
+    static void apply(Id*, Visitor*);
 };
 
 class Assign: public Expression {
 public:
     Assign(Id* id, Expression* value) :
-            m_id(id), m_value(value) {
+            name(id), value(value) {
     }
     virtual ~Assign() = default;
 
     virtual void accept(Visitor*);
 
-    Id* m_id;
-    Expression* m_value;
+    Id* name;
+    Expression* value;
 };
 
 class BinaryOp: public Expression {
@@ -198,33 +205,33 @@ public:
     };
 
     BinaryOp(Op op, Expression* lhs, Expression* rhs) :
-            m_operation(op), m_lhs(lhs), m_rhs(rhs) {
+            m_operation(op), lhs(lhs), rhs(rhs) {
     }
     virtual ~BinaryOp() = default;
 
     virtual void accept(Visitor*);
 
     Op m_operation;
-    Expression* m_lhs = nullptr, *m_rhs = nullptr;
+    Expression* lhs = nullptr, *rhs = nullptr;
 };
 
 class Call: public Expression {
 public:
     Call(Id* id, Expression* arg = nullptr) :
-            m_id(id), m_arg(arg) {
+            name(id), arguments(arg) {
     }
     virtual ~Call() = default;
 
     virtual void accept(Visitor*);
 
-    Id* m_id = nullptr;
-    Expression* m_arg = nullptr;
+    Id* name = nullptr;
+    Expression* arguments = nullptr;
 };
 
 class Terminal: public Expression {
 public:
     enum Type {
-        Integer, Real, String, Boolean, Class, Function, Unknown,
+        Integer, Real, String, Boolean, Object, Function, Null, Unknown
     };
 
     Terminal() = default;
@@ -237,8 +244,8 @@ public:
 
 class Integer: public Terminal {
 public:
-    Integer(long long integer) :
-            m_integer(integer) {
+    Integer(long long value) :
+            value(value) {
     }
     virtual ~Integer() = default;
 
@@ -247,13 +254,13 @@ public:
         return Terminal::Integer;
     }
 
-    long long m_integer;
+    long long value;
 };
 
 class Real: public Terminal {
 public:
-    Real(double real) :
-            m_real(real) {
+    Real(double value) :
+            value(value) {
     }
     virtual ~Real() = default;
 
@@ -262,13 +269,13 @@ public:
         return Terminal::Real;
     }
 
-    double m_real;
+    double value;
 };
 
 class String: public Terminal {
 public:
     String(const std::string& value) :
-            m_value(value) {
+            value(value) {
     }
     virtual ~String() = default;
 
@@ -277,13 +284,13 @@ public:
         return Terminal::String;
     }
 
-    std::string m_value;
+    std::string value;
 };
 
 class Boolean: public Terminal {
 public:
     Boolean(bool value) :
-            m_value(value) {
+            value(value) {
     }
     virtual ~Boolean() = default;
 
@@ -292,7 +299,18 @@ public:
         return Terminal::Boolean;
     }
 
-    bool m_value;
+    bool value;
+};
+
+class Null: public Terminal {
+public:
+    Null() = default;
+    virtual ~Null() = default;
+
+    virtual void accept(Visitor*);
+    virtual Type getType() const {
+        return Terminal::Null;
+    }
 };
 
 }

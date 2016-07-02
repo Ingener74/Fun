@@ -2,10 +2,4 @@
 
 namespace fun {
 
-Utils::Utils() {
-}
-
-Utils::~Utils() {
-}
-
 }

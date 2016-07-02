@@ -50,3 +50,29 @@ add_library(
         ${BISON_FunParser_OUTPUTS}
         ${FLEX_FunScanner_OUTPUTS}
 )
+
+if(ENABLE_LIQUID_METAPHOR)
+    add_custom_command(OUTPUT Test0
+        COMMAND ../Liquid-Metaphor/Liquid-Metaphor ../../Fun/tests/test-0.fun
+    )
+
+    add_custom_command(OUTPUT Test1
+        COMMAND ../Liquid-Metaphor/Liquid-Metaphor ../../Fun/tests/test-1.fun
+    )
+
+    add_custom_command(OUTPUT Test2
+        COMMAND ../Liquid-Metaphor/Liquid-Metaphor ../../Fun/tests/test-2.fun
+    )
+
+    add_custom_command(OUTPUT Test3
+        COMMAND ../Liquid-Metaphor/Liquid-Metaphor ../../Fun/tests/test-3.fun
+    )
+    
+    add_custom_command(OUTPUT Test4
+        COMMAND ../Liquid-Metaphor/Liquid-Metaphor ../../Fun/tests/test-4.fun
+    )
+
+    add_custom_target(TestFun
+        DEPENDS Test0 Test1 Test2 Test3 Test4
+    )
+endif()

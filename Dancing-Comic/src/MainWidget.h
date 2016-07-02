@@ -10,17 +10,18 @@
 class LifeWidget;
 
 class MainWidget: public QWidget, public Ui_MainWidget {
-    Q_OBJECT
+Q_OBJECT
 public:
     MainWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     virtual ~MainWidget();
 
-	void keyPressEvent(QKeyEvent *) override;
-	void closeEvent(QCloseEvent *) override;
+    void keyPressEvent(QKeyEvent *) override;
+    void closeEvent(QCloseEvent *) override;
 
-    Q_SLOT void run();
+    Q_SLOT
+    void run();
 
 private:
-    std::streambuf* m_cout_buffer = nullptr, * m_cerr_buffer = nullptr, *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
+    std::streambuf* m_cout_buffer = nullptr, *m_cerr_buffer = nullptr, *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
     QSettings m_settings;
 };

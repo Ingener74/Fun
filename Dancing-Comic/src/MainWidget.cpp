@@ -20,14 +20,14 @@ using namespace fun;
 class TextEditStreambuf: public streambuf {
 public:
     TextEditStreambuf(QTextEdit* te) :
-        m_buffer(1 << 16), m_te(te) {
+            m_buffer(1 << 16), m_te(te) {
         setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
     }
 
     virtual ~TextEditStreambuf() {
     }
 
-	int sync() override
+    int sync() override
     {
         m_te->setPlainText(QString::fromStdString(string(m_buffer.data())));
         return 0;
@@ -40,7 +40,7 @@ protected:
 };
 
 MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
-    QWidget(parent, f) {
+        QWidget(parent, f) {
     setupUi(this);
 
     QSettings settings("Venus.Games", "Dancing-Comic");
@@ -90,10 +90,12 @@ void MainWidget::run() {
 
     ss << codeTextEdit->toPlainText().toStdString();
 
+    Statement::clear();
     FunLexer lexer(&ss);
     FunParser parser(lexer);
     parser.set_debug_level(debugCheckBox->isChecked());
     parser.parse();
     Printer pv;
-    Node::root->accept(&pv);
+    Statement::apply(&pv);
+    Statement::clear();
 }

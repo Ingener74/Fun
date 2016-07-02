@@ -7,10 +7,8 @@ public:
     Visitor();
     virtual ~Visitor();
 
-    virtual void visit(class Node*){}
     virtual void visit(class ArgumentList*){}
     virtual void visit(class ExpressionList*){}
-    virtual void visit(class Scope*){}
 
     virtual void visit(class Statement*){}
     virtual void visit(class Function*){}

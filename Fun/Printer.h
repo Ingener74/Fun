@@ -14,8 +14,6 @@ public:
     Printer();
     virtual ~Printer();
 
-    virtual void visit(class Scope*);
-
     virtual void visit(class Function*);
     virtual void visit(class If*);
     virtual void visit(class While*);
@@ -34,7 +32,6 @@ public:
 
 private:
     std::stack<Terminal*> m_terminals;
-    std::stack<Scope*> m_scopes;
 
     std::string getTabs() const;
 };

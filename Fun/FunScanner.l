@@ -22,32 +22,37 @@ using namespace std;
 DIGIT    [0-9]
 ID       [a-zA-Z_][a-zA-Z_0-9]*
 
+%x comment
+
 %%
 
 %{
 int nnn1 = 0;
 %}
 
-"import"  return fun::FunParser::token::IMPORT;
-"if"      return fun::FunParser::token::IF;
-"else"    return fun::FunParser::token::ELSE;
-"for"     return fun::FunParser::token::FOR;
-"in"      return fun::FunParser::token::IN;
-"while"   return fun::FunParser::token::WHILE;
-"do"      return fun::FunParser::token::DO;
-"print"   return fun::FunParser::token::PRINT;
-"fun"     return fun::FunParser::token::FUN;
-"ret"     return fun::FunParser::token::RETURN;
-"end"     return fun::FunParser::token::END;
-"true"    return fun::FunParser::token::TRUE;
-"false"   return fun::FunParser::token::FALSE;
-"class"   return fun::FunParser::token::CLASS;
+"import"    return fun::FunParser::token::IMPORT;
+"if"        return fun::FunParser::token::IF;
+"else"      return fun::FunParser::token::ELSE;
+"for"       return fun::FunParser::token::FOR;
+"in"        return fun::FunParser::token::IN;
+"while"     return fun::FunParser::token::WHILE;
+"do"        return fun::FunParser::token::DO;
+"print"     return fun::FunParser::token::PRINT;
+"fun"       return fun::FunParser::token::FUN;
+"ret"       return fun::FunParser::token::RETURN;
+"end"       return fun::FunParser::token::END;
+"true"      return fun::FunParser::token::TRUE;
+"false"     return fun::FunParser::token::FALSE;
+"class"     return fun::FunParser::token::CLASS;
+"null"      return fun::FunParser::token::NIL;
+"break"     return fun::FunParser::token::BREAK;
+"continue"  return fun::FunParser::token::CONTINUE;
 
-":"       return fun::FunParser::token::COLON;
-";"       return fun::FunParser::token::SEMICOLON;
-"("       return fun::FunParser::token::LPAREN;
-")"       return fun::FunParser::token::RPAREN;
-","       return fun::FunParser::token::COMMA;
+":"         return fun::FunParser::token::COLON;
+";"         return fun::FunParser::token::SEMICOLON;
+"("         return fun::FunParser::token::LPAREN;
+")"         return fun::FunParser::token::RPAREN;
+","         return fun::FunParser::token::COMMA;
 
 {DIGIT}+ {
     yylval->integer = atoi(yytext); 
@@ -69,7 +74,9 @@ int nnn1 = 0;
     return fun::FunParser::token::STRING;
 }
 
-[#][^#\n]*[\n] { /* comment*/ }
+"#"           { BEGIN(comment); }
+<comment>"\n" { BEGIN(INITIAL); }
+<comment>.    {}
 
 "="   return fun::FunParser::token::ASSIGN;
 

@@ -16,6 +16,10 @@ int main(int argc, char* argv[]) {
 
         ifstream file(argv[1]);
 
+        if (!file.is_open())
+            throw std::runtime_error(string("can't open file ") + string(argv[1]));
+
+        Statement::clear();
         FunLexer lexer(&file);
         FunParser parser(lexer);
         parser.set_debug_level(argc > 2);
@@ -23,11 +27,13 @@ int main(int argc, char* argv[]) {
 
         Printer pv;
 
-        Node::root->accept(&pv);
+        int result = Statement::apply(&pv);
 
-        return 0;
+        Statement::clear();
+
+        return result;
     } catch (const std::exception& e) {
-        cerr << "error: " << e.what() << endl;
+        cerr << e.what() << endl;
         return 1;
     }
 }
