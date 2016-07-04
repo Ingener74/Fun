@@ -25,7 +25,7 @@ void yyerror(const char* );
     double                real;
     std::string*          str;
     
-    Statement*            statement_type;
+    Statement*            sttmnt_type;
     Function*             func_type;
     Import*               import_type;
     Print*                print_type;
@@ -35,6 +35,8 @@ void yyerror(const char* );
     Return*               return_type;
     Id*                   id_type;    
     Expression*           expr_type;
+    Break*                break_type;
+    Continue*             continue_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -50,6 +52,8 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token EOL
 
 %token ASSIGN             "="
+
+
 
 %token ADD                "+"
 %token ADD_ASSIGN         "+="
@@ -71,6 +75,9 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 
 %token LESS               "<"
 %token LESS_EQUAL         "<="
+
+%token EQUAL              "=="
+%token NOT_EQUAL          "!="
 
 %token COLON              ":"
 %token SEMICOLON          ";"
@@ -97,9 +104,11 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token BREAK              "break"
 %token CONTINUE           "continue"
 
-%type <statement_type>    program
-%type <statement_type>    statement
-%type <statement_type>    statements
+%type <sttmnt_type>       program
+%type <sttmnt_type>       sttmnt
+%type <sttmnt_type>       sttmnts
+%type <sttmnt_type>       cycle_sttmnt
+%type <sttmnt_type>       cycle_sttmnts
 %type <id_type>           id
 %type <id_type>           ids
 %type <expr_type>         expr
@@ -111,6 +120,8 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <while_type>        while
 %type <for_type>          for
 %type <return_type>       ret
+%type <break_type>        break
+%type <continue_type>     continue
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -129,120 +140,117 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %start program;
 
 program
-    : statements                                        { Statement::entryPoint = $1; }
+    : sttmnts { Statement::entryPoint = $1; }
     ;
 
-statements
-    : %empty                                            { $$ = nullptr; }
-    | statement statements                              { $$ = $1; $1->nextStatement = $2; }
+sttmnts
+    : %empty           { $$ = nullptr; }
+    | sttmnt sttmnts   { $$ = $1; $1->nextStatement = $2; }
     ;
 
-statement
-    : import                                            { $$ = $1; }
-    | print                                             { $$ = $1; }
-    | func                                              { $$ = $1; }
-    | if                                                { $$ = $1; }
-    | while                                             { $$ = $1; }
-    | for                                               { $$ = $1; }
-    | ret                                               { $$ = $1; }
-    | expr                                              { $$ = $1; }
+sttmnt
+    : import    { $$ = $1; }
+    | print     { $$ = $1; }
+    | func      { $$ = $1; }
+    | if        { $$ = $1; }
+    | while     { $$ = $1; }
+    | for       { $$ = $1; }
+    | ret       { $$ = $1; }
+    | expr      { $$ = $1; }
+    ;
+
+cycle_sttmnts
+    : %empty                        { $$ = nullptr; }
+    | sttmnt        cycle_sttmnts   { $$ = $1; $1->nextStatement = $2; }
+    | cycle_sttmnt  cycle_sttmnts   { $$ = $1; $1->nextStatement = $2; }
+    ;
+
+cycle_sttmnt
+    : break    { $$ = $1; }
+    | continue { $$ = $1; }
     ;
 
 import
-    : "import" ids                                      { $$ = Statement::make<Import>($2); }
+    : "import" ids { $$ = Statement::make<Import>($2); }
     ;
 
 print
-    : "print" exprs                                     { $$ = Statement::make<Print>($2); }
+    : "print" exprs { $$ = Statement::make<Print>($2); }
     ;
 
 func
-    : "fun" id "("     ")"            "end"             { $$ = Statement::make<Function>($2, nullptr, nullptr); }
-    | "fun" id "("     ")" statements "end"             { $$ = Statement::make<Function>($2, nullptr, $5     ); }
-    | "fun" id "(" ids ")"            "end"             { $$ = Statement::make<Function>($2, $4     , nullptr); }
-    | "fun" id "(" ids ")" statements "end"             { $$ = Statement::make<Function>($2, $4     , $6     ); }
+    : "fun" id "(" ids ")" sttmnts "end"   { $$ = Statement::make<Function>($2, $4, $6); }
     ;
 
 if
-    : "if" expr ":"            "end"                    { $$ = Statement::make<If>($2); }
-    | "if" expr ":" statements "end"                    { $$ = Statement::make<If>($2, $4); }
-    | "if" expr ":"            "else"            "end"  { $$ = Statement::make<If>($2); }
-    | "if" expr ":"            "else" statements "end"  { $$ = Statement::make<If>($2, nullptr, $5); }
-    | "if" expr ":" statements "else"            "end"  { $$ = Statement::make<If>($2, $4); }
-    | "if" expr ":" statements "else" statements "end"  { $$ = Statement::make<If>($2, $4, $6); }
+    : "if" expr ":" cycle_sttmnts "end"                       { $$ = Statement::make<If>($2, $4);     }
+    | "if" expr ":" cycle_sttmnts "else" cycle_sttmnts "end"  { $$ = Statement::make<If>($2, $4, $6); }
     ;
 
 while
-    : "while" expr ":" statements "end"                 { $$ = Statement::make<While>($2, $4); }
+    : "while" expr ":" cycle_sttmnts "end" { $$ = Statement::make<While>($2, $4); }
     ;
 
 for
-    : "for"      ";"      ";"      ":"            "end" { $$ = Statement::make<For>(nullptr, nullptr, nullptr, nullptr); }
-    | "for"      ";"      ";" expr ":"            "end" { $$ = Statement::make<For>(nullptr, nullptr, $4     , nullptr); }
-    | "for"      ";" expr ";"      ":"            "end" { $$ = Statement::make<For>(nullptr, $3     , nullptr, nullptr); }
-    | "for"      ";" expr ";" expr ":"            "end" { $$ = Statement::make<For>(nullptr, $3     , $5     , nullptr); }
+    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2, $4, $6, $8); }
+    ;
 
-    | "for" expr ";"      ";"      ":"            "end" { $$ = Statement::make<For>($2     , nullptr, nullptr, nullptr); }
-    | "for" expr ";"      ";" expr ":"            "end" { $$ = Statement::make<For>($2     , nullptr, $5     , nullptr); }
-    | "for" expr ";" expr ";"      ":"            "end" { $$ = Statement::make<For>($2     , $4     , nullptr, nullptr); }
-    | "for" expr ";" expr ";" expr ":"            "end" { $$ = Statement::make<For>($2     , $4     , $6     , nullptr); }
-    
-    | "for"      ";"      ";"      ":" statements "end" { $$ = Statement::make<For>(nullptr, nullptr, nullptr, $5     ); }
-    | "for"      ";"      ";" expr ":" statements "end" { $$ = Statement::make<For>(nullptr, nullptr, $4     , $6     ); }
-    | "for"      ";" expr ";"      ":" statements "end" { $$ = Statement::make<For>(nullptr, $3     , nullptr, $6     ); }
-    | "for"      ";" expr ";" expr ":" statements "end" { $$ = Statement::make<For>(nullptr, $3     , $5     , $7     ); }
-    
-    | "for" expr ";"      ";"      ":" statements "end" { $$ = Statement::make<For>($2     , nullptr, nullptr, $6     ); }
-    | "for" expr ";"      ";" expr ":" statements "end" { $$ = Statement::make<For>($2     , nullptr, $5     , $7     ); }
-    | "for" expr ";" expr ";"      ":" statements "end" { $$ = Statement::make<For>($2     , $4     , nullptr, $7     ); }
-    | "for" expr ";" expr ";" expr ":" statements "end" { $$ = Statement::make<For>($2     , $4     , $6     , $8     ); }
+break
+    : "break" { $$ = Statement::make<Break>(); }
+    ;
+
+continue
+    : "continue" { $$ = Statement::make<Continue>(); }
     ;
 
 ret
-    : "ret"                                             { $$ = Statement::make<Return>();   }
-    | "ret" exprs                                       { $$ = Statement::make<Return>($2); }
+    : "ret"        { $$ = Statement::make<Return>();   } // check useless
+    | "ret" exprs  { $$ = Statement::make<Return>($2); }
     ;
 
 ids
-    : %empty                                            { $$ = nullptr;              }
-    | id                                                { $$ = $1;                   }
-    | id "," ids                                        { $$ = $1; $1->nextId = $3;  }
+    : %empty       { $$ = nullptr;              }
+    | id           { $$ = $1;                   }
+    | id "," ids   { $$ = $1; $1->nextId = $3;  }
     ;
 
 id
-    : ID                                                { $$ = Statement::make<Id>(*$1); }
+    : ID { $$ = Statement::make<Id>(*$1); }
     ;
 
 expr
-    : id "=" expr                                       { $$ = Statement::make<Assign>($1, $3);                         }
-    | expr "+" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
-    | expr "+=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::ADD_ASSIGN, $1, $3); }
-    | expr "-" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
-    | expr "-=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::SUB_ASSIGN, $1, $3); }
-    | expr "*" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
-    | expr "*=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::MUL_ASSIGN, $1, $3); }
-    | expr "/" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::DIV,        $1, $3); }
-    | expr "/=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::DIV_ASSIGN, $1, $3); }
-    | expr "%" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::MOD,        $1, $3); }
-    | expr "%=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::MOD_ASSIGN, $1, $3); }
-    | expr ">" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::MORE,       $1, $3); }
-    | expr ">=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr                                     { $$ = Statement::make<BinaryOp>(BinaryOp::LESS,       $1, $3); }
-    | expr "<=" expr                                    { $$ = Statement::make<BinaryOp>(BinaryOp::LESS_EQUAL, $1, $3); }
-    | INTEGER                                           { $$ = Statement::make<Integer>($1);                            }
-    | REAL                                              { $$ = Statement::make<Real>($1);                               }
-    | TRUE                                              { $$ = Statement::make<Boolean>(true);                          }
-    | FALSE                                             { $$ = Statement::make<Boolean>(false);                         }
-    | STRING                                            { $$ = Statement::make<String>(*$1);                            }
-    | NIL                                               { $$ = Statement::make<Null>();                                 }
-    | id                                                { $$ = $1;                                                      }
-    | id "("  ")"                                       { $$ = Statement::make<Call>($1);                               }
-    | id "(" exprs ")"                                  { $$ = Statement::make<Call>($1, $3);                           }
+    : %empty             { $$ = nullptr; }
+    | id "=" expr        { $$ = Statement::make<Assign>($1, $3);                         }
+    | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
+    | expr "+=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::ADD_ASSIGN, $1, $3); }
+    | expr "-" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
+    | expr "-=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::SUB_ASSIGN, $1, $3); }
+    | expr "*" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
+    | expr "*=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MUL_ASSIGN, $1, $3); }
+    | expr "/" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::DIV,        $1, $3); }
+    | expr "/=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::DIV_ASSIGN, $1, $3); }
+    | expr "%" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MOD,        $1, $3); }
+    | expr "%=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MOD_ASSIGN, $1, $3); }
+    | expr ">" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MORE,       $1, $3); }
+    | expr ">=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::LESS,       $1, $3); }
+    | expr "<=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::LESS_EQUAL, $1, $3); }
+    | expr "==" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::EQUAL,      $1, $3); }
+    | expr "!=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::NOT_EQUAL,  $1, $3); }
+    | INTEGER            { $$ = Statement::make<Integer>($1);                            }
+    | REAL               { $$ = Statement::make<Real>($1);                               }
+    | TRUE               { $$ = Statement::make<Boolean>(true);                          }
+    | FALSE              { $$ = Statement::make<Boolean>(false);                         }
+    | STRING             { $$ = Statement::make<String>(*$1);                            }
+    | NIL                { $$ = Statement::make<Null>();                                 }
+    | id                 { $$ = $1;                                                      }
+    | id "("  ")"        { $$ = Statement::make<Call>($1);                               } // check useless
+    | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
     ;
 
 exprs
-    : expr                                              { $$ = $1; }
-    | expr "," exprs                                    { $$ = $1; $1->nextExpression = $3; }
+    : expr             { $$ = $1; }
+    | expr "," exprs   { $$ = $1; $1->nextExpression = $3; }
     ;
 
 %%

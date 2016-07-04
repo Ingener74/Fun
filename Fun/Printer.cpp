@@ -15,13 +15,23 @@ Printer::Printer() {
 Printer::~Printer() {
 }
 
+// Statements
+
+void Printer::visit(Break*) {
+}
+
+void Printer::visit(Continue*) {
+}
+
+void Printer::visit(For*) {
+    cout << "for " << endl;
+}
+
 void Printer::visit(Function* node) {
 }
 
 void Printer::visit(If* node) {
-}
-
-void Printer::visit(While* node) {
+    cout << getTabs() << "if " << endl;
 }
 
 void Printer::visit(Import* node) {
@@ -32,8 +42,19 @@ void Printer::visit(Print* node) {
     cout << getTabs() << "print " << endl;
 }
 
-void Printer::visit(Expression* node) {
+void Printer::visit(Return*) {
+    cout << "return " << endl;
 }
+
+void Printer::visit(While* node) {
+    cout << getTabs() << "while " << endl;
+}
+
+void Printer::visit(Class*) {
+    cout << "class " << endl;
+}
+
+// Expression
 
 void Printer::visit(Assign* node) {
 }
@@ -93,16 +114,22 @@ void Printer::visit(Id* node) {
     cout << node->value << endl;
 }
 
+// Terminal
+
+void Printer::visit(Boolean* node) {
+    cout << std::boolalpha << node->value << endl;
+}
+
 void Printer::visit(Integer* node) {
     cout << node->value << endl;
 }
 
-void Printer::visit(Real* node) {
-    cout << node->value << endl;
+void Printer::visit(Null*) {
+    cout << "null" << endl;
 }
 
-void Printer::visit(Boolean* node) {
-    cout << std::boolalpha << node->value << endl;
+void Printer::visit(Real* node) {
+    cout << node->value << endl;
 }
 
 void Printer::visit(String* node) {

@@ -13,13 +13,13 @@ else()
 endif()
 
 
-option(ENABLE_DESERTED_XYLOPHONE "Enable Deserted-Xylophone" ON)
+option(ENABLE_DESERTED_XYLOPHONE "Enable Deserted-Xylophone" OFF)
 if(ENABLE_DESERTED_XYLOPHONE)
     add_subdirectory(Deserted-Xylophone)
 endif()
 
 
-option(ENABLE_TAINTED_BULLDOZER "Enable Tainted-Bulldozer" ON)
+option(ENABLE_TAINTED_BULLDOZER "Enable Tainted-Bulldozer" OFF)
 if(ENABLE_TAINTED_BULLDOZER)
     add_subdirectory(Tainted-Bulldozer)
 endif()

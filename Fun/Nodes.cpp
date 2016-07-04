@@ -164,8 +164,7 @@ void Call::accept(Visitor* v) {
     v->visit(this);
     fassert(name, "Call expression must have name")
     name->accept(v);
-    if (arguments)
-        arguments->accept(v);
+    Expression::apply(arguments, v);
     v->visit(this);
 }
 

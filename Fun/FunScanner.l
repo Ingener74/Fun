@@ -101,6 +101,9 @@ int nnn1 = 0;
 "<"   return fun::FunParser::token::LESS;
 "<="  return fun::FunParser::token::LESS_EQUAL;
 
+"=="  return fun::FunParser::token::EQUAL;
+"!="  return fun::FunParser::token::NOT_EQUAL;
+
 [ \t\n] ;
 
 . { cerr << "Invalid symbol " << yytext << endl; }
