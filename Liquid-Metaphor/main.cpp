@@ -27,11 +27,11 @@ int main(int argc, char* argv[]) {
 
         Printer pv;
 
-        int result = Statement::apply(&pv);
+        Statement::apply(&pv);
 
         Statement::clear();
 
-        return result;
+        return 0;
     } catch (const std::exception& e) {
         cerr << e.what() << endl;
         return 1;

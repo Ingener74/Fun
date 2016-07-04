@@ -13,9 +13,7 @@ public:
     Statement() = default;
     virtual ~Statement() = default;
 
-    virtual void accept(Visitor*) = 0;
-
-    Statement* nextStatement = nullptr;
+    virtual Statement* accept(Visitor*) = 0;
 
     template<typename T, typename ... Args>
     static T* make(Args&& ... args) {
@@ -25,14 +23,16 @@ public:
         return result;
     }
 
-    static void clear();
-    static int apply(Visitor* v);
+    Statement* nextStatement = nullptr;
 
-protected:
+    static void clear();
+    static void apply(Visitor* v);
+
     static Statement* entryPoint;
+protected:
     static std::vector<std::unique_ptr<Statement>> statements;
 
-    static int apply(Statement* start, Visitor* v);
+    static void apply(Statement* start, Visitor* v);
 };
 
 class Break: public Statement {
@@ -40,7 +40,7 @@ public:
     Break() = default;
     virtual ~Break() = default;
 
-    virtual void accept(Visitor*);
+    virtual Break* accept(Visitor*);
 };
 
 class Continue: public Statement {
@@ -48,7 +48,7 @@ public:
     Continue() = default;
     virtual ~Continue() = default;
 
-    virtual void accept(Visitor*);
+    virtual Continue* accept(Visitor*);
 };
 
 class Expression;
@@ -61,7 +61,7 @@ public:
     }
     virtual ~For() = default;
 
-    virtual void accept(Visitor*);
+    virtual For* accept(Visitor*);
 
     Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
     Statement* scope = nullptr;
@@ -76,7 +76,7 @@ public:
     }
     virtual ~Function() = default;
 
-    virtual void accept(Visitor*);
+    virtual Function* accept(Visitor*);
 
     Id* name = nullptr;
     Id* args = nullptr;
@@ -90,7 +90,7 @@ public:
     }
     virtual ~If() = default;
 
-    void accept(Visitor*);
+    virtual If* accept(Visitor*);
 
     Expression* condition = nullptr;
     Statement* thenScope = nullptr, *elseScope = nullptr;
@@ -103,7 +103,7 @@ public:
     }
     virtual ~Import() = default;
 
-    virtual void accept(Visitor*);
+    virtual Import* accept(Visitor*);
 
     Id* id = nullptr;
 };
@@ -115,7 +115,7 @@ public:
     }
     virtual ~Print() = default;
 
-    virtual void accept(Visitor*);
+    virtual Print* accept(Visitor*);
 
     Expression* expression = nullptr;
 };
@@ -127,7 +127,7 @@ public:
     }
     virtual ~Return() = default;
 
-    virtual void accept(Visitor*);
+    virtual Return* accept(Visitor*);
 
     Expression* expression = nullptr;
 };
@@ -139,7 +139,7 @@ public:
     }
     virtual ~While() = default;
 
-    virtual void accept(Visitor*);
+    virtual While* accept(Visitor*);
 
     Expression* condition = nullptr;
     Statement* scope = nullptr;
@@ -149,6 +149,8 @@ class Expression: public Statement {
 public:
     Expression() = default;
     virtual ~Expression() = default;
+
+    virtual Expression* accept(Visitor*) = 0;
 
     Expression* nextExpression = nullptr;
 
@@ -162,7 +164,7 @@ public:
     }
     virtual ~Assign() = default;
 
-    virtual void accept(Visitor*);
+    virtual Assign* accept(Visitor*);
 
     Id* name;
     Expression* value;
@@ -195,7 +197,7 @@ public:
     }
     virtual ~BinaryOp() = default;
 
-    virtual void accept(Visitor*);
+    virtual BinaryOp* accept(Visitor*);
 
     Op m_operation;
     Expression* lhs = nullptr, *rhs = nullptr;
@@ -208,7 +210,7 @@ public:
     }
     virtual ~Call() = default;
 
-    virtual void accept(Visitor*);
+    virtual Call* accept(Visitor*);
 
     Id* name = nullptr;
     Expression* arguments = nullptr;
@@ -221,7 +223,7 @@ public:
     }
     virtual ~Id() = default;
 
-    virtual void accept(Visitor*);
+    virtual Id* accept(Visitor*);
 
     Id* nextId = nullptr;
 
@@ -239,6 +241,8 @@ public:
     Terminal() = default;
     virtual ~Terminal() = default;
 
+    virtual Terminal* accept(Visitor*) = 0;
+
     virtual Type getType() const {
         return Unknown;
     }
@@ -251,7 +255,8 @@ public:
     }
     virtual ~Boolean() = default;
 
-    virtual void accept(Visitor*);
+    virtual Boolean* accept(Visitor*);
+
     virtual Type getType() const {
         return Terminal::Boolean;
     }
@@ -266,7 +271,8 @@ public:
     }
     virtual ~Integer() = default;
 
-    virtual void accept(Visitor* visitor);
+    virtual Integer* accept(Visitor* visitor);
+
     virtual Type getType() const {
         return Terminal::Integer;
     }
@@ -279,7 +285,8 @@ public:
     Null() = default;
     virtual ~Null() = default;
 
-    virtual void accept(Visitor*);
+    virtual Null* accept(Visitor*);
+
     virtual Type getType() const {
         return Terminal::Null;
     }
@@ -292,7 +299,8 @@ public:
     }
     virtual ~Real() = default;
 
-    virtual void accept(Visitor* v);
+    virtual Real* accept(Visitor* v);
+
     virtual Type getType() const {
         return Terminal::Real;
     }
@@ -307,7 +315,8 @@ public:
     }
     virtual ~String() = default;
 
-    virtual void accept(Visitor* v);
+    virtual String* accept(Visitor* v);
+
     virtual Type getType() const {
         return Terminal::String;
     }

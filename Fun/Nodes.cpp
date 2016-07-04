@@ -14,86 +14,30 @@ void Statement::clear() {
     statements.clear();
 }
 
-int Statement::apply(Visitor* v) {
-    return apply(entryPoint, v);
+void Statement::apply(Visitor* v) {
+    apply(entryPoint, v);
 }
 
-int Statement::apply(Statement* start, Visitor* v) {
-    if (!start)
-        return -1;
-
-    do {
-        start->accept(v);
-        start = start->nextStatement;
-    } while (start);
-    return 0;
+void Statement::apply(Statement* start, Visitor* v) {
+    while (start)
+        start = start->accept(v)->nextStatement;
 }
 
-void Import::accept(Visitor* v) {
+Break* Break::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
-    fassert(id, "Import must have an id");
-    Id::apply(id, v);
     v->visit(this);
+    return this;
 }
 
-void Return::accept(Visitor* v) {
+Continue* Continue::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
-    if (expression) {
-        auto curExpr = expression;
-        do {
-            curExpr->accept(v);
-            curExpr = curExpr->nextExpression;
-        } while (curExpr);
-    }
     v->visit(this);
+    return this;
 }
 
-void Print::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
-    fassert(expression, "Print must have the expressions")
-    auto curExpr = expression;
-    do {
-        curExpr->accept(v);
-        curExpr = curExpr->nextExpression;
-    } while (curExpr);
-    v->visit(this);
-}
-
-void Function::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
-    fassert(name, "Function must have the name");
-    name->accept(v);
-    if (args)
-        args->accept(v);
-    if (scope)
-        scope->accept(v);
-    v->visit(this);
-}
-
-void If::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
-    fassert(condition, "If must have the condition expression");
-    condition->accept(v);
-    apply(thenScope, v);
-    apply(elseScope, v);
-    v->visit(this);
-}
-
-void While::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
-    fassert(condition, "While must have the condition expression");
-    condition->accept(v);
-    apply(scope, v);
-    v->visit(this);
-}
-
-void For::accept(Visitor* v) {
+For* For::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
     if (initial)
@@ -104,52 +48,96 @@ void For::accept(Visitor* v) {
         increment->accept(v);
     apply(scope, v);
     v->visit(this);
+    return this;
 }
 
-void Break::accept(Visitor* v) {
+Function* Function::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    fassert(name, "Function must have the name");
+    name->accept(v);
+    if (args)
+        args->accept(v);
+    if (scope)
+        scope->accept(v);
     v->visit(this);
+    return this;
 }
 
-void Continue::accept(Visitor* v) {
+If* If::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    fassert(condition, "If must have the condition expression");
+    condition->accept(v);
+    apply(thenScope, v);
+    apply(elseScope, v);
     v->visit(this);
+    return this;
+}
+
+Import* Import::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    fassert(id, "Import must have an id");
+    Id::apply(id, v);
+    v->visit(this);
+    return this;
+}
+
+Print* Print::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    fassert(expression, "Print must have the expressions")
+    auto curExpr = expression;
+    do {
+        curExpr->accept(v);
+        curExpr = curExpr->nextExpression;
+    } while (curExpr);
+    v->visit(this);
+    return this;
+}
+
+Return* Return::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    if (expression) {
+        auto curExpr = expression;
+        do {
+            curExpr->accept(v);
+            curExpr = curExpr->nextExpression;
+        } while (curExpr);
+    }
+    v->visit(this);
+    return this;
+}
+
+While* While::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    fassert(condition, "While must have the condition expression");
+    condition->accept(v);
+    apply(scope, v);
+    v->visit(this);
+    return this;
 }
 
 void Expression::apply(Expression* expression, Visitor* v) {
-    auto expr = expression;
-    do {
-        expr->accept(v);
-        expr = expr->nextExpression;
-    } while (expr);
+    while (expression)
+        expression = expression->accept(v)->nextExpression;
 }
 
-void Id::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
-}
-
-void Id::apply(Id* id, Visitor* v) {
-    auto currentId = id;
-    do {
-        currentId->accept(v);
-        currentId = currentId->nextId;
-    } while (currentId);
-}
-
-void Assign::accept(Visitor* v) {
+Assign* Assign::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
     fassert(name, "Assign must have name")
-    name->accept(v);
+    Id::apply(name, v);
     fassert(value, "Assign must have value")
-    value->accept(v);
+    Expression::apply(value, v);
     v->visit(this);
+    return this;
 }
 
-void BinaryOp::accept(Visitor* v) {
+BinaryOp* BinaryOp::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
     fassert(lhs, "Binary operation must have left side expression")
@@ -157,40 +145,58 @@ void BinaryOp::accept(Visitor* v) {
     fassert(rhs, "Binary operation must have right side expression")
     rhs->accept(v);
     v->visit(this);
+    return this;
 }
 
-void Call::accept(Visitor* v) {
+Call* Call::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
     fassert(name, "Call expression must have name")
     name->accept(v);
     Expression::apply(arguments, v);
     v->visit(this);
+    return this;
 }
 
-void Integer::accept(Visitor* v) {
+Id* Id::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    return this;
 }
 
-void Real::accept(Visitor* v) {
-    fassert(v, "Visitor is null");
-    v->visit(this);
+void Id::apply(Id* id, Visitor* v) {
+    while (id)
+        id = id->accept(v)->nextId;
 }
 
-void String::accept(Visitor* v) {
+Boolean* Boolean::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    return this;
 }
 
-void Boolean::accept(Visitor* v) {
+Integer* Integer::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    return this;
 }
 
-void Null::accept(Visitor* v) {
+Null* Null::accept(Visitor* v) {
     fassert(v, "Visitor is null");
     v->visit(this);
+    return this;
+}
+
+Real* Real::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    return this;
+}
+
+String* String::accept(Visitor* v) {
+    fassert(v, "Visitor is null");
+    v->visit(this);
+    return this;
 }
 
 }
