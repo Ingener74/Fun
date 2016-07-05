@@ -51,6 +51,24 @@ public:
     virtual Continue* accept(Visitor*);
 };
 
+class Id;
+
+class Exception: public Statement {
+public:
+    Exception(Statement* tryStmts = nullptr, Id* errorClasses = nullptr, Id* errorObject = nullptr,
+            Statement* catchStmts = nullptr) :
+            tryStmts(tryStmts), errorClasses(errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
+    }
+    virtual ~Exception() = default;
+
+    virtual Exception* accept(Visitor*);
+
+    Statement* tryStmts = nullptr;
+    Id* errorClasses = nullptr;
+    Id* errorObject = nullptr;
+    Statement* catchStmts = nullptr;
+};
+
 class Expression;
 
 class For: public Statement {
@@ -66,8 +84,6 @@ public:
     Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
     Statement* scope = nullptr;
 };
-
-class Id;
 
 class Function: public Statement {
 public:
@@ -128,6 +144,18 @@ public:
     virtual ~Return() = default;
 
     virtual Return* accept(Visitor*);
+
+    Expression* expression = nullptr;
+};
+
+class Throw: public Statement {
+public:
+    Throw(Expression* exression = nullptr) :
+            expression(expression) {
+    }
+    virtual ~Throw() = default;
+
+    virtual Throw* accept(Visitor*);
 
     Expression* expression = nullptr;
 };

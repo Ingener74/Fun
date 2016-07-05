@@ -37,6 +37,8 @@ void yyerror(const char* );
     Expression*           expr_type;
     Break*                break_type;
     Continue*             continue_type;
+    Exception*            exception_type;
+    Throw*                throw_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -103,6 +105,10 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token NIL                "null"
 %token BREAK              "break"
 %token CONTINUE           "continue"
+%token TRY                "try"
+%token CATCH              "catch"
+%token AS                 "as"
+%token THROW              "throw"
 
 %type <sttmnt_type>       program
 %type <sttmnt_type>       sttmnt
@@ -122,6 +128,8 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <return_type>       ret
 %type <break_type>        break
 %type <continue_type>     continue
+%type <exception_type>    exception
+%type <throw_type>        throw
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -157,6 +165,8 @@ sttmnt
     | for       { $$ = $1; }
     | ret       { $$ = $1; }
     | expr      { $$ = $1; }
+    | exception { $$ = $1; }
+    | throw     { $$ = $1; }
     ;
 
 cycle_sttmnts
@@ -206,6 +216,14 @@ continue
 ret
     : "ret"        { $$ = Statement::make<Return>();   } // check useless
     | "ret" exprs  { $$ = Statement::make<Return>($2); }
+    ;
+
+exception
+    : "try" sttmnts "catch" ids "as" id ":" sttmnts "end" { $$ = Statement::make<Exception>($2, $4, $6, $8); }
+    ;
+
+throw
+    : "throw " expr { $$ = Statement::make<Throw>($2); }
     ;
 
 ids

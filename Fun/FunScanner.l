@@ -47,6 +47,10 @@ int nnn1 = 0;
 "null"      return fun::FunParser::token::NIL;
 "break"     return fun::FunParser::token::BREAK;
 "continue"  return fun::FunParser::token::CONTINUE;
+"try"       return fun::FunParser::token::TRY;
+"catch"     return fun::FunParser::token::CATCH;
+"as"        return fun::FunParser::token::AS;
+"throw"     return fun::FunParser::token::THROW;
 
 ":"         return fun::FunParser::token::COLON;
 ";"         return fun::FunParser::token::SEMICOLON;
