@@ -62,15 +62,35 @@ fun testFunction(x, y)
     ret quz_res
 end
 
+fun testExc(t)
+    try
+        if t:
+            throw "if t"
+        else
+            throw "it not t"
+        end
+    catch Exception as e:
+        print "caugth error " + e
+    end
+end
+
 testFunction(100, 200)
 
 # class TestClass
-#     fun init(test)
+#     fun init(self, test)
 #         self.m_test = test
 #         self.copy("one hundred is ", 100)
 #     end
-#     copy = fun(arg1, arg2)
+#     fun copy(self, arg1, arg2)
 #         print arg1 + arg2
 #     end
 # end
+
+fun main()
+    print "main"
+end
+
+if isProgram:
+    main()
+end
 
