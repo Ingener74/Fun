@@ -39,6 +39,7 @@ void yyerror(const char* );
     Continue*             continue_type;
     Exception*            exception_type;
     Throw*                throw_type;
+    ElseIf*               elif_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -89,6 +90,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 
 %token IMPORT             "import"
 %token IF                 "if"
+%token ELIF               "elif"
 %token ELSE               "else"
 %token FOR                "for"
 %token IN                 "in"
@@ -123,6 +125,8 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <import_type>       import
 %type <print_type>        print
 %type <if_type>           if
+%type <elif_type>         elif
+%type <elif_type>         elifs
 %type <while_type>        while
 %type <for_type>          for
 %type <return_type>       ret
@@ -193,8 +197,17 @@ func
     ;
 
 if
-    : "if" expr ":" cycle_sttmnts "end"                       { $$ = Statement::make<If>($2, $4);     }
-    | "if" expr ":" cycle_sttmnts "else" cycle_sttmnts "end"  { $$ = Statement::make<If>($2, $4, $6); }
+    : "if" expr ":" cycle_sttmnts elifs "end"                       { $$ = Statement::make<If>($2, $4, $5);     }
+    | "if" expr ":" cycle_sttmnts elifs "else" cycle_sttmnts "end"  { $$ = Statement::make<If>($2, $4, $5, $7); }
+    ;
+
+elifs
+    : %empty      { $$ = nullptr; }
+    | elif elifs  { $$ = $1; $1->nextElseIf = $2; }
+    ;
+
+elif
+    : "elif" expr ":" cycle_sttmnts { $$ = Statement::make<ElseIf>($2, $4); }
     ;
 
 while

@@ -99,17 +99,21 @@ public:
     Statement* scope = nullptr;
 };
 
+class ElseIf;
+
 class If: public Statement {
 public:
-    If(Expression* condition, Statement* then_scope = nullptr, Statement* else_scope = nullptr) :
-            condition(condition), thenScope(then_scope), elseScope(else_scope) {
+    If(Expression* cond, Statement* thenStmts = nullptr, ElseIf* elseIf = nullptr, Statement* elseStmts = nullptr) :
+            cond(cond), thenStmts(thenStmts), elseIf(elseIf), elseStmts(elseStmts) {
     }
     virtual ~If() = default;
 
     virtual If* accept(Visitor*);
 
-    Expression* condition = nullptr;
-    Statement* thenScope = nullptr, *elseScope = nullptr;
+    Expression* cond;
+    Statement* thenStmts;
+    ElseIf* elseIf;
+    Statement* elseStmts;
 };
 
 class Import: public Statement {
@@ -162,15 +166,31 @@ public:
 
 class While: public Statement {
 public:
-    While(Expression* condition, Statement* scope) :
-            condition(condition), scope(scope) {
+    While(Expression* cond = nullptr, Statement* stmts = nullptr) :
+            cond(cond), stmts(stmts) {
     }
     virtual ~While() = default;
 
     virtual While* accept(Visitor*);
 
-    Expression* condition = nullptr;
-    Statement* scope = nullptr;
+    Expression* cond;
+    Statement* stmts;
+};
+
+class ElseIf: public Statement {
+public:
+    ElseIf(Expression* cond = nullptr, Statement* stmts = nullptr) :
+            cond(cond), stmts(stmts) {
+    }
+    virtual ~ElseIf() = default;
+
+    virtual ElseIf* accept(Visitor*);
+
+    Expression* cond;
+    Statement* stmts;
+
+    static void apply(ElseIf*, Visitor*);
+    ElseIf* nextElseIf = nullptr;
 };
 
 class Expression: public Statement {
@@ -180,9 +200,8 @@ public:
 
     virtual Expression* accept(Visitor*) = 0;
 
-    Expression* nextExpression = nullptr;
-
     static void apply(Expression*, Visitor*);
+    Expression* nextExpression = nullptr;
 };
 
 class Assign: public Expression {

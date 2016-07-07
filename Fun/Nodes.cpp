@@ -60,10 +60,11 @@ ACCEPT(Function, {
 })
 
 ACCEPT(If, {
-    fassert(condition, "If must have the condition expression");
-    Expression::apply(condition, v);
-    Statement::apply(thenScope, v);
-    Statement::apply(elseScope, v);
+    fassert(cond, "If must have the condition expression");
+    Expression::apply(cond, v);
+    Statement::apply(thenStmts, v);
+    ElseIf::apply(elseIf, v);
+    Statement::apply(elseStmts, v);
 })
 
 ACCEPT(Import, {
@@ -81,10 +82,21 @@ ACCEPT(Return, { Expression::apply(expression, v); })
 ACCEPT(Throw, { Expression::apply(expression, v); })
 
 ACCEPT(While, {
-    fassert(condition, "While must have the condition expression");
-    Expression::apply(condition, v);
-    Statement::apply(scope, v);
+    fassert(cond, "While must have the condition expression");
+    Expression::apply(cond, v);
+    Statement::apply(stmts, v);
 })
+
+ACCEPT(ElseIf, {
+    fassert(cond, "Else If must have the condition expression");
+    Expression::apply(cond, v);
+    Statement::apply(stmts, v);
+})
+
+void ElseIf::apply(ElseIf* elseIf, Visitor* v) {
+    while (elseIf)
+        elseIf = elseIf->accept(v)->nextElseIf;
+}
 
 void Expression::apply(Expression* expression, Visitor* v) {
     while (expression)

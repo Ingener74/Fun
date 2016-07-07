@@ -72,19 +72,30 @@ fun testExc(t)
     catch Exception as e:
         print "caugth error " + e
     end
+
+    try
+        if true:
+            throw "if true"
+        else
+            throw "if false"
+        end
+    catch IOError, RuntimeError as e:
+        print e
+    end
 end
 
 testFunction(100, 200)
 
-# class TestClass
-#     fun init(self, test)
-#         self.m_test = test
-#         self.copy("one hundred is ", 100)
-#     end
-#     fun copy(self, arg1, arg2)
-#         print arg1 + arg2
-#     end
-# end
+class TestClass
+    fun init(self, test)
+        self.m_test = test
+        self.copy("one hundred is ", 100)
+    end
+    
+    fun copy(self, arg1, arg2)
+        print arg1 + arg2
+    end
+end
 
 fun main()
     print "main"

@@ -32,6 +32,7 @@ int nnn1 = 0;
 
 "import"    return fun::FunParser::token::IMPORT;
 "if"        return fun::FunParser::token::IF;
+"elif"      return fun::FunParser::token::ELIF;
 "else"      return fun::FunParser::token::ELSE;
 "for"       return fun::FunParser::token::FOR;
 "in"        return fun::FunParser::token::IN;
