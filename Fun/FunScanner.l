@@ -44,7 +44,6 @@ int nnn1 = 0;
 "end"       return fun::FunParser::token::END;
 "true"      return fun::FunParser::token::TRUE;
 "false"     return fun::FunParser::token::FALSE;
-"class"     return fun::FunParser::token::CLASS;
 "null"      return fun::FunParser::token::NIL;
 "break"     return fun::FunParser::token::BREAK;
 "continue"  return fun::FunParser::token::CONTINUE;
@@ -52,6 +51,9 @@ int nnn1 = 0;
 "catch"     return fun::FunParser::token::CATCH;
 "as"        return fun::FunParser::token::AS;
 "throw"     return fun::FunParser::token::THROW;
+"class"     return fun::FunParser::token::CLASS;
+"super"     return fun::FunParser::token::SUPER;
+"__init__"  return fun::FunParser::token::INIT;
 
 ":"         return fun::FunParser::token::COLON;
 ";"         return fun::FunParser::token::SEMICOLON;

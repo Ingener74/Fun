@@ -87,13 +87,12 @@ end
 testFunction(100, 200)
 
 class TestClass
-    fun init(self, test)
+    fun __init__(self, test)
         self.m_test = test
         self.copy("one hundred is ", 100)
     end
     
-    fun copy(self, arg1, arg2)
-        print arg1 + arg2
+    fun __copy__(self, other)
     end
 end
 
@@ -105,3 +104,34 @@ if isProgram:
     main()
 end
 
+class Animal
+    fun __init__(self)
+        self.animal_type = ""
+    end
+
+    fun print(self)
+        print "Animal: " + self._animal_type
+    end
+
+    fun __str__()
+        throw NotImplementedError()
+    end
+end
+
+class Cat(Animal)
+    fun __init(self)
+        super.__init__(self)
+        self.animal_type = "Cat"
+    end
+end
+
+class Dog(Animal)
+    fun __init(self)
+        super.__init__(self)
+        self.animal_type = "Dog"
+    end
+end
+
+dog = Dog()
+
+dog.print()

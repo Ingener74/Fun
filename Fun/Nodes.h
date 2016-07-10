@@ -99,21 +99,59 @@ public:
     Statement* scope = nullptr;
 };
 
-class ElseIf;
-
 class If: public Statement {
 public:
-    If(Expression* cond, Statement* thenStmts = nullptr, ElseIf* elseIf = nullptr, Statement* elseStmts = nullptr) :
-            cond(cond), thenStmts(thenStmts), elseIf(elseIf), elseStmts(elseStmts) {
+    If(Expression* cond, Statement* stmts = nullptr) :
+            cond(cond), stmts(stmts){
     }
     virtual ~If() = default;
 
     virtual If* accept(Visitor*);
 
     Expression* cond;
-    Statement* thenStmts;
-    ElseIf* elseIf;
-    Statement* elseStmts;
+    Statement* stmts;
+};
+
+class ElseIf: public Statement {
+public:
+    ElseIf(Expression* cond = nullptr, Statement* stmts = nullptr) :
+            cond(cond), stmts(stmts) {
+    }
+    virtual ~ElseIf() = default;
+
+    virtual ElseIf* accept(Visitor*);
+
+    Expression* cond;
+    Statement* stmts;
+
+    static void apply(ElseIf*, Visitor*);
+    ElseIf* nextElseIf = nullptr;
+};
+
+class Else: public Statement {
+public:
+    Else(Statement* stmts = nullptr) :
+            stmts(stmts) {
+    }
+    virtual ~Else() = default;
+
+    virtual Else* accept(Visitor*);
+
+    Statement* stmts;
+};
+
+class IfElseIfsElse : public Statement {
+public:
+    IfElseIfsElse(If* ifStmts = nullptr, ElseIf* elseIfsStmts = nullptr, Else* elseStmts = nullptr) :
+            ifStmts(ifStmts), elseIfsStmts(elseIfsStmts), elseStmts(elseStmts) {
+    }
+    virtual ~IfElseIfsElse() = default;
+
+    virtual IfElseIfsElse* accept(Visitor*);
+
+    If* ifStmts;
+    ElseIf* elseIfsStmts;
+    Else* elseStmts;
 };
 
 class Import: public Statement {
@@ -175,22 +213,6 @@ public:
 
     Expression* cond;
     Statement* stmts;
-};
-
-class ElseIf: public Statement {
-public:
-    ElseIf(Expression* cond = nullptr, Statement* stmts = nullptr) :
-            cond(cond), stmts(stmts) {
-    }
-    virtual ~ElseIf() = default;
-
-    virtual ElseIf* accept(Visitor*);
-
-    Expression* cond;
-    Statement* stmts;
-
-    static void apply(ElseIf*, Visitor*);
-    ElseIf* nextElseIf = nullptr;
 };
 
 class Expression: public Statement {

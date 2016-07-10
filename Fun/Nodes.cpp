@@ -62,10 +62,30 @@ ACCEPT(Function, {
 ACCEPT(If, {
     fassert(cond, "If must have the condition expression");
     Expression::apply(cond, v);
-    Statement::apply(thenStmts, v);
-    ElseIf::apply(elseIf, v);
+    Statement::apply(stmts, v);
+})
+
+ACCEPT(ElseIf, {
+    fassert(cond, "Else If must have the condition expression");
+    Expression::apply(cond, v);
+    Statement::apply(stmts, v);
+})
+
+ACCEPT(Else, {
+    Statement::apply(stmts, v);
+})
+
+ACCEPT(IfElseIfsElse, {
+    fassert(ifStmts, "If Elif Else must have the if statement");
+    Statement::apply(ifStmts, v);
+    ElseIf::apply(elseIfsStmts, v);
     Statement::apply(elseStmts, v);
 })
+
+void ElseIf::apply(ElseIf* elseIf, Visitor* v) {
+    while (elseIf)
+        elseIf = elseIf->accept(v)->nextElseIf;
+}
 
 ACCEPT(Import, {
     fassert(id, "Import must have an id");
@@ -86,17 +106,6 @@ ACCEPT(While, {
     Expression::apply(cond, v);
     Statement::apply(stmts, v);
 })
-
-ACCEPT(ElseIf, {
-    fassert(cond, "Else If must have the condition expression");
-    Expression::apply(cond, v);
-    Statement::apply(stmts, v);
-})
-
-void ElseIf::apply(ElseIf* elseIf, Visitor* v) {
-    while (elseIf)
-        elseIf = elseIf->accept(v)->nextElseIf;
-}
 
 void Expression::apply(Expression* expression, Visitor* v) {
     while (expression)

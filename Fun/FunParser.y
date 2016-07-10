@@ -21,25 +21,27 @@ void yyerror(const char* );
 %}
 
 %union{
-    long long int         integer;
-    double                real;
-    std::string*          str;
+    long long int            integer;
+    double                   real;
+    std::string*             str;
     
-    Statement*            sttmnt_type;
-    Function*             func_type;
-    Import*               import_type;
-    Print*                print_type;
-    If*                   if_type;
-    While*                while_type;
-    For*                  for_type;
-    Return*               return_type;
-    Id*                   id_type;    
-    Expression*           expr_type;
-    Break*                break_type;
-    Continue*             continue_type;
-    Exception*            exception_type;
-    Throw*                throw_type;
-    ElseIf*               elif_type;
+    Statement*               sttmnt_type;
+    Function*                func_type;
+    Import*                  import_type;
+    Print*                   print_type;
+    While*                   while_type;
+    For*                     for_type;
+    Return*                  return_type;
+    Id*                      id_type;    
+    Expression*              expr_type;
+    Break*                   break_type;
+    Continue*                continue_type;
+    Exception*               exception_type;
+    Throw*                   throw_type;
+    IfElseIfsElse*           ifelseifselse_type;
+    If*                      if_type;
+    ElseIf*                  elif_type;
+    Else*                    else_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -48,92 +50,95 @@ void yyerror(const char* );
 int yylex(fun::FunParser::semantic_type* , FunLexer&);
 }
 
-%token <integer>          INTEGER
-%token <real>             REAL
-%token <str>              ID
-%token <str>              STRING
+%token <integer>             INTEGER
+%token <real>                REAL
+%token <str>                 ID
+%token <str>                 STRING
 %token EOL
 
-%token ASSIGN             "="
+%token ASSIGN                "="
 
 
 
-%token ADD                "+"
-%token ADD_ASSIGN         "+="
+%token ADD                   "+"
+%token ADD_ASSIGN            "+="
 
-%token SUB                "-"
-%token SUB_ASSIGN         "-="
+%token SUB                   "-"
+%token SUB_ASSIGN            "-="
 
-%token MUL                "*"
-%token MUL_ASSIGN         "*="
+%token MUL                   "*"
+%token MUL_ASSIGN            "*="
 
-%token DIV                "/"
-%token DIV_ASSIGN         "/="
+%token DIV                   "/"
+%token DIV_ASSIGN            "/="
+   
+%token MOD                   "%"
+%token MOD_ASSIGN            "%="
 
-%token MOD                "%"
-%token MOD_ASSIGN         "%="
+%token MORE                  ">"
+%token MORE_EQUAL            ">="
 
-%token MORE               ">"
-%token MORE_EQUAL         ">="
+%token LESS                  "<"
+%token LESS_EQUAL            "<="
 
-%token LESS               "<"
-%token LESS_EQUAL         "<="
+%token EQUAL                 "=="
+%token NOT_EQUAL             "!="
 
-%token EQUAL              "=="
-%token NOT_EQUAL          "!="
+%token COLON                 ":"
+%token SEMICOLON             ";"
+%token LPAREN                "("
+%token RPAREN                ")"
+%token COMMA                 ","
 
-%token COLON              ":"
-%token SEMICOLON          ";"
-%token LPAREN             "("
-%token RPAREN             ")"
-%token COMMA              ","
+%token IMPORT                "import"
+%token IF                    "if"
+%token ELIF                  "elif"
+%token ELSE                  "else"
+%token FOR                   "for"
+%token IN                    "in"
+%token WHILE                 "while"
+%token DO                    "do"
+%token FUN                   "fun"
+%token PRINT                 "print"
+%token RETURN                "ret"
+%token END                   "end"
+%token TRUE                  "true"
+%token FALSE                 "false"
+%token NIL                   "null"
+%token BREAK                 "break"
+%token CONTINUE              "continue"
+%token TRY                   "try"
+%token CATCH                 "catch"
+%token AS                    "as"
+%token THROW                 "throw"
+%token CLASS                 "class"
+%token SUPER                 "super"
+%token INIT                  "__init__"
 
-%token IMPORT             "import"
-%token IF                 "if"
-%token ELIF               "elif"
-%token ELSE               "else"
-%token FOR                "for"
-%token IN                 "in"
-%token WHILE              "while"
-%token DO                 "do"
-%token FUN                "fun"
-%token PRINT              "print"
-%token RETURN             "ret"
-%token END                "end"
-%token TRUE               "true"
-%token FALSE              "false"
-%token CLASS              "class"
-%token INIT               "init"
-%token NIL                "null"
-%token BREAK              "break"
-%token CONTINUE           "continue"
-%token TRY                "try"
-%token CATCH              "catch"
-%token AS                 "as"
-%token THROW              "throw"
-
-%type <sttmnt_type>       program
-%type <sttmnt_type>       sttmnt
-%type <sttmnt_type>       sttmnts
-%type <sttmnt_type>       cycle_sttmnt
-%type <sttmnt_type>       cycle_sttmnts
-%type <id_type>           id
-%type <id_type>           ids
-%type <expr_type>         expr
-%type <expr_type>         exprs
-%type <func_type>         func
-%type <import_type>       import
-%type <print_type>        print
-%type <if_type>           if
-%type <elif_type>         elif
-%type <elif_type>         elifs
-%type <while_type>        while
-%type <for_type>          for
-%type <return_type>       ret
-%type <break_type>        break
-%type <continue_type>     continue
-%type <exception_type>    exception
-%type <throw_type>        throw
+%type <sttmnt_type>          program
+%type <sttmnt_type>          sttmnt
+%type <sttmnt_type>          sttmnts
+%type <sttmnt_type>          cycle_sttmnt
+%type <sttmnt_type>          cycle_sttmnts
+%type <id_type>              id
+%type <id_type>              ids
+%type <expr_type>            expr
+%type <expr_type>            exprs
+%type <func_type>            func
+%type <import_type>          import
+%type <print_type>           print
+%type <ifelseifselse_type>   ifelifselse
+%type <if_type>              if
+%type <elif_type>            elif
+%type <elif_type>            elifs
+%type <else_type>            else
+%type <while_type>           while
+%type <for_type>             for
+%type <return_type>          ret
+%type <break_type>           break
+%type <continue_type>        continue
+%type <exception_type>       exception
+%type <throw_type>           throw
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -161,16 +166,16 @@ sttmnts
     ;
 
 sttmnt
-    : import    { $$ = $1; }
-    | print     { $$ = $1; }
-    | func      { $$ = $1; }
-    | if        { $$ = $1; }
-    | while     { $$ = $1; }
-    | for       { $$ = $1; }
-    | ret       { $$ = $1; }
-    | expr      { $$ = $1; }
-    | exception { $$ = $1; }
-    | throw     { $$ = $1; }
+    : import       { $$ = $1; }
+    | print        { $$ = $1; }
+    | func         { $$ = $1; }
+    | ifelifselse  { $$ = $1; }
+    | while        { $$ = $1; }
+    | for          { $$ = $1; }
+    | ret          { $$ = $1; }
+    | expr         { $$ = $1; }
+    | exception    { $$ = $1; }
+    | throw        { $$ = $1; }
     ;
 
 cycle_sttmnts
@@ -196,9 +201,13 @@ func
     : "fun" id "(" ids ")" sttmnts "end"   { $$ = Statement::make<Function>($2, $4, $6); }
     ;
 
+ifelifselse
+    : if "end" { $$ = Statement::make<IfElseIfsElse>($1); }
+    | if elifs else "end" { $$ = Statement::make<IfElseIfsElse>($1, $2, $3); }
+    ;
+
 if
-    : "if" expr ":" cycle_sttmnts elifs "end"                       { $$ = Statement::make<If>($2, $4, $5);     }
-    | "if" expr ":" cycle_sttmnts elifs "else" cycle_sttmnts "end"  { $$ = Statement::make<If>($2, $4, $5, $7); }
+    : "if" expr ":" cycle_sttmnts { $$ = Statement::make<If>($2, $4); }
     ;
 
 elifs
@@ -208,6 +217,10 @@ elifs
 
 elif
     : "elif" expr ":" cycle_sttmnts { $$ = Statement::make<ElseIf>($2, $4); }
+    ;
+
+else
+    : "else" cycle_sttmnts { $$ = Statement::make<Else>($2); }
     ;
 
 while

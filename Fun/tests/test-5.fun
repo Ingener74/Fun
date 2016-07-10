@@ -4,6 +4,8 @@ foo = 42
 # if : end # if must have the condition expression
 
 if false:
+	if false:end
+	if false:end
 end
 
 if true: end

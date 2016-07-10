@@ -1,37 +1,83 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 
-#include <FunLexer.h>
-#include <Nodes.h>
-#include <Printer.h>
+#include <cxxopts.hpp>
+
+#include <fun.h>
 
 using namespace std;
 using namespace fun;
 
+bool parseAndRunCode(Visitor* visitor, istream& inputStream, bool debug) {
+    FunLexer lexer(&inputStream);
+    FunParser parser(lexer);
+    parser.set_debug_level(debug);
+    bool result = parser.parse();
+    Statement::apply(visitor);
+    return result;
+}
+
 int main(int argc, char* argv[]) {
     try {
-        if (argc < 2)
-            throw std::runtime_error("no files");
+        cxxopts::Options options(argv[0], "Fun - command line options");
 
-        ifstream file(argv[1]);
+        options.add_options("")
+                ("h,help", "Help")
+                ("f,file", "Input file", cxxopts::value<std::string>())
+                ("r,run", "Interpret script")
+                ("c,compile", "Compile script")
+                ("d,debug", "Enable debug");
 
-        if (!file.is_open())
-            throw std::runtime_error(string("can't open file ") + string(argv[1]));
+        options.parse(argc, argv);
 
-        Statement::clear();
-        FunLexer lexer(&file);
-        FunParser parser(lexer);
-        parser.set_debug_level(argc > 2);
-        parser.parse();
+        if (options.count("help")) {
+            cout << options.help({ "" }) << endl;
+        }
 
-        Printer pv;
+        Interpreter interpret;
+        Compiler compiler;
+        Printer printer;
 
-        Statement::apply(&pv);
+        Visitor* visitor = nullptr;
 
-        Statement::clear();
+        if (options.count("run"))
+            visitor = &interpret;
+        else if (options.count("compile"))
+            visitor = &compiler;
+        else
+            visitor = &printer;
+
+        ifstream file(options["file"].as<string>());
+
+        if (options.count("file") && file.is_open()) {
+            parseAndRunCode(visitor, file, options.count("debug"));
+        } else {
+            stringstream sourceStream;
+            while (true) {
+                cout << ">>> ";
+
+                string input;
+                getline(cin, input);
+
+                if (input == "quit") {
+                    return 0;
+                } else if (!input.empty()) {
+                    sourceStream << input << endl;
+                    continue;
+                }
+
+                parseAndRunCode(visitor, sourceStream, options.count("debug"));
+
+                sourceStream.clear();
+            }
+        }
 
         return 0;
+    } catch (const cxxopts::OptionException& e) {
+        cerr << e.what() << endl;
+        return 1;
     } catch (const std::exception& e) {
         cerr << e.what() << endl;
         return 1;
