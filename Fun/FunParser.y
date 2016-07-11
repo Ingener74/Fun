@@ -89,6 +89,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token LPAREN                "("
 %token RPAREN                ")"
 %token COMMA                 ","
+%token DOT                   "."
 
 %token IMPORT                "import"
 %token IF                    "if"
@@ -113,6 +114,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token THROW                 "throw"
 %token CLASS                 "class"
 %token SUPER                 "super"
+%token SELF                  "self"
 %token INIT                  "__init__"
 
 %type <sttmnt_type>          program
@@ -122,6 +124,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <sttmnt_type>          cycle_sttmnts
 %type <id_type>              id
 %type <id_type>              ids
+%type <id_type>              dots
 %type <expr_type>            expr
 %type <expr_type>            exprs
 %type <func_type>            func
@@ -290,6 +293,13 @@ expr
     | id                 { $$ = $1;                                                      }
     | id "("  ")"        { $$ = Statement::make<Call>($1);                               } // check useless
     | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
+    | "self"             { $$ = Statement::make<Self>();                                 }
+    | dots               { $$ = $1; }
+    ;
+
+dots
+    : id          { $$ = $1; }
+    | id "." dots { $$ = $1; $1->nextId = $3; }
     ;
 
 exprs

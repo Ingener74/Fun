@@ -149,5 +149,7 @@ ACCEPT_E(Real)
 
 ACCEPT_E(String)
 
+ACCEPT_E(Self)
+
 }
 

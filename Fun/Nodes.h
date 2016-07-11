@@ -393,4 +393,12 @@ public:
     std::string value;
 };
 
+class Self: public Expression {
+public:
+    Self() = default;
+    virtual ~Self() = default;
+
+    virtual Self* accept(Visitor*);
+};
+
 }

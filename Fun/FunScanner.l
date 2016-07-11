@@ -53,6 +53,7 @@ int nnn1 = 0;
 "throw"     return fun::FunParser::token::THROW;
 "class"     return fun::FunParser::token::CLASS;
 "super"     return fun::FunParser::token::SUPER;
+"self"      return fun::FunParser::token::SELF;
 "__init__"  return fun::FunParser::token::INIT;
 
 ":"         return fun::FunParser::token::COLON;
@@ -60,6 +61,7 @@ int nnn1 = 0;
 "("         return fun::FunParser::token::LPAREN;
 ")"         return fun::FunParser::token::RPAREN;
 ","         return fun::FunParser::token::COMMA;
+"."         return fun::FunParser::token::DOT;
 
 {DIGIT}+ {
     yylval->integer = atoi(yytext); 
