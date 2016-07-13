@@ -135,3 +135,21 @@ end
 dog = Dog()
 
 dog.print()
+
+dictionaryExample = {
+    integerField  = 42,
+    realField     = 3.1415,
+    booleanField  = false,
+    stringField   = "foo bar"
+    nilField      = nil,
+    objectField   = Dog(),
+    functionField = fun()end,
+}
+
+# integrated modules
+# * math
+# * thread
+# * net
+# * json
+# * xml
+# * 

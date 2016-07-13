@@ -228,35 +228,35 @@ public:
 
 class Assign: public Expression {
 public:
-    Assign(Id* id, Expression* value) :
-            name(id), value(value) {
+    enum Type {
+        ASSIGN, ADD, SUB, MUL, DIV, MOD,
+    };
+
+    Assign(Id* ids, Expression* exprs, Type type = ASSIGN) :
+            ids(ids), exprs(exprs), type(type) {
     }
     virtual ~Assign() = default;
 
     virtual Assign* accept(Visitor*);
 
-    Id* name;
-    Expression* value;
+    Type type;
+    Id* ids;
+    Expression* exprs;
 };
 
 class BinaryOp: public Expression {
 public:
     enum Op {
         ADD,
-        ADD_ASSIGN,
         SUB,
-        SUB_ASSIGN,
         MUL,
-        MUL_ASSIGN,
         DIV,
-        DIV_ASSIGN,
         MOD,
-        MOD_ASSIGN,
+
         MORE,
         MORE_EQUAL,
         LESS,
         LESS_EQUAL,
-
         EQUAL,
         NOT_EQUAL,
     };
@@ -304,7 +304,7 @@ public:
 class Terminal: public Expression {
 public:
     enum Type {
-        Integer, Real, String, Boolean, Object, Function, Null, Unknown
+        Integer, Real, String, Boolean, Object, Function, Nil, Unknown
     };
 
     Terminal() = default;
@@ -349,15 +349,15 @@ public:
     long long value;
 };
 
-class Null: public Terminal {
+class Nil: public Terminal {
 public:
-    Null() = default;
-    virtual ~Null() = default;
+    Nil() = default;
+    virtual ~Nil() = default;
 
-    virtual Null* accept(Visitor*);
+    virtual Nil* accept(Visitor*);
 
     virtual Type getType() const {
-        return Terminal::Null;
+        return Terminal::Nil;
     }
 };
 

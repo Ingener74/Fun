@@ -35,7 +35,7 @@ public:
 //    virtual void visit(class Terminal*);
     virtual void visit(class Boolean*);
     virtual void visit(class Integer*);
-    virtual void visit(class Null*);
+    virtual void visit(class Nil*);
     virtual void visit(class Real*);
     virtual void visit(class String*);
 

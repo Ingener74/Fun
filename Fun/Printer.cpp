@@ -65,31 +65,16 @@ void Printer::visit(BinaryOp* node) {
     case BinaryOp::ADD: {
         break;
     }
-    case BinaryOp::ADD_ASSIGN: {
-        break;
-    }
     case BinaryOp::SUB: {
-        break;
-    }
-    case BinaryOp::SUB_ASSIGN: {
         break;
     }
     case BinaryOp::MUL: {
         break;
     }
-    case BinaryOp::MUL_ASSIGN: {
-        break;
-    }
     case BinaryOp::DIV: {
         break;
     }
-    case BinaryOp::DIV_ASSIGN: {
-        break;
-    }
     case BinaryOp::MOD: {
-        break;
-    }
-    case BinaryOp::MOD_ASSIGN: {
         break;
     }
     case BinaryOp::MORE: {
@@ -124,7 +109,7 @@ void Printer::visit(Integer* node) {
     cout << node->value << endl;
 }
 
-void Printer::visit(Null*) {
+void Printer::visit(Nil*) {
     cout << "null" << endl;
 }
 

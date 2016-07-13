@@ -113,10 +113,10 @@ void Expression::apply(Expression* expression, Visitor* v) {
 }
 
 ACCEPT(Assign, {
-    fassert(name, "Assign must have name")
-    Id::apply(name, v);
-    fassert(value, "Assign must have value")
-    Expression::apply(value, v);
+    fassert(ids, "Assign must have name")
+    Id::apply(ids, v);
+    fassert(exprs, "Assign must have value")
+    Expression::apply(exprs, v);
 })
 
 ACCEPT(BinaryOp, {
@@ -143,7 +143,7 @@ ACCEPT_E(Boolean)
 
 ACCEPT_E(Integer)
 
-ACCEPT_E(Null)
+ACCEPT_E(Nil)
 
 ACCEPT_E(Real)
 

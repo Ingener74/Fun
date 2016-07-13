@@ -105,7 +105,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token END                   "end"
 %token TRUE                  "true"
 %token FALSE                 "false"
-%token NIL                   "null"
+%token NIL                   "nil"
 %token BREAK                 "break"
 %token CONTINUE              "continue"
 %token TRY                   "try"
@@ -115,7 +115,21 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token CLASS                 "class"
 %token SUPER                 "super"
 %token SELF                  "self"
+
 %token INIT                  "__init__"
+%token COPY                  "__copy__"
+%token STR                   "__str__"
+%token CALL                  "__call__"
+%token ADD_METHOD            "__add__"
+%token SUB_METHOD            "__sub__"
+%token MUL_METHOD            "__mul__"
+%token DIV_METHOD            "__div__"
+%token MOD_METHOD            "__mod__"
+%token ADDA_METHOD           "__adda__"
+%token SUBA_METHOD           "__suba__"
+%token MULA_METHOD           "__mula__"
+%token DIVA_METHOD           "__diva__"
+%token MODA_METHOD           "__moda__"
 
 %type <sttmnt_type>          program
 %type <sttmnt_type>          sttmnt
@@ -126,6 +140,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <id_type>              ids
 %type <id_type>              dots
 %type <expr_type>            expr
+%type <expr_type>            assign
 %type <expr_type>            exprs
 %type <func_type>            func
 %type <import_type>          import
@@ -267,17 +282,12 @@ id
 
 expr
     : %empty             { $$ = nullptr; }
-    | id "=" expr        { $$ = Statement::make<Assign>($1, $3);                         }
+    | assign             { $$ = $1; }
     | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
-    | expr "+=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::ADD_ASSIGN, $1, $3); }
     | expr "-" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
-    | expr "-=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::SUB_ASSIGN, $1, $3); }
     | expr "*" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
-    | expr "*=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MUL_ASSIGN, $1, $3); }
     | expr "/" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::DIV,        $1, $3); }
-    | expr "/=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::DIV_ASSIGN, $1, $3); }
     | expr "%" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MOD,        $1, $3); }
-    | expr "%=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MOD_ASSIGN, $1, $3); }
     | expr ">" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MORE,       $1, $3); }
     | expr ">=" expr     { $$ = Statement::make<BinaryOp>(BinaryOp::MORE_EQUAL, $1, $3); }
     | expr "<" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::LESS,       $1, $3); }
@@ -289,12 +299,21 @@ expr
     | TRUE               { $$ = Statement::make<Boolean>(true);                          }
     | FALSE              { $$ = Statement::make<Boolean>(false);                         }
     | STRING             { $$ = Statement::make<String>(*$1);                            }
-    | NIL                { $$ = Statement::make<Null>();                                 }
+    | NIL                { $$ = Statement::make<Nil>();                                  }
     | id                 { $$ = $1;                                                      }
     | id "("  ")"        { $$ = Statement::make<Call>($1);                               } // check useless
     | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
     | "self"             { $$ = Statement::make<Self>();                                 }
     | dots               { $$ = $1; }
+    ;
+
+assign
+    : ids "="  exprs { $$ = Statement::make<Assign>($1, $3);    }
+    | ids "+=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::ADD); }
+    | ids "-=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::SUB); }
+    | ids "*=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MUL); }
+    | ids "/=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::DIV); }
+    | ids "%=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MOD); }
     ;
 
 dots
