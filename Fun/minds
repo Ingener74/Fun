@@ -1,0 +1,103 @@
+integrated modules
+* math
+* thread
+* json
+* net
+* native
+* gl
+* glut
+* sqlite
+* xml
+* gui
+
+result = native.ccall("c_function_name_add", 10, 20)
+
+dictionaryExample = {
+	integerField   = 42,
+	realField      = 3.1415,
+	functionField  = fun() print "integer value " + self.realField end,
+	booleanField   = false,
+	objectField    = Dog("Barky"),
+	stringField    = "Mac OS",
+	nilField       = null,
+}
+
+class ThreadBody
+	fun __init__()
+		self.processList = {
+			firstWork = fun()
+				print "do hard work"
+				sleepSec(3)
+			end
+		}
+		self.isWork = true
+		self.th = thread.create(self)
+	end
+
+	fun __call__()
+		isw
+		lock(isWork) isw = isWork end
+		while isw:
+			proc
+			lock(processList) 
+				while processList.len() <= 0 and isw:
+					processList.wait()
+				end
+				if process.len() <= 0:
+					continue
+				end
+				proc = processList[0] 
+				processList.remove(0)
+			end
+			proc()
+		end
+	end
+
+	fun addWork(work)
+		lock(self.processList)
+			self.processList.append(work)
+			self.processList.notifyOne()
+		end
+		ret self
+	end
+
+	fun stop()
+		lock(isWork)
+			isWork = false
+		end
+		processList.notifyOne()
+	end
+end
+
+threadBody = ThreadBody().addWork(fun()
+	i = 100
+	while i > 0:
+		print "hui 100 raz"
+		i -= 1
+	end
+end).addWork(fun()
+	print "Boo"
+end)
+
+thread.create(fun() 
+	while true:
+	end
+end)
+
+
+
+__call__
+__init__
+__copy__
+__dict__
+__add__
+__sub__
+__str__
+__mul__
+__div__
+__adda__
+__suba__
+__mula__
+__diva__
+__mod__
+__moda__
