@@ -72,10 +72,14 @@ int nnn1 = 0;
 
 ":"         return fun::FunParser::token::COLON;
 ";"         return fun::FunParser::token::SEMICOLON;
-"("         return fun::FunParser::token::LPAREN;
-")"         return fun::FunParser::token::RPAREN;
 ","         return fun::FunParser::token::COMMA;
 "."         return fun::FunParser::token::DOT;
+"("         return fun::FunParser::token::LPAREN;
+")"         return fun::FunParser::token::RPAREN;
+"{"         return fun::FunParser::token::CURLYL;
+"}"         return fun::FunParser::token::CURLYR;
+"["         return fun::FunParser::token::SQUAREL;
+"]"         return fun::FunParser::token::SQUARER;
 
 {DIGIT}+ {
     yylval->integer = atoi(yytext); 

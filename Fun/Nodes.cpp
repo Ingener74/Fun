@@ -119,6 +119,11 @@ ACCEPT(Assign, {
     Expression::apply(exprs, v);
 })
 
+void Assign::apply(Assign* assign, Visitor* v) {
+    while (assign)
+        assign = assign->accept(v)->nextAssign;
+}
+
 ACCEPT(BinaryOp, {
     fassert(lhs, "Binary operation must have left side expression")
     Expression::apply(lhs, v);
@@ -130,6 +135,10 @@ ACCEPT(Call, {
     fassert(name, "Call expression must have name")
     Id::apply(name, v);
     Expression::apply(arguments, v);
+})
+
+ACCEPT(Dictionary, {
+    Assign::apply(assign, v);
 })
 
 ACCEPT_E(Id)

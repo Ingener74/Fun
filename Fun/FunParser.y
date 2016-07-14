@@ -42,6 +42,8 @@ void yyerror(const char* );
     If*                      if_type;
     ElseIf*                  elif_type;
     Else*                    else_type;
+    Dictionary*              dictionary_type;
+    Assign*                  assign_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -86,10 +88,14 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 
 %token COLON                 ":"
 %token SEMICOLON             ";"
-%token LPAREN                "("
-%token RPAREN                ")"
 %token COMMA                 ","
 %token DOT                   "."
+%token CURLYL                "{"
+%token CURLYR                "}"
+%token SQUAREL               "["
+%token SQUARER               "]"
+%token LPAREN                "("
+%token RPAREN                ")"
 
 %token IMPORT                "import"
 %token IF                    "if"
@@ -140,7 +146,9 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <id_type>              ids
 %type <id_type>              dots
 %type <expr_type>            expr
-%type <expr_type>            assign
+%type <expr_type>            assign_expr
+%type <assign_type>          assigns
+%type <assign_type>          assign
 %type <expr_type>            exprs
 %type <func_type>            func
 %type <import_type>          import
@@ -157,6 +165,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <continue_type>        continue
 %type <exception_type>       exception
 %type <throw_type>           throw
+%type <dictionary_type>      dictionary
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -282,7 +291,7 @@ id
 
 expr
     : %empty             { $$ = nullptr; }
-    | assign             { $$ = $1; }
+    | assign_expr        { $$ = $1; }
     | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
     | expr "-" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
     | expr "*" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
@@ -305,15 +314,29 @@ expr
     | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
     | "self"             { $$ = Statement::make<Self>();                                 }
     | dots               { $$ = $1; }
+    | dictionary         { $$ = $1; }
     ;
 
-assign
-    : ids "="  exprs { $$ = Statement::make<Assign>($1, $3);    }
+assign_expr
+    : assign         { $$ = $1; }
     | ids "+=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::ADD); }
     | ids "-=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::SUB); }
     | ids "*=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MUL); }
     | ids "/=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::DIV); }
     | ids "%=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MOD); }
+    ;
+
+assign
+    : ids "="  exprs { $$ = Statement::make<Assign>($1, $3); }
+    ;
+
+assigns
+    : %empty             { $$ = nullptr; }
+    | assign "," assigns { $$ = $1; $1->nextAssign = $3; }
+    ;
+
+dictionary
+    : "{" assigns "}" { $$ = Statement::make<Dictionary>($2); }
     ;
 
 dots

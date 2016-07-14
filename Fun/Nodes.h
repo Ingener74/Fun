@@ -242,6 +242,9 @@ public:
     Type type;
     Id* ids;
     Expression* exprs;
+
+    static void apply(Assign*, Visitor*);
+    Assign* nextAssign = nullptr;
 };
 
 class BinaryOp: public Expression {
@@ -283,6 +286,18 @@ public:
 
     Id* name = nullptr;
     Expression* arguments = nullptr;
+};
+
+class Dictionary: public Expression {
+public:
+    Dictionary(Assign* assign) :
+            assign(assign) {
+    }
+    virtual ~Dictionary() = default;
+
+    virtual Dictionary* accept(Visitor*);
+
+    Assign* assign;
 };
 
 class Id: public Expression {
