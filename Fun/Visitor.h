@@ -9,6 +9,8 @@ public:
 
     virtual void iterateStatements(class Statement*){}
     virtual void iterateExpressions(class Expression*){}
+    virtual void iterateIds(class Id*){}
+    virtual void iterateAssigns(class Assign*){}
 
     virtual void visit(class Statement*){}
     virtual void visit(class Break*){}

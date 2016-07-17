@@ -25,8 +25,27 @@ void Printer::iterateStatements(Statement* stmt) {
 }
 
 void fun::Printer::iterateExpressions(Expression* expr) {
-    while (expr)
+    while (expr) {
         expr = expr->accept(this)->nextExpression;
+        if (expr)
+            cout << ", ";
+    }
+}
+
+void Printer::iterateIds(Id* id) {
+    while (id) {
+        id = id->accept(this)->nextId;
+        if (id)
+            cout << ", ";
+    }
+}
+
+void Printer::iterateAssigns(Assign* assign) {
+    while (assign) {
+        cout << indents();
+        assign = assign->accept(this)->nextAssign;
+        cout << "," << endl;
+    }
 }
 
 // Statements
@@ -154,7 +173,6 @@ void Printer::visit(Return* return_stmt) {
                 cout << ", " << endl;
         }
     }
-    cout << endl;
 }
 
 void Printer::visit(While* while_stmt) {
@@ -168,6 +186,29 @@ void Printer::visit(While* while_stmt) {
         _scopeLevel--;
     }
     cout << indents() << "end";
+}
+
+void Printer::visit(Exception* exception_stmt) {
+    cout << "try" << endl;
+    _scopeLevel++;
+    iterateStatements(exception_stmt->tryStmts);
+    _scopeLevel--;
+    cout << indents() << "catch ";
+    iterateIds(exception_stmt->errorClasses);
+    cout << " as ";
+    iterateIds(exception_stmt->errorObject);
+    cout << endl;
+    _scopeLevel++;
+    iterateStatements(exception_stmt->catchStmts);
+    _scopeLevel--;
+    cout << indents() << "end";
+}
+
+void Printer::visit(Throw* throw_stmt) {
+    cout << "throw ";
+    if (throw_stmt->expression) {
+        iterateExpressions(throw_stmt->expression);
+    }
 }
 
 // Expression
@@ -228,8 +269,12 @@ void Printer::visit(Call* call) {
     cout << ")";
 }
 
-void Printer::visit(Dictionary*) {
-
+void Printer::visit(Dictionary* dict) {
+    cout << "{" << endl;
+    _scopeLevel++;
+    iterateAssigns(dict->assign);
+    _scopeLevel--;
+    cout << "}";
 }
 
 void Printer::visit(Id* node) {
@@ -243,6 +288,7 @@ void Printer::visit(RoundBrackets* round) {
 }
 
 void Printer::visit(Self*) {
+    cout << "self";
 }
 
 // Terminal

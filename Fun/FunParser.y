@@ -286,7 +286,7 @@ exception
     ;
 
 throw
-    : "throw " expr { $$ = Statement::make<Throw>($2); }
+    : "throw" expr { $$ = Statement::make<Throw>($2); }
     ;
 
 ids
@@ -343,7 +343,7 @@ assign
 
 assigns
     : %empty             { $$ = nullptr; }
-    | assign "," assigns { $$ = $1; NEXT_ASSIGN($1, $3); }
+    | assign assigns { $$ = $1; NEXT_ASSIGN($1, $2); }
     ;
 
 dictionary

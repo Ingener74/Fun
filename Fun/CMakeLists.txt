@@ -60,9 +60,11 @@ if(ENABLE_LIQUID_METAPHOR)
     add_custom_command(OUTPUT Test5 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-5.fun)
     add_custom_command(OUTPUT Test6 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-6.fun)
     add_custom_command(OUTPUT Test7 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-7.fun)
+    add_custom_command(OUTPUT Test8 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-8.fun)
+    add_custom_command(OUTPUT Test9 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-9.fun)
     
     add_custom_target(TestFun
-        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7
+        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9
     )
     
 endif()

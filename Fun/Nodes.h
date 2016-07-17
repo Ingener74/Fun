@@ -193,7 +193,7 @@ public:
 class Throw: public Statement {
 public:
     Throw(Expression* exression = nullptr) :
-            expression(expression) {
+            expression(exression) {
     }
     virtual ~Throw() = default;
 
