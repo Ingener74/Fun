@@ -155,7 +155,6 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <assign_type>          assign
 %type <expr_type>            exprs
 %type <func_type>            func
-%type <func_type>            functions
 %type <import_type>          import
 %type <print_type>           print
 %type <ifelseifselse_type>   ifelifselse
@@ -172,6 +171,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <throw_type>           throw
 %type <dictionary_type>      dictionary
 %type <class_type>           class
+%type <sttmnt_type>          class_stmts
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -236,13 +236,13 @@ func
     ;
 
 class
-    : "class" id "(" ids ")" functions "end" { $$ = Statement::make<Class>($2, $4, $6); }
+    : "class" id "(" ids ")" class_stmts "end" { $$ = Statement::make<Class>($2, $4, $6); }
     ;
 
-functions
-    : %empty         { $$ = nullptr;                   }
-    | func           { $$ = $1;                        }
-    | func functions { $$ = $1; NEXT_FUNCTION($1, $2); }
+class_stmts
+    : %empty             { $$ = nullptr;                    }
+    | func class_stmts   { $$ = $1; NEXT_STATEMENT($1, $2); }
+    | assign class_stmts { $$ = $1; NEXT_STATEMENT($1, $2); }
     ;
 
 ifelifselse
@@ -293,8 +293,7 @@ continue
     ;
 
 ret
-    : "ret"        { $$ = Statement::make<Return>();   } // check useless
-    | "ret" exprs  { $$ = Statement::make<Return>($2); }
+    : "ret" exprs  { $$ = Statement::make<Return>($2); }
     ;
 
 exception
@@ -305,19 +304,18 @@ throw
     : "throw" expr { $$ = Statement::make<Throw>($2); }
     ;
 
-ids
-    : %empty       { $$ = nullptr;              }
-    | id           { $$ = $1;                   }
-    | id "," ids   { $$ = $1; NEXT_ID($1, $3); }
-    ;
-
 id
     : ID { $$ = Statement::make<Id>(*$1); }
     ;
 
+ids
+    : %empty       { $$ = nullptr;             }
+    | id           { $$ = $1;                  }
+    | id "," ids   { $$ = $1; NEXT_ID($1, $3); }
+    ;
+
 expr
-    : /*%empty             { $$ = nullptr; }
-    | */assign_expr        { $$ = $1; }
+    : assign_expr        { $$ = $1; }
     | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
     | expr "-" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
     | expr "*" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
@@ -358,7 +356,7 @@ assign
     ;
 
 assigns
-    : %empty             { $$ = nullptr; }
+    : %empty         { $$ = nullptr; }
     | assign assigns { $$ = $1; NEXT_ASSIGN($1, $2); }
     ;
 

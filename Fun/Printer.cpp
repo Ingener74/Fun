@@ -64,15 +64,15 @@ void Printer::visit(Continue* continue_stmt) {
 }
 
 void Printer::visit(Class* class_stmt) {
-    cout << "class";
+    cout << "class ";
     iterateIds(class_stmt->name);
     cout << "(";
     iterateIds(class_stmt->derived);
     cout << ")" << endl;
     _scopeLevel++;
-    iterateFunctions(class_stmt->method);
+    iterateStatements(class_stmt->stmts);
     _scopeLevel--;
-    cout << "end" << endl;
+    cout << indents() << "end" << endl;
 }
 
 void Printer::visit(For* for_stmt) {
@@ -95,7 +95,7 @@ void Printer::visit(For* for_stmt) {
 }
 
 void Printer::visit(Function* function) {
-    cout << indents() << "fun ";
+    cout << "fun ";
     function->name->accept(this);
     cout << "(";
     if (function->args) {
@@ -112,7 +112,7 @@ void Printer::visit(Function* function) {
         iterateStatements(function->stmts);
         _scopeLevel--;
     }
-    cout << indents() << "end" << endl;
+    cout << indents() << "end";
 }
 
 void Printer::visit(If* if_stmt) {

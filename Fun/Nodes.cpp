@@ -24,15 +24,6 @@ void Statement::clear() {
     statements.clear();
 }
 
-//void Statement::apply(Visitor* v) {
-//    apply(entryPoint, v);
-//}
-//
-//void Statement::apply(Statement* start, Visitor* v) {
-//    while (start)
-//        start = start->accept(v)->nextStatement;
-//}
-
 ACCEPT_E(Break)
 
 ACCEPT(Class, {

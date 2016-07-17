@@ -26,8 +26,6 @@ public:
     Statement* nextStatement = nullptr;
 
     static void clear();
-//    static void apply(Visitor* v);
-//    static void apply(Statement* start, Visitor* v);
 
     static Statement* entryPoint;
 protected:
@@ -48,8 +46,8 @@ class Function;
 
 class Class: public Statement {
 public:
-    Class(Id* name, Id* derived, Function* method) :
-            name(name), derived(derived), method(method) {
+    Class(Id* name, Id* derived, Statement* stmts) :
+            name(name), derived(derived), stmts(stmts) {
     }
     virtual ~Class() = default;
 
@@ -57,7 +55,7 @@ public:
 
     Id* name = nullptr;
     Id* derived = nullptr;
-    Function* method = nullptr;
+    Statement* stmts = nullptr;
 };
 
 class Continue: public Statement {
