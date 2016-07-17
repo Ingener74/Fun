@@ -24,6 +24,8 @@ void yyerror(const char* );
 #define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b;
 #define NEXT_ELSE_IF(a, b)    if(!a) throw std::runtime_error("next else if error");    a->nextElseIf = b;
 #define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b;
+#define NEXT_FUNCTION(a, b)   if(!a) throw std::runtime_error("next function error");   a->nextFunction = b;
+
 %}
 
 %union{
@@ -50,6 +52,7 @@ void yyerror(const char* );
     Else*                    else_type;
     Dictionary*              dictionary_type;
     Assign*                  assign_type;
+    Class*                   class_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -152,6 +155,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <assign_type>          assign
 %type <expr_type>            exprs
 %type <func_type>            func
+%type <func_type>            functions
 %type <import_type>          import
 %type <print_type>           print
 %type <ifelseifselse_type>   ifelifselse
@@ -167,6 +171,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <exception_type>       exception
 %type <throw_type>           throw
 %type <dictionary_type>      dictionary
+%type <class_type>           class
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -204,6 +209,7 @@ sttmnt
     | expr         { $$ = $1; }
     | exception    { $$ = $1; }
     | throw        { $$ = $1; }
+    | class        { $$ = $1; }
     ;
 
 cycle_sttmnts
@@ -227,6 +233,16 @@ print
 
 func
     : "fun" id "(" ids ")" sttmnts "end"   { $$ = Statement::make<Function>($2, $4, $6); }
+    ;
+
+class
+    : "class" id "(" ids ")" functions "end" { $$ = Statement::make<Class>($2, $4, $6); }
+    ;
+
+functions
+    : %empty         { $$ = nullptr;                   }
+    | func           { $$ = $1;                        }
+    | func functions { $$ = $1; NEXT_FUNCTION($1, $2); }
     ;
 
 ifelifselse

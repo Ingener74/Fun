@@ -22,7 +22,7 @@ dictionaryExample = {
 	nilField       = null,
 }
 
-class ThreadBody
+class TaskQueue
 	fun __init__()
 		self.processList = {
 			firstWork = fun()
@@ -69,7 +69,7 @@ class ThreadBody
 	end
 end
 
-threadBody = ThreadBody().addWork(fun()
+threadBody = TaskQueue().addWork(fun()
 	i = 100
 	while i > 0:
 		print "hui 100 raz"

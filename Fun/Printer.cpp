@@ -40,6 +40,11 @@ void Printer::iterateIds(Id* id) {
     }
 }
 
+void Printer::iterateFunctions(Function* function) {
+    while (function)
+        function = function->accept(this)->nextFunction;
+}
+
 void Printer::iterateAssigns(Assign* assign) {
     while (assign) {
         cout << indents();
@@ -56,6 +61,18 @@ void Printer::visit(Break* break_stmt) {
 
 void Printer::visit(Continue* continue_stmt) {
     cout << "continue";
+}
+
+void Printer::visit(Class* class_stmt) {
+    cout << "class";
+    iterateIds(class_stmt->name);
+    cout << "(";
+    iterateIds(class_stmt->derived);
+    cout << ")" << endl;
+    _scopeLevel++;
+    iterateFunctions(class_stmt->method);
+    _scopeLevel--;
+    cout << "end" << endl;
 }
 
 void Printer::visit(For* for_stmt) {
@@ -78,9 +95,9 @@ void Printer::visit(For* for_stmt) {
 }
 
 void Printer::visit(Function* function) {
-    cout << indents() << "fun";
+    cout << indents() << "fun ";
     function->name->accept(this);
-    cout << "(" << endl;
+    cout << "(";
     if (function->args) {
         auto arg = function->args;
         while (arg) {
@@ -164,7 +181,7 @@ void Printer::visit(Print* print) {
 }
 
 void Printer::visit(Return* return_stmt) {
-    cout << indents() << "return ";
+    cout << "ret ";
     if (return_stmt->expression) {
         auto expr = return_stmt->expression;
         while (expr) {

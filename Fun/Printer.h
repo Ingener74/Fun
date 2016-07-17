@@ -15,11 +15,13 @@ public:
     virtual void iterateStatements(Statement*);
     virtual void iterateExpressions(Expression*);
     virtual void iterateIds(Id*);
+    virtual void iterateFunctions(class Function*);
     virtual void iterateAssigns(Assign*);
 
 //    virtual void visit(Statement*);
     virtual void visit(Break*);
     virtual void visit(Continue*);
+    virtual void visit(Class*);
     virtual void visit(For*);
     virtual void visit(Function*);
     virtual void visit(If*);

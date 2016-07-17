@@ -10,11 +10,13 @@ public:
     virtual void iterateStatements(class Statement*){}
     virtual void iterateExpressions(class Expression*){}
     virtual void iterateIds(class Id*){}
+    virtual void iterateFunctions(class Function*){}
     virtual void iterateAssigns(class Assign*){}
 
     virtual void visit(class Statement*){}
     virtual void visit(class Break*){}
     virtual void visit(class Continue*){}
+    virtual void visit(class Class*){}
     virtual void visit(class For*){}
     virtual void visit(class Function*){}
     virtual void visit(class If*){}

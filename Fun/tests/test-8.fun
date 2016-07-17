@@ -1,19 +1,17 @@
 
-try
-	foo = 42
-	if foo > 20:
-		print "foo more 20"
-	elif foo > 30:
-		print "foo more 30"
-	elif foo > 40:
-		print "foo more 40"
-	elif foo > 50:
-		print "foo more 50"
-	else
-		print "foo less or equal 20"
-	end
+fun test1()end
+fun test2()
+end
 
+fun test3()
+	if 1>0:
+	end
+end
+
+fun test4()
+	ret 0
+end
+
+fun test5()
 	throw Error("error")
-catch Exception as e:
-	print e
 end

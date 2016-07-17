@@ -35,6 +35,10 @@ void Statement::clear() {
 
 ACCEPT_E(Break)
 
+ACCEPT(Class, {
+    fassert(name, "Class must have the name");
+})
+
 ACCEPT_E(Continue)
 
 ACCEPT_E(Exception)

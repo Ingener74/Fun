@@ -52,19 +52,21 @@ add_library(
 )
 
 if(ENABLE_LIQUID_METAPHOR)
-    add_custom_command(OUTPUT Test0 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-0.fun)
-    add_custom_command(OUTPUT Test1 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-1.fun)
-    add_custom_command(OUTPUT Test2 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-2.fun)
-    add_custom_command(OUTPUT Test3 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-3.fun)
-    add_custom_command(OUTPUT Test4 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-4.fun)
-    add_custom_command(OUTPUT Test5 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-5.fun)
-    add_custom_command(OUTPUT Test6 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-6.fun)
-    add_custom_command(OUTPUT Test7 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-7.fun)
-    add_custom_command(OUTPUT Test8 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-8.fun)
-    add_custom_command(OUTPUT Test9 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-9.fun)
+    add_custom_command(OUTPUT Test0  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-0.fun)
+    add_custom_command(OUTPUT Test1  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-1.fun)
+    add_custom_command(OUTPUT Test2  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-2.fun)
+    add_custom_command(OUTPUT Test3  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-3.fun)
+    add_custom_command(OUTPUT Test4  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-4.fun)
+    add_custom_command(OUTPUT Test5  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-5.fun)
+    add_custom_command(OUTPUT Test6  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-6.fun)
+    add_custom_command(OUTPUT Test7  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-7.fun)
+    add_custom_command(OUTPUT Test8  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-8.fun)
+    add_custom_command(OUTPUT Test9  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-9.fun)
+    add_custom_command(OUTPUT Test10 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-10.fun)
+    add_custom_command(OUTPUT Test11 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-11.fun)
     
     add_custom_target(TestFun
-        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9
+        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9 Test10 Test11
     )
     
 endif()

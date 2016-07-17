@@ -43,6 +43,23 @@ public:
     virtual Break* accept(Visitor*);
 };
 
+class Id;
+class Function;
+
+class Class: public Statement {
+public:
+    Class(Id* name, Id* derived, Function* method) :
+            name(name), derived(derived), method(method) {
+    }
+    virtual ~Class() = default;
+
+    virtual Class* accept(Visitor*);
+
+    Id* name = nullptr;
+    Id* derived = nullptr;
+    Function* method = nullptr;
+};
+
 class Continue: public Statement {
 public:
     Continue() = default;
@@ -50,8 +67,6 @@ public:
 
     virtual Continue* accept(Visitor*);
 };
-
-class Id;
 
 class Exception: public Statement {
 public:
@@ -97,6 +112,8 @@ public:
     Id* name = nullptr;
     Id* args = nullptr;
     Statement* stmts = nullptr;
+
+    Function* nextFunction = nullptr;
 };
 
 class If: public Statement {
