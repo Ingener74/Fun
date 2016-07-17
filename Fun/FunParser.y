@@ -18,6 +18,12 @@ class FunLexer;
 #include <iostream>
 using namespace std;
 void yyerror(const char* );
+
+#define NEXT_STATEMENT(a, b)  if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b;
+#define NEXT_EXPRESSION(a, b) if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b;
+#define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b;
+#define NEXT_ELSE_IF(a, b)    if(!a) throw std::runtime_error("next else if error");    a->nextElseIf = b;
+#define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b;
 %}
 
 %union{
@@ -60,22 +66,17 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 
 %token ASSIGN                "="
 
-
-
-%token ADD                   "+"
 %token ADD_ASSIGN            "+="
-
-%token SUB                   "-"
 %token SUB_ASSIGN            "-="
-
-%token MUL                   "*"
 %token MUL_ASSIGN            "*="
-
-%token DIV                   "/"
 %token DIV_ASSIGN            "/="
-   
-%token MOD                   "%"
 %token MOD_ASSIGN            "%="
+   
+%token ADD                   "+"
+%token SUB                   "-"
+%token MUL                   "*"
+%token DIV                   "/"
+%token MOD                   "%"
 
 %token MORE                  ">"
 %token MORE_EQUAL            ">="
@@ -144,7 +145,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <sttmnt_type>          cycle_sttmnts
 %type <id_type>              id
 %type <id_type>              ids
-%type <id_type>              dots
+%type <expr_type>            dots
 %type <expr_type>            expr
 %type <expr_type>            assign_expr
 %type <assign_type>          assigns
@@ -189,7 +190,7 @@ program
 
 sttmnts
     : %empty           { $$ = nullptr; }
-    | sttmnt sttmnts   { $$ = $1; $1->nextStatement = $2; }
+    | sttmnt sttmnts   { $$ = $1; NEXT_STATEMENT($1, $2) }
     ;
 
 sttmnt
@@ -207,8 +208,8 @@ sttmnt
 
 cycle_sttmnts
     : %empty                        { $$ = nullptr; }
-    | sttmnt        cycle_sttmnts   { $$ = $1; $1->nextStatement = $2; }
-    | cycle_sttmnt  cycle_sttmnts   { $$ = $1; $1->nextStatement = $2; }
+    | sttmnt        cycle_sttmnts   { $$ = $1; NEXT_STATEMENT($1, $2); }
+    | cycle_sttmnt  cycle_sttmnts   { $$ = $1; NEXT_STATEMENT($1, $2); }
     ;
 
 cycle_sttmnt
@@ -229,7 +230,9 @@ func
     ;
 
 ifelifselse
-    : if "end" { $$ = Statement::make<IfElseIfsElse>($1); }
+    : if "end"            { $$ = Statement::make<IfElseIfsElse>($1); }
+    | if elifs "end"      { $$ = Statement::make<IfElseIfsElse>($1, $2); }
+    | if else "end"       { $$ = Statement::make<IfElseIfsElse>($1, nullptr, $2); }
     | if elifs else "end" { $$ = Statement::make<IfElseIfsElse>($1, $2, $3); }
     ;
 
@@ -239,7 +242,7 @@ if
 
 elifs
     : %empty      { $$ = nullptr; }
-    | elif elifs  { $$ = $1; $1->nextElseIf = $2; }
+    | elif elifs  { $$ = $1; NEXT_ELSE_IF($1, $2); }
     ;
 
 elif
@@ -255,7 +258,14 @@ while
     ;
 
 for
-    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2, $4, $6, $8); }
+    : "for"      ";"      ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, nullptr, nullptr, $5); }
+    | "for"      ";"      ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, nullptr, $4     , $6); }
+    | "for"      ";" expr ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, $3     , nullptr, $6); }
+    | "for"      ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, $3     , $5     , $7); }
+    | "for" expr ";"      ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , nullptr, nullptr, $6); }
+    | "for" expr ";"      ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , nullptr, $5     , $7); }
+    | "for" expr ";" expr ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , nullptr, $7); }
+    | "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , $6     , $8); }
     ;
 
 break
@@ -282,7 +292,7 @@ throw
 ids
     : %empty       { $$ = nullptr;              }
     | id           { $$ = $1;                   }
-    | id "," ids   { $$ = $1; $1->nextId = $3;  }
+    | id "," ids   { $$ = $1; NEXT_ID($1, $3); }
     ;
 
 id
@@ -290,8 +300,8 @@ id
     ;
 
 expr
-    : %empty             { $$ = nullptr; }
-    | assign_expr        { $$ = $1; }
+    : /*%empty             { $$ = nullptr; }
+    | */assign_expr        { $$ = $1; }
     | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
     | expr "-" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::SUB,        $1, $3); }
     | expr "*" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::MUL,        $1, $3); }
@@ -313,26 +323,27 @@ expr
     | id "("  ")"        { $$ = Statement::make<Call>($1);                               } // check useless
     | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
     | "self"             { $$ = Statement::make<Self>();                                 }
+    | "(" expr ")"       { $$ = Statement::make<RoundBrackets>($2);                      }
     | dots               { $$ = $1; }
     | dictionary         { $$ = $1; }
     ;
 
 assign_expr
-    : assign         { $$ = $1; }
-    | ids "+=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::ADD); }
-    | ids "-=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::SUB); }
-    | ids "*=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MUL); }
-    | ids "/=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::DIV); }
-    | ids "%=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MOD); }
+    : assign           { $$ = $1; }
+    | exprs "+=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::ADD); }
+    | exprs "-=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::SUB); }
+    | exprs "*=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MUL); }
+    | exprs "/=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::DIV); }
+    | exprs "%=" exprs { $$ = Statement::make<Assign>($1, $3, Assign::MOD); }
     ;
 
 assign
-    : ids "="  exprs { $$ = Statement::make<Assign>($1, $3); }
+    : exprs "=" exprs { $$ = Statement::make<Assign>($1, $3); }
     ;
 
 assigns
     : %empty             { $$ = nullptr; }
-    | assign "," assigns { $$ = $1; $1->nextAssign = $3; }
+    | assign "," assigns { $$ = $1; NEXT_ASSIGN($1, $3); }
     ;
 
 dictionary
@@ -340,13 +351,12 @@ dictionary
     ;
 
 dots
-    : id          { $$ = $1; }
-    | id "." dots { $$ = $1; $1->nextId = $3; }
+    : expr "." dots { $$ = $1; NEXT_EXPRESSION($1, $3); }
     ;
 
 exprs
     : expr             { $$ = $1; }
-    | expr "," exprs   { $$ = $1; $1->nextExpression = $3; }
+    | expr "," exprs   { $$ = $1; NEXT_EXPRESSION($1, $3); }
     ;
 
 %%

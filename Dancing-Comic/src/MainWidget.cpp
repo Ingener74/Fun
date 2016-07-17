@@ -33,6 +33,12 @@ public:
         return 0;
     }
 
+    void clear() {
+        for (auto& i : m_buffer)
+            i = 0;
+        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
+    }
+
     vector<char> m_buffer;
 
 protected:
@@ -86,16 +92,19 @@ void MainWidget::closeEvent(QCloseEvent*) {
 }
 
 void MainWidget::run() {
+    m_cout_buffer->clear();
+    m_cerr_buffer->clear();
+    consoleTextEdit->setText("");
+
     stringstream ss;
 
     ss << codeTextEdit->toPlainText().toStdString();
 
-    Statement::clear();
     FunLexer lexer(&ss);
     FunParser parser(lexer);
     parser.set_debug_level(debugCheckBox->isChecked());
     parser.parse();
     Printer pv;
-    Statement::apply(&pv);
-    Statement::clear();
+//    Statement::apply(&pv);
+    pv.iterateStatements(Statement::entryPoint);
 }

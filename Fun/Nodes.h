@@ -26,13 +26,13 @@ public:
     Statement* nextStatement = nullptr;
 
     static void clear();
-    static void apply(Visitor* v);
+//    static void apply(Visitor* v);
+//    static void apply(Statement* start, Visitor* v);
 
     static Statement* entryPoint;
 protected:
     static std::vector<std::unique_ptr<Statement>> statements;
 
-    static void apply(Statement* start, Visitor* v);
 };
 
 class Break: public Statement {
@@ -74,21 +74,21 @@ class Expression;
 class For: public Statement {
 public:
     For(Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment = nullptr,
-            Statement* scope = nullptr) :
-            initial(initial), condition(condition), increment(increment), scope(scope) {
+            Statement* stmts = nullptr) :
+            initial(initial), condition(condition), increment(increment), stmts(stmts) {
     }
     virtual ~For() = default;
 
     virtual For* accept(Visitor*);
 
     Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
-    Statement* scope = nullptr;
+    Statement* stmts = nullptr;
 };
 
 class Function: public Statement {
 public:
     Function(Id* id, Id* args = nullptr, Statement* scope = nullptr) :
-            name(id), args(args), scope(scope) {
+            name(id), args(args), stmts(scope) {
     }
     virtual ~Function() = default;
 
@@ -96,7 +96,7 @@ public:
 
     Id* name = nullptr;
     Id* args = nullptr;
-    Statement* scope = nullptr;
+    Statement* stmts = nullptr;
 };
 
 class If: public Statement {
@@ -232,7 +232,7 @@ public:
         ASSIGN, ADD, SUB, MUL, DIV, MOD,
     };
 
-    Assign(Id* ids, Expression* exprs, Type type = ASSIGN) :
+    Assign(Expression* ids, Expression* exprs, Type type = ASSIGN) :
             ids(ids), exprs(exprs), type(type) {
     }
     virtual ~Assign() = default;
@@ -240,7 +240,7 @@ public:
     virtual Assign* accept(Visitor*);
 
     Type type;
-    Id* ids;
+    Expression* ids;
     Expression* exprs;
 
     static void apply(Assign*, Visitor*);
@@ -316,6 +316,18 @@ public:
     static void apply(Id*, Visitor*);
 };
 
+class RoundBrackets: public Expression {
+public:
+    RoundBrackets(Expression* expr) :
+            expr(expr) {
+    }
+    virtual ~RoundBrackets() = default;
+
+    virtual RoundBrackets* accept(Visitor*);
+
+    Expression* expr;
+};
+
 class Terminal: public Expression {
 public:
     enum Type {
@@ -330,6 +342,11 @@ public:
     virtual Type getType() const {
         return Unknown;
     }
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 class Boolean: public Terminal {

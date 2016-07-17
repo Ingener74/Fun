@@ -8,6 +8,7 @@
 #include "ui_mainwidget.h"
 
 class LifeWidget;
+class TextEditStreambuf;
 
 class MainWidget: public QWidget, public Ui_MainWidget {
 Q_OBJECT
@@ -22,6 +23,7 @@ public:
     void run();
 
 private:
-    std::streambuf* m_cout_buffer = nullptr, *m_cerr_buffer = nullptr, *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
+    TextEditStreambuf* m_cout_buffer = nullptr, *m_cerr_buffer = nullptr;
+    std::streambuf *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
     QSettings m_settings;
 };
