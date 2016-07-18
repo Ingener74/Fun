@@ -292,14 +292,14 @@ public:
 
 class Call: public Expression {
 public:
-    Call(Id* id, Expression* arg = nullptr) :
-            name(id), arguments(arg) {
+    Call(Expression* callable, Expression* arg = nullptr) :
+            callable(callable), arguments(arg) {
     }
     virtual ~Call() = default;
 
     virtual Call* accept(Visitor*);
 
-    Id* name = nullptr;
+    Expression* callable = nullptr;
     Expression* arguments = nullptr;
 };
 
@@ -329,6 +329,19 @@ public:
     std::string value;
 
     static void apply(Id*, Visitor*);
+};
+
+class Index: public Expression {
+public:
+    Index(Expression* indexable, Expression* arg) :
+            indexable(indexable), arg(arg) {
+    }
+    virtual ~Index() = default;
+
+    virtual Index* accept(Visitor*);
+
+    Expression* indexable = nullptr;
+    Expression* arg = nullptr;
 };
 
 class RoundBrackets: public Expression {
@@ -438,14 +451,6 @@ public:
     }
 
     std::string value;
-};
-
-class Self: public Expression {
-public:
-    Self() = default;
-    virtual ~Self() = default;
-
-    virtual Self* accept(Visitor*);
 };
 
 }

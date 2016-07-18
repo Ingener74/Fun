@@ -34,7 +34,6 @@ public:
     virtual void visit(Dictionary*);
     virtual void visit(Id*);
     virtual void visit(RoundBrackets*);
-    virtual void visit(Self*);
 
     virtual void visit(Terminal*);
     virtual void visit(Boolean*);

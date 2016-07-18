@@ -53,6 +53,7 @@ void yyerror(const char* );
     Dictionary*              dictionary_type;
     Assign*                  assign_type;
     Class*                   class_type;
+    Index*                   index_type;
 }
 
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
@@ -80,6 +81,33 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token MUL                   "*"
 %token DIV                   "/"
 %token MOD                   "%"
+
+%token INC "++"
+%token DEC "--"
+
+/*
+++   --         Суффиксальный/постфиксный инкремент и декремент
+.               Выбор элемента по ссылке
+++   --         Префиксный инкремент и декремент    Справа-налево
++   −           Унарный плюс и минус
+!   ~           Логическое НЕ и побитовое НЕ
+*   /   %       Умножение, деление и остаток
++   −           Сложение и вычитание
+<<   >>         Побитовый сдвиг влево и сдвиг вправо
+&               Побитовое И
+^               Побитовый XOR (исключающее или)
+|               Побитовое ИЛИ (inclusive or)
+&&              Логическое И
+||              Логическое ИЛИ
+?:              Тернарное условие   Справа-налево
+=               Прямое присваивание (предоставляемое по умолчанию для C++ классов)
++=   −=         Присвоение с суммированием и разностью
+*=   /=   %=    Присвоение с умножением, делением и остатком от деления
+<<=   >>=       Присвоение с побитовым сдвигом слево и вправо
+&=   ^=   |=    Присвоение с побитовыми логическими операциями (И, XOR, ИЛИ)
+throw           Throw оператор (выброс исключений)
+,
+*/
 
 %token MORE                  ">"
 %token MORE_EQUAL            ">="
@@ -123,23 +151,6 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %token AS                    "as"
 %token THROW                 "throw"
 %token CLASS                 "class"
-%token SUPER                 "super"
-%token SELF                  "self"
-
-%token INIT                  "__init__"
-%token COPY                  "__copy__"
-%token STR                   "__str__"
-%token CALL                  "__call__"
-%token ADD_METHOD            "__add__"
-%token SUB_METHOD            "__sub__"
-%token MUL_METHOD            "__mul__"
-%token DIV_METHOD            "__div__"
-%token MOD_METHOD            "__mod__"
-%token ADDA_METHOD           "__adda__"
-%token SUBA_METHOD           "__suba__"
-%token MULA_METHOD           "__mula__"
-%token DIVA_METHOD           "__diva__"
-%token MODA_METHOD           "__moda__"
 
 %type <sttmnt_type>          program
 %type <sttmnt_type>          sttmnt
@@ -172,6 +183,7 @@ int yylex(fun::FunParser::semantic_type* , FunLexer&);
 %type <dictionary_type>      dictionary
 %type <class_type>           class
 %type <sttmnt_type>          class_stmts
+%type <index_type>           index
 
 %param { FunLexer& myLexer };
 // %parse-param { fun::FunAst* ast };
@@ -334,12 +346,16 @@ expr
     | STRING             { $$ = Statement::make<String>(*$1);                            }
     | NIL                { $$ = Statement::make<Nil>();                                  }
     | id                 { $$ = $1;                                                      }
-    | id "("  ")"        { $$ = Statement::make<Call>($1);                               } // check useless
-    | id "(" exprs ")"   { $$ = Statement::make<Call>($1, $3);                           }
-    | "self"             { $$ = Statement::make<Self>();                                 }
+    | expr "("  ")"      { $$ = Statement::make<Call>($1);                               } // check useless
+    | expr "(" exprs ")" { $$ = Statement::make<Call>($1, $3);                           }
     | "(" expr ")"       { $$ = Statement::make<RoundBrackets>($2);                      }
     | dots               { $$ = $1; }
     | dictionary         { $$ = $1; }
+    | index              { $$ = $1; }
+    ;
+
+index
+    : expr "[" expr "]"  { $$ = Statement::make<Index>($1, $3); }
     ;
 
 assign_expr

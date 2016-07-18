@@ -77,9 +77,6 @@ void Interpreter::visit(class Id*) {
 void Interpreter::visit(class RoundBrackets*) {
 }
 
-void Interpreter::visit(class Self*) {
-}
-
 void Interpreter::visit(class Terminal*) {
 }
 

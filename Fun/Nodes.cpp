@@ -96,12 +96,16 @@ ACCEPT(BinaryOp, {
 })
 
 ACCEPT(Call, {
-    fassert(name, "Call expression must have name")
+    fassert(callable, "Call expression must have name")
 })
 
 ACCEPT_E(Dictionary)
 
 ACCEPT_E(Id)
+
+ACCEPT(Index, {
+    fassert(indexable, "Index expression must have name")
+})
 
 void Id::apply(Id* id, Visitor* v) {
     while (id)
@@ -119,8 +123,6 @@ ACCEPT_E(Nil)
 ACCEPT_E(Real)
 
 ACCEPT_E(String)
-
-ACCEPT_E(Self)
 
 std::string Terminal::toString() const {
     return "";

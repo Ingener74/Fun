@@ -52,23 +52,6 @@ int nnn1 = 0;
 "as"        return fun::FunParser::token::AS;
 "throw"     return fun::FunParser::token::THROW;
 "class"     return fun::FunParser::token::CLASS;
-"super"     return fun::FunParser::token::SUPER;
-"self"      return fun::FunParser::token::SELF;
-
-"__init__"  return fun::FunParser::token::INIT;
-"__copy__"  return fun::FunParser::token::COPY;
-"__str__"   return fun::FunParser::token::STR;
-"__call__"  return fun::FunParser::token::CALL;
-"__add__"   return fun::FunParser::token::ADD_METHOD;
-"__sub__"   return fun::FunParser::token::SUB_METHOD;
-"__mul__"   return fun::FunParser::token::MUL_METHOD;
-"__div__"   return fun::FunParser::token::DIV_METHOD;
-"__mod__"   return fun::FunParser::token::MOD_METHOD;
-"__adda__"  return fun::FunParser::token::ADDA_METHOD;
-"__suba__"  return fun::FunParser::token::SUBA_METHOD;
-"__mula__"  return fun::FunParser::token::MULA_METHOD;
-"__diva__"  return fun::FunParser::token::DIVA_METHOD;
-"__moda__"  return fun::FunParser::token::MODA_METHOD;
 
 ":"         return fun::FunParser::token::COLON;
 ";"         return fun::FunParser::token::SEMICOLON;

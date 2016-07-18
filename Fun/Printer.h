@@ -41,8 +41,8 @@ public:
     virtual void visit(Call*);
     virtual void visit(Dictionary*);
     virtual void visit(Id*);
+    virtual void visit(Index*);
     virtual void visit(RoundBrackets*);
-    virtual void visit(Self*);
 
 //    virtual void visit(Terminal*);
     virtual void visit(Boolean*);

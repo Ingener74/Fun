@@ -279,7 +279,7 @@ void Printer::visit(BinaryOp* bin_op) {
 }
 
 void Printer::visit(Call* call) {
-    call->name->accept(this);
+    call->callable->accept(this);
     cout << "(";
     if (call->arguments)
         iterateExpressions(call->arguments);
@@ -298,14 +298,17 @@ void Printer::visit(Id* node) {
     cout << node->value;
 }
 
+void Printer::visit(Index* index) {
+    index->indexable->accept(this);
+    cout << "[";
+    index->arg->accept(this);
+    cout << "]";
+}
+
 void Printer::visit(RoundBrackets* round) {
     cout << "(";
     iterateExpressions(round->expr);
     cout << ")";
-}
-
-void Printer::visit(Self*) {
-    cout << "self";
 }
 
 // Terminal
@@ -327,7 +330,7 @@ void Printer::visit(Real* node) {
 }
 
 void Printer::visit(String* node) {
-    cout << node->value;
+    cout << "\"" << node->value << "\"";
 }
 
 std::string Printer::indents() const {

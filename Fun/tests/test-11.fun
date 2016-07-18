@@ -4,7 +4,7 @@ class Animal()
 	DOG = 1
 	CAT = 2
 
-	fun init()
+	fun __init__()
 		foo = DOG
 		if foo == CAT:
 			print "is Cat"
@@ -15,10 +15,12 @@ class Animal()
 		end
 	end
 
-	fun str()
-
+	fun __str__()
 		class Format()
-			fun init()
+			fun __init__()
+			end
+
+			fun __call__()
 			end
 		end
 

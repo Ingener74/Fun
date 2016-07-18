@@ -36,8 +36,8 @@ public:
     virtual void visit(class Call*){}
     virtual void visit(class Dictionary*){}
     virtual void visit(class Id*){}
+    virtual void visit(class Index*){}
     virtual void visit(class RoundBrackets*){}
-    virtual void visit(class Self*){}
 
     virtual void visit(class Terminal*){}
     virtual void visit(class Boolean*){}
