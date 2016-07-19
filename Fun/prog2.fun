@@ -146,6 +146,12 @@ dictionaryExample = {
     functionField = fun()end,
 }
 
+try
+    foo = 42
+catch Exception as e:
+    print "error: " + e
+end
+
 # integrated modules
 # * math
 # * thread
