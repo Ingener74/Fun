@@ -10,12 +10,9 @@
 
 #include "MainWidget.h"
 
-#include <FunLexer.h>
-#include <Nodes.h>
-#include <Printer.h>
+#include <fun.h>
 
 using namespace std;
-using namespace fun;
 
 class TextEditStreambuf: public streambuf {
 public:
@@ -56,6 +53,10 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     int id = QFontDatabase::addApplicationFont(":/fonts/DroidSansMono.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont monospace(family);
+
+    m_printer.reset(new fun::Printer);
+    m_interpreter.reset(new fun::Interpreter);
+    m_compiler.reset(new fun::Compiler);
 
     codeTextEdit->setFont(monospace);
     consoleTextEdit->setFont(monospace);
@@ -101,10 +102,8 @@ void MainWidget::run() {
     ss << codeTextEdit->toPlainText().toStdString();
 
     FunLexer lexer(&ss);
-    FunParser parser(lexer);
+    fun::FunParser parser(lexer);
     parser.set_debug_level(debugCheckBox->isChecked());
     parser.parse();
-    Printer pv;
-//    Statement::apply(&pv);
-    pv.iterateStatements(Statement::entryPoint);
+    m_interpreter->iterateStatements(fun::Statement::entryPoint);
 }

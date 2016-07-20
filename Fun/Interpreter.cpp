@@ -1,6 +1,27 @@
+#include <iostream>
+#include "Nodes.h"
 #include "Interpreter.h"
 
 namespace fun {
+
+using namespace std;
+
+void Interpreter::iterateStatements(Statement* stmts) {
+    while (stmts)
+        stmts = stmts->accept(this)->nextStatement;
+}
+
+void Interpreter::iterateExpressions(Expression* exprs) {
+}
+
+void Interpreter::iterateIds(Id* ids) {
+}
+
+void Interpreter::iterateFunctions(Function* functions) {
+}
+
+void Interpreter::iterateAssigns(Assign* assigns) {
+}
 
 Interpreter::Interpreter() {
 }
@@ -8,91 +29,97 @@ Interpreter::Interpreter() {
 Interpreter::~Interpreter() {
 }
 
-void Interpreter::visit(class Statement*) {
+void Interpreter::visit(Statement*) {
 }
 
-void Interpreter::visit(class Break*) {
+void Interpreter::visit(Break*) {
 }
 
-void Interpreter::visit(class Continue*) {
+void Interpreter::visit(Continue*) {
 }
 
-void Interpreter::visit(class For*) {
+void Interpreter::visit(For*) {
 }
 
-void Interpreter::visit(class Function*) {
+void Interpreter::visit(Function*) {
 }
 
-void Interpreter::visit(class If*) {
+void Interpreter::visit(If*) {
 }
 
-void Interpreter::visit(class ElseIf*) {
+void Interpreter::visit(ElseIf*) {
 }
 
-void Interpreter::visit(class Else*) {
+void Interpreter::visit(Else*) {
 }
 
-void Interpreter::visit(class IfElseIfsElse*) {
+void Interpreter::visit(IfElseIfsElse*) {
 }
 
-void Interpreter::visit(class Import*) {
+void Interpreter::visit(Import*) {
 }
 
-void Interpreter::visit(class Print*) {
+void Interpreter::visit(Print* print) {
+    print->expression->accept(this);
+    cout << _terminals.back()->toString() << endl;
 }
 
-void Interpreter::visit(class Return*) {
+void Interpreter::visit(Return*) {
 }
 
-void Interpreter::visit(class While*) {
+void Interpreter::visit(While*) {
 }
 
-void Interpreter::visit(class Class*) {
+void Interpreter::visit(Class*) {
 }
 
-void Interpreter::visit(class Exception*) {
+void Interpreter::visit(Exception*) {
 }
 
-void Interpreter::visit(class Throw*) {
+void Interpreter::visit(Throw*) {
 }
 
-void Interpreter::visit(class Expression*) {
+void Interpreter::visit(Expression*) {
 }
 
-void Interpreter::visit(class Assign*) {
+void Interpreter::visit(Assign*) {
 }
 
-void Interpreter::visit(class BinaryOp*) {
+void Interpreter::visit(BinaryOp*) {
 }
 
-void Interpreter::visit(class Call*) {
+void Interpreter::visit(Call*) {
 }
 
-void Interpreter::visit(class Dictionary*) {
+void Interpreter::visit(Dictionary*) {
 }
 
-void Interpreter::visit(class Id*) {
+void Interpreter::visit(Id*) {
 }
 
-void Interpreter::visit(class RoundBrackets*) {
+void Interpreter::visit(RoundBrackets*) {
 }
 
-void Interpreter::visit(class Terminal*) {
+// Terminals
+
+void Interpreter::visit(Boolean* boolean) {
+    _terminals.push_back(boolean);
 }
 
-void Interpreter::visit(class Boolean*) {
+void Interpreter::visit(Integer* integer) {
+    _terminals.push_back(integer);
 }
 
-void Interpreter::visit(class Integer*) {
+void Interpreter::visit(Nil* nil) {
+    _terminals.push_back(nil);
 }
 
-void Interpreter::visit(class Nil*) {
+void Interpreter::visit(Real* real) {
+    _terminals.push_back(real);
 }
 
-void Interpreter::visit(class Real*) {
-}
-
-void Interpreter::visit(class String*) {
+void Interpreter::visit(String* str) {
+    _terminals.push_back(str);
 }
 
 }

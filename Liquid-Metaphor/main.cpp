@@ -15,7 +15,6 @@ bool parseAndRunCode(Visitor* visitor, istream& inputStream, bool debug) {
     FunParser parser(lexer);
     parser.set_debug_level(debug);
     bool result = parser.parse();
-//    Statement::apply(visitor);
     visitor->iterateStatements(Statement::entryPoint);
     return result;
 }

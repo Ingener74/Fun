@@ -10,6 +10,10 @@
 class LifeWidget;
 class TextEditStreambuf;
 
+namespace fun{
+class Visitor;
+}
+
 class MainWidget: public QWidget, public Ui_MainWidget {
 Q_OBJECT
 public:
@@ -26,4 +30,5 @@ private:
     TextEditStreambuf* m_cout_buffer = nullptr, *m_cerr_buffer = nullptr;
     std::streambuf *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
     QSettings m_settings;
+    std::unique_ptr<fun::Visitor> m_printer, m_interpreter, m_compiler;
 };

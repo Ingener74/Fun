@@ -9,7 +9,7 @@ end
 test2()
 
 fun test3()
-	if 1>0:
+	if 1 > 0:
 		fun test3_inside()
 			print "test 3 inside"
 		end

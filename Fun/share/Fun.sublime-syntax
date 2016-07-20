@@ -22,7 +22,7 @@ contexts:
     # strings in YAML. When using single quoted strings, only single quotes
     # need to be escaped: this is done by using two single quotes next to each
     # other.
-    - match: '\b(if|elif|else|for|while|class|super|end|fun|import|as|throw|try|catch|print|ret|continue|break)\b'
+    - match: '\b(if|elif|else|for|in|while|class|super|end|fun|import|as|throw|try|catch|print|ret|continue|break)\b'
       scope: keyword.control.fun
     - match: '(?<![^.]\.|:)\b(false|nil|true)\b|(?<![.])\.{3}(?!\.)'
       scope: constant.language.fun

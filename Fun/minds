@@ -1,26 +1,70 @@
-integrated modules
-* math
-* thread
-* json
-* net
-* native
-* gl
-* glut
-* sqlite
-* xml
-* gui
+# integrated modules
+# * math
+# * fs
+# * system
+# * thread
+# * json
+# * net
+# * native
+# * gl
+# * glut
+# * sqlite
+# * xml
+# * gui
+# * debug
+# * 
 
+# c function call over native module
 result = native.ccall("c_function_name_add", 10, 20)
 
+# if and for expression like in python
+foo = 10 if x < 10 else 20
+
+foo = 10 if x < 10 else 
+	  20 if x < 20 else 30
+
+foo = 10 if x < 10 else 
+	  20 if x < 20 else 
+	  30 if x < 30 else 40
+
+bar = [x + 1 for x = 0; x < 10; x++]
+
+foo5 = [0:2:100]
+
+bar = range(0, 10)     # generator
+foo = range(0, 2, 100) # generator
+
+for i in range(0, 100):
+	print "i = " + i
+end
+
+for i in [0:100]:
+	print "i = " + i
+end
+
+foo6 = [x * 2 for x in foo5]
+
+# dictionary to variables
+x, y = {
+	x = 10,
+	y = 20,
+}
+assert(x == 10)
+assert(y == 20)
+
+# dictionary example
 dictionaryExample = {
 	integerField   = 42,
 	realField      = 3.1415,
-	functionField  = fun() print "integer value " + self.realField end,
+	functionField  = fun() 
+		print "integer value " + self.realField
+	end,
 	booleanField   = false,
 	objectField    = Dog("Barky"),
 	stringField    = "Mac OS",
 	nilField       = null,
 }
+
 
 class TaskQueue
 	fun __init__()
@@ -84,20 +128,28 @@ thread.create(fun()
 	end
 end)
 
+# type module type transform
+int()
+real()
+str()
+bool()
 
+# debug module
+debug.stacktrace()
+debug.breakpoint()
 
-__call__
-__init__
-__copy__
-__dict__
-__add__
-__sub__
-__str__
-__mul__
-__div__
-__adda__
-__suba__
-__mula__
-__diva__
-__mod__
-__moda__
+# __call__
+# __init__
+# __copy__
+# __dict__
+# __add__
+# __sub__
+# __str__
+# __mul__
+# __div__
+# __adda__
+# __suba__
+# __mula__
+# __diva__
+# __mod__
+# __moda__

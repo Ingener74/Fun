@@ -391,6 +391,11 @@ public:
     }
 
     bool value;
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 class Integer: public Terminal {
@@ -407,6 +412,11 @@ public:
     }
 
     long long value;
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 class Nil: public Terminal {
@@ -419,6 +429,11 @@ public:
     virtual Type getType() const {
         return Terminal::Nil;
     }
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 class Real: public Terminal {
@@ -435,6 +450,11 @@ public:
     }
 
     double value;
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 class String: public Terminal {
@@ -451,6 +471,11 @@ public:
     }
 
     std::string value;
+
+    virtual std::string toString() const;
+    virtual bool toBoolean() const;
+    virtual long long toInteger() const;
+    virtual double toReal() const;
 };
 
 }

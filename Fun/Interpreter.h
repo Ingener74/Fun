@@ -10,6 +10,12 @@ public:
     Interpreter();
     virtual ~Interpreter();
 
+    virtual void iterateStatements(class Statement*);
+    virtual void iterateExpressions(class Expression*);
+    virtual void iterateIds(class Id*);
+    virtual void iterateFunctions(class Function*);
+    virtual void iterateAssigns(class Assign*);
+
     virtual void visit(Statement*);
     virtual void visit(Break*);
     virtual void visit(Continue*);
@@ -35,7 +41,6 @@ public:
     virtual void visit(Id*);
     virtual void visit(RoundBrackets*);
 
-    virtual void visit(Terminal*);
     virtual void visit(Boolean*);
     virtual void visit(Integer*);
     virtual void visit(Nil*);
