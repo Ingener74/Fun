@@ -138,6 +138,10 @@ bool()
 debug.stacktrace()
 debug.breakpoint()
 
+
+file = fs.open("test", fun() end)
+
+
 # __call__
 # __init__
 # __copy__

@@ -326,6 +326,7 @@ ids
     | id "," ids   { $$ = $1; NEXT_ID($1, $3); }
     ;
 
+// %empty             { $$ = Statement::make<Nil>(); }
 expr
     : assign_expr        { $$ = $1; }
     | expr "+" expr      { $$ = Statement::make<BinaryOp>(BinaryOp::ADD,        $1, $3); }
