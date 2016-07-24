@@ -125,7 +125,18 @@ void Interpreter::visit(ElseIf* elseif_stmt) {
 }
 
 void Interpreter::visit(Else* else_stmt) {
-    iterateStatements(else_stmt->stmts);
+    auto stmt = else_stmt->stmts;
+    while (stmt) {
+        if (break_flag) {
+            break_flag = false;
+            break;
+        }
+        if (continue_flag) {
+            continue_flag = false;
+            break;
+        }
+        stmt = stmt->accept(this)->nextStatement;
+    }
 }
 
 void Interpreter::visit(IfElseIfsElse* ifelseifselse_stmt) {
