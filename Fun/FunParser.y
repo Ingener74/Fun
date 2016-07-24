@@ -159,7 +159,7 @@ throw           Throw оператор (выброс исключений)
 %type <sttmnt_type>          cycle_sttmnts
 %type <id_type>              id
 %type <id_type>              ids
-%type <expr_type>            dots
+// %type <expr_type>            dots
 %type <expr_type>            expr
 %type <expr_type>            assign_expr
 %type <assign_type>          assigns
@@ -195,6 +195,7 @@ throw           Throw оператор (выброс исключений)
 
 %left "="
 %left ","
+%left "<" ">" "!=" "<=" ">="
 %left "+" "-"
 %left "*" "/"
 
@@ -287,14 +288,7 @@ while
     ;
 
 for
-    : "for"      ";"      ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, nullptr, nullptr, $5); }
-    | "for"      ";"      ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, nullptr, $4     , $6); }
-    | "for"      ";" expr ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, $3     , nullptr, $6); }
-    | "for"      ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>(nullptr, $3     , $5     , $7); }
-    | "for" expr ";"      ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , nullptr, nullptr, $6); }
-    | "for" expr ";"      ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , nullptr, $5     , $7); }
-    | "for" expr ";" expr ";"      ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , nullptr, $7); }
-    | "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , $6     , $8); }
+    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , $6     , $8); }
     ;
 
 break
@@ -351,7 +345,7 @@ expr
     | expr "("  ")"      { $$ = Statement::make<Call>($1);                               } // check useless
     | expr "(" exprs ")" { $$ = Statement::make<Call>($1, $3);                           }
     | "(" expr ")"       { $$ = Statement::make<RoundBrackets>($2);                      }
-    | dots               { $$ = $1; }
+    // | dots               { $$ = $1; }
     | dictionary         { $$ = $1; }
     | index              { $$ = $1; }
     ;
@@ -382,9 +376,11 @@ dictionary
     : "{" assigns "}" { $$ = Statement::make<Dictionary>($2); }
     ;
 
+/*
 dots
     : expr "." dots { $$ = $1; NEXT_EXPRESSION($1, $3); }
     ;
+*/
 
 exprs
     : expr             { $$ = $1; }

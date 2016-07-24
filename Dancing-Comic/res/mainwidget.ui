@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1155</width>
-    <height>1003</height>
+    <width>318</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,6 +39,25 @@
            <property name="text">
             <string>Отладка</string>
            </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="visitorComboBox">
+           <item>
+            <property name="text">
+             <string>Интерпретатор</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Компилятор</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Принтер</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item>

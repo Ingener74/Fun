@@ -69,6 +69,9 @@ private:
     };
     Operation operation = Undefined;
 
+    bool break_flag = false;
+    bool continue_flag = false;
+
     Terminal* operate(Terminal* a, BinaryOp::Op operation, Terminal* b);
 };
 

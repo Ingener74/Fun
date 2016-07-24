@@ -49,6 +49,7 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     QSettings settings("Venus.Games", "Dancing-Comic");
     restoreGeometry(settings.value("geom").toByteArray());
     splitter->restoreState(settings.value("splitter").toByteArray());
+    visitorComboBox->setCurrentIndex(settings.value("visitor").toInt());
 
     int id = QFontDatabase::addApplicationFont(":/fonts/DroidSansMono.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
@@ -57,6 +58,8 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     m_printer.reset(new fun::Printer);
     m_interpreter.reset(new fun::Interpreter);
     m_compiler.reset(new fun::Compiler);
+
+    visitorIndexChanged(0);
 
     codeTextEdit->setFont(monospace);
     consoleTextEdit->setFont(monospace);
@@ -70,6 +73,7 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     m_cerr_orig = cerr.rdbuf();
     cerr.rdbuf(m_cerr_buffer);
 
+    connect(visitorComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(visitorIndexChanged(int)));
     connect(runPushButton, SIGNAL(clicked()), this, SLOT(run()));
 }
 
@@ -81,15 +85,15 @@ MainWidget::~MainWidget() {
 }
 
 void MainWidget::keyPressEvent(QKeyEvent* e) {
-    if (e->key() == Qt::Key_Escape) {
+    if (e->key() == Qt::Key_Escape)
         close();
-    }
 }
 
 void MainWidget::closeEvent(QCloseEvent*) {
     QSettings settings("Venus.Games", "Dancing-Comic");
     settings.setValue("geom", saveGeometry());
     settings.setValue("splitter", splitter->saveState());
+    settings.setValue("visitor", visitorComboBox->currentIndex());
 }
 
 void MainWidget::run() {
@@ -106,8 +110,15 @@ void MainWidget::run() {
         fun::FunParser parser(lexer);
         parser.set_debug_level(debugCheckBox->isChecked());
         parser.parse();
-        m_interpreter->iterateStatements(fun::Statement::entryPoint);
+        visitor->iterateStatements(fun::Statement::entryPoint);
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
+}
+
+void MainWidget::visitorIndexChanged(int index){
+    visitor =
+            visitorComboBox->currentIndex() == 0 ? m_interpreter.get() :
+            visitorComboBox->currentIndex() == 1 ? m_compiler.get() :
+            visitorComboBox->currentIndex() == 2 ? m_printer.get() : m_printer.get();
 }

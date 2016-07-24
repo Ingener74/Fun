@@ -23,12 +23,14 @@ public:
     void keyPressEvent(QKeyEvent *) override;
     void closeEvent(QCloseEvent *) override;
 
-    Q_SLOT
-    void run();
+    Q_SLOT void run();
+    Q_SLOT void visitorIndexChanged(int index);
 
 private:
     TextEditStreambuf* m_cout_buffer = nullptr, *m_cerr_buffer = nullptr;
     std::streambuf *m_cout_orig = nullptr, *m_cerr_orig = nullptr;
     QSettings m_settings;
+
     std::unique_ptr<fun::Visitor> m_printer, m_interpreter, m_compiler;
+    fun::Visitor* visitor = nullptr;
 };
