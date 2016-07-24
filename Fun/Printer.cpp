@@ -49,7 +49,7 @@ void Printer::iterateAssigns(Assign* assign) {
     while (assign) {
         cout << indents();
         assign = assign->accept(this)->nextAssign;
-        cout << "," << endl;
+        cout << endl;
     }
 }
 
@@ -235,7 +235,7 @@ void Printer::visit(Assign* assign) {
     while (id) {
         id = id->accept(this)->nextExpression;
         if (id)
-            cout << ", " << endl;
+            cout << ", ";
     }
 
     static map<Assign::Type, string> assigns{
@@ -253,7 +253,7 @@ void Printer::visit(Assign* assign) {
     while (expr) {
         expr = expr->accept(this)->nextExpression;
         if (expr)
-            cout << ", " << endl;
+            cout << ", ";
     }
 }
 

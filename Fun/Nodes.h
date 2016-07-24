@@ -371,10 +371,10 @@ public:
         return Unknown;
     }
 
-    virtual std::string toString() const;
-    virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual std::string toString() const { return ""; }
+    virtual bool toBoolean() const { return false; }
+    virtual long long toInteger() const { return 0; }
+    virtual double toReal() const { return 0.0; }
 };
 
 class Boolean: public Terminal {
@@ -392,10 +392,10 @@ public:
 
     bool value;
 
-    virtual std::string toString() const;
-    virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual std::string toString() const { return value ? "true" : "false"; }
+    virtual bool toBoolean() const { return value; }
+    virtual long long toInteger() const { return static_cast<long long>(value); }
+    virtual double toReal() const { return static_cast<double>(value); }
 };
 
 class Integer: public Terminal {
@@ -414,9 +414,9 @@ public:
     long long value;
 
     virtual std::string toString() const;
-    virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual bool toBoolean() const { return static_cast<bool>(value); }
+    virtual long long toInteger() const { return value; }
+    virtual double toReal() const { return static_cast<double>(value); }
 };
 
 class Nil: public Terminal {
@@ -430,10 +430,10 @@ public:
         return Terminal::Nil;
     }
 
-    virtual std::string toString() const;
-    virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual std::string toString() const { return ""; }
+    virtual bool toBoolean() const { return false; }
+    virtual long long toInteger() const { return 0; }
+    virtual double toReal() const { return 0.0; }
 };
 
 class Real: public Terminal {
@@ -453,8 +453,8 @@ public:
 
     virtual std::string toString() const;
     virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual long long toInteger() const { return static_cast<long long>(value); }
+    virtual double toReal() const { return value; }
 };
 
 class String: public Terminal {
@@ -472,10 +472,10 @@ public:
 
     std::string value;
 
-    virtual std::string toString() const;
-    virtual bool toBoolean() const;
-    virtual long long toInteger() const;
-    virtual double toReal() const;
+    virtual std::string toString() const { return value; }
+    virtual bool toBoolean() const { return !value.empty(); }
+    virtual long long toInteger() const { return value.size(); }
+    virtual double toReal() const { return value.size(); }
 };
 
 }

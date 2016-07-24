@@ -1,22 +1,25 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <Visitor.h>
 
 namespace fun {
+
+class Terminal;
 
 class Interpreter: public Visitor {
 public:
     Interpreter();
     virtual ~Interpreter();
 
-    virtual void iterateStatements(class Statement*);
-    virtual void iterateExpressions(class Expression*);
-    virtual void iterateIds(class Id*);
-    virtual void iterateFunctions(class Function*);
-    virtual void iterateAssigns(class Assign*);
+    virtual void iterateStatements(Statement*);
+    virtual void iterateExpressions(Expression*);
+    virtual void iterateIds(Id*);
+    virtual void iterateFunctions(Function*);
+    virtual void iterateAssigns(Assign*);
+    virtual void iterateElseIfs(ElseIf*);
 
-    virtual void visit(Statement*);
     virtual void visit(Break*);
     virtual void visit(Continue*);
     virtual void visit(For*);
@@ -33,7 +36,6 @@ public:
     virtual void visit(Exception*);
     virtual void visit(Throw*);
 
-    virtual void visit(Expression*);
     virtual void visit(Assign*);
     virtual void visit(BinaryOp*);
     virtual void visit(Call*);
@@ -48,7 +50,26 @@ public:
     virtual void visit(String*);
 
 private:
-    std::vector<class Terminal*> _terminals;
+    std::vector<Terminal*> operands;
+
+//    std::vector<>
+    std::map<std::string, std::pair<int, Terminal*>> variables;
+
+    template<typename T, typename ... Args>
+    T* create(Args&& ... args) {
+        std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
+        T* result = node.get();
+        mem.push_back(std::move(node));
+        return result;
+    }
+    std::vector<std::unique_ptr<Terminal>> mem;
+
+    enum Operation{
+        Load, Store, Undefined,
+    };
+    Operation operation = Undefined;
+
+    Terminal* operate(Terminal* a, BinaryOp::Op operation, Terminal* b);
 };
 
 }

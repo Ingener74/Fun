@@ -15,7 +15,7 @@ public:
     virtual void iterateStatements(Statement*);
     virtual void iterateExpressions(Expression*);
     virtual void iterateIds(Id*);
-    virtual void iterateFunctions(class Function*);
+    virtual void iterateFunctions(Function*);
     virtual void iterateAssigns(Assign*);
 
 //    virtual void visit(Statement*);

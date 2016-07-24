@@ -18,7 +18,7 @@ namespace fun {
 using namespace std;
 
 Statement* Statement::entryPoint = nullptr;
-std::vector<std::unique_ptr<Statement>> Statement::statements;
+vector<unique_ptr<Statement>> Statement::statements;
 
 void Statement::clear() {
     entryPoint = nullptr;
@@ -108,6 +108,9 @@ ACCEPT(Index, {
     fassert(indexable, "Index expression must have name")
 })
 
+//ACCEPT(ForExpression, {
+//})
+
 void Id::apply(Id* id, Visitor* v) {
     while (id)
         id = id->accept(v)->nextId;
@@ -125,73 +128,13 @@ ACCEPT_E(Real)
 
 ACCEPT_E(String)
 
-std::string Terminal::toString() const {
-    return "";
-}
-
-bool Terminal::toBoolean() const {
-    return false;
-}
-
-long long Terminal::toInteger() const {
-    return 0;
-}
-
-double Terminal::toReal() const {
-    return 0;
-}
-
-std::string Boolean::toString() const {
-    return value ? "true" : "false";
-}
-
-bool Boolean::toBoolean() const {
-    return value;
-}
-
-long long Boolean::toInteger() const {
-    return static_cast<long long>(value);
-}
-
-double Boolean::toReal() const {
-    return static_cast<double>(value);
-}
-
-std::string Integer::toString() const {
+string Integer::toString() const {
     stringstream ss;
     ss << value;
     return ss.str();
 }
 
-bool Integer::toBoolean() const {
-    return static_cast<bool>(value);
-}
-
-long long Integer::toInteger() const {
-    return value;
-}
-
-double Integer::toReal() const {
-    return static_cast<double>(value);
-}
-
-std::string Nil::toString() const {
-    return "nil";
-}
-
-bool Nil::toBoolean() const {
-    return false;
-}
-
-long long Nil::toInteger() const {
-    return 0;
-}
-
-double Nil::toReal() const {
-    return 0;
-}
-
-std::string Real::toString() const {
+string Real::toString() const {
     stringstream ss;
     ss << value;
     return ss.str();
@@ -200,30 +143,6 @@ std::string Real::toString() const {
 const double Eps = 1e-6;
 bool Real::toBoolean() const {
     return value > Eps;
-}
-
-long long Real::toInteger() const {
-    return static_cast<long long>(value);
-}
-
-double Real::toReal() const {
-    return value;
-}
-
-std::string String::toString() const {
-    return value;
-}
-
-bool String::toBoolean() const {
-    return !value.empty();
-}
-
-long long String::toInteger() const {
-    return value.size();
-}
-
-double String::toReal() const {
-    return static_cast<double>(value.size());
 }
 
 }

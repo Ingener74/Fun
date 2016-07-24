@@ -93,17 +93,21 @@ void MainWidget::closeEvent(QCloseEvent*) {
 }
 
 void MainWidget::run() {
-    m_cout_buffer->clear();
-    m_cerr_buffer->clear();
-    consoleTextEdit->setText("");
+    try {
+        m_cout_buffer->clear();
+        m_cerr_buffer->clear();
+        consoleTextEdit->setText("");
 
-    stringstream ss;
+        stringstream ss;
 
-    ss << codeTextEdit->toPlainText().toStdString();
+        ss << codeTextEdit->toPlainText().toStdString();
 
-    FunLexer lexer(&ss);
-    fun::FunParser parser(lexer);
-    parser.set_debug_level(debugCheckBox->isChecked());
-    parser.parse();
-    m_interpreter->iterateStatements(fun::Statement::entryPoint);
+        FunLexer lexer(&ss);
+        fun::FunParser parser(lexer);
+        parser.set_debug_level(debugCheckBox->isChecked());
+        parser.parse();
+        m_interpreter->iterateStatements(fun::Statement::entryPoint);
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+    }
 }
