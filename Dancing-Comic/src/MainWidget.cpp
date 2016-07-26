@@ -17,29 +17,28 @@ using namespace std;
 class TextEditStreambuf: public streambuf {
 public:
     TextEditStreambuf(QTextEdit* te) :
-            m_buffer(1 << 16), m_te(te) {
-        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
+            buffer(1 << 16), _te(te) {
+        setp(buffer.data(), buffer.data() + buffer.size());
     }
 
     virtual ~TextEditStreambuf() {
     }
 
-    int sync() override
-    {
-        m_te->setPlainText(QString::fromStdString(string(m_buffer.data())));
+    int sync() override {
+        _te->setPlainText(QString::fromStdString(string(buffer.data())));
         return 0;
     }
 
     void clear() {
-        for (auto& i : m_buffer)
+        for (auto& i : buffer)
             i = 0;
-        setp(m_buffer.data(), m_buffer.data() + m_buffer.size());
+        setp(buffer.data(), buffer.data() + buffer.size());
     }
 
-    vector<char> m_buffer;
+    vector<char> buffer;
 
 protected:
-    QTextEdit* m_te = nullptr;
+    QTextEdit* _te = nullptr;
 };
 
 MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
@@ -55,33 +54,34 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
     QFont monospace(family);
 
-    m_printer.reset(new fun::Printer);
-    m_interpreter.reset(new fun::Interpreter);
-    m_compiler.reset(new fun::Compiler);
+    _printer.reset(new fun::Printer);
+    _interpreter.reset(new fun::Interpreter);
+    _compiler.reset(new fun::Compiler);
 
     visitorIndexChanged(0);
 
     codeTextEdit->setFont(monospace);
     consoleTextEdit->setFont(monospace);
 
-    m_cout_buffer = new TextEditStreambuf(consoleTextEdit);
-    m_cerr_buffer = new TextEditStreambuf(consoleTextEdit);
+    _coutBuffer = new TextEditStreambuf(consoleTextEdit);
+    _cerrBuffer = new TextEditStreambuf(consoleTextEdit);
 
-    m_cout_orig = cout.rdbuf();
-    cout.rdbuf(m_cout_buffer);
+    _coutOrig = cout.rdbuf();
+    cout.rdbuf(_coutBuffer);
 
-    m_cerr_orig = cerr.rdbuf();
-    cerr.rdbuf(m_cerr_buffer);
+    _cerrOrig = cerr.rdbuf();
+    cerr.rdbuf(_cerrBuffer);
 
     connect(visitorComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(visitorIndexChanged(int)));
+
     connect(runPushButton, SIGNAL(clicked()), this, SLOT(run()));
 }
 
 MainWidget::~MainWidget() {
-    cout.rdbuf(m_cout_orig);
-    cout.rdbuf(m_cerr_orig);
-    delete m_cout_buffer;
-    delete m_cerr_buffer;
+    cout.rdbuf(_coutOrig);
+    cout.rdbuf(_cerrOrig);
+    delete _coutBuffer;
+    delete _cerrBuffer;
 }
 
 void MainWidget::keyPressEvent(QKeyEvent* e) {
@@ -98,8 +98,8 @@ void MainWidget::closeEvent(QCloseEvent*) {
 
 void MainWidget::run() {
     try {
-        m_cout_buffer->clear();
-        m_cerr_buffer->clear();
+        _coutBuffer->clear();
+        _cerrBuffer->clear();
         consoleTextEdit->setText("");
 
         stringstream ss;
@@ -110,15 +110,15 @@ void MainWidget::run() {
         fun::FunParser parser(lexer);
         parser.set_debug_level(debugCheckBox->isChecked());
         parser.parse();
-        visitor->iterateStatements(fun::Statement::entryPoint);
+        _visitor->iterateStatements(fun::Statement::entryPoint);
     } catch (const exception& e) {
         cerr << e.what() << endl;
     }
 }
 
 void MainWidget::visitorIndexChanged(int index){
-    visitor =
-            visitorComboBox->currentIndex() == 0 ? m_interpreter.get() :
-            visitorComboBox->currentIndex() == 1 ? m_compiler.get() :
-            visitorComboBox->currentIndex() == 2 ? m_printer.get() : m_printer.get();
+    _visitor =
+            visitorComboBox->currentIndex() == 0 ? _interpreter.get() :
+            visitorComboBox->currentIndex() == 1 ? _compiler.get() :
+            visitorComboBox->currentIndex() == 2 ? _printer.get() : _printer.get();
 }

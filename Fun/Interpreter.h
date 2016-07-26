@@ -55,6 +55,8 @@ private:
 //    std::vector<>
     std::map<std::string, std::pair<int, Terminal*>> variables;
 
+    std::vector<std::map<std::string, std::pair<int, Terminal*>>> vars;
+
     template<typename T, typename ... Args>
     T* create(Args&& ... args) {
         std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
@@ -64,11 +66,8 @@ private:
     }
     std::vector<std::unique_ptr<Terminal>> mem;
 
-    enum Operation{
-        Load, Store, Undefined,
-    };
-    Operation operation = Undefined;
-
+    bool load_flag = false;
+    bool store_flag = false;
     bool break_flag = false;
     bool continue_flag = false;
 

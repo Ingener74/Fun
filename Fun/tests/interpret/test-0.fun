@@ -83,7 +83,8 @@ print 3.1415 + 10
 print ""
 print 10 > 1
 
-
+print ""
+print "foo = " + foo + ", bar = " + bar + ", foo + bar = " + (foo + bar)
 
 
 

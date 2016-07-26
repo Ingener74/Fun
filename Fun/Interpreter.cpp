@@ -45,24 +45,26 @@ void Interpreter::visit(Continue* continue_stmt) {
 }
 
 void Interpreter::visit(For* for_stmt) {
-    operation = Load;
     fassert(for_stmt->initial, "for must have initial expression")
+    load_flag = true;
     for_stmt->initial->accept(this);
+    load_flag = false;
+
     while (true) {
-        operation = Load;
         fassert(for_stmt->condition, "for must have condition expression")
+        load_flag = true;
         for_stmt->condition->accept(this);
+        load_flag = false;
 
         if (operands.back()->toBoolean()) {
             operands.pop_back();
+
             auto stmt = for_stmt->stmts;
+
             while (stmt) {
-                if (break_flag) {
-                    break;
-                }
-                if (continue_flag) {
-                    break;
-                }
+                if (break_flag) break;
+                if (continue_flag) break;
+
                 stmt = stmt->accept(this)->nextStatement;
             }
             if (continue_flag) {
@@ -80,17 +82,21 @@ void Interpreter::visit(For* for_stmt) {
             break;
         }
     }
-    operation = Undefined;
 }
 
 void Interpreter::visit(Function* function) {
 }
 
 void Interpreter::visit(If* if_stmt) {
-    operation = Load;
+    load_flag = true;
     if_stmt->cond->accept(this);
+    load_flag = false;
+
     if (operands.back()->toBoolean()) {
+        operands.pop_back();
+
         auto stmt = if_stmt->stmts;
+
         while (stmt) {
             if (break_flag) {
                 break_flag = false;
@@ -106,10 +112,14 @@ void Interpreter::visit(If* if_stmt) {
 }
 
 void Interpreter::visit(ElseIf* elseif_stmt) {
-    operation = Load;
+    load_flag = true;
     elseif_stmt->cond->accept(this);
+    load_flag = false;
     if (operands.back()->toBoolean()) {
+        operands.pop_back();
+
         auto stmt = elseif_stmt->stmts;
+
         while (stmt) {
             if (break_flag) {
                 break_flag = false;
@@ -167,10 +177,11 @@ void Interpreter::visit(Import* import_stmt) {
 }
 
 void Interpreter::visit(Print* print) {
-    operation = Load;
+    load_flag = true;
     print->expression->accept(this);
+    load_flag = false;
     cout << operands.back()->toString() << endl;
-    operation = Undefined;
+//    operands.pop_back();
 }
 
 void Interpreter::visit(Return* return_stmt) {
@@ -178,20 +189,17 @@ void Interpreter::visit(Return* return_stmt) {
 
 void Interpreter::visit(While* while_stmt) {
     while (true) {
-        operation = Load;
+        load_flag = true;
         while_stmt->cond->accept(this);
+        load_flag = false;
 
         if (operands.back()->toBoolean()) {
             operands.pop_back();
 
             auto stmt = while_stmt->stmts;
             while (stmt) {
-                if (break_flag) {
-                    break;
-                }
-                if (continue_flag) {
-                    break;
-                }
+                if (break_flag) break;
+                if (continue_flag) break;
                 stmt = stmt->accept(this)->nextStatement;
             }
             if (continue_flag) {
@@ -207,7 +215,6 @@ void Interpreter::visit(While* while_stmt) {
             break;
         }
     }
-    operation = Undefined;
 }
 
 void Interpreter::visit(Class* class_stmt) {
@@ -225,37 +232,46 @@ void Interpreter::visit(Assign* assign) {
     auto rhs = assign->exprs;
     while (lhs && rhs) {
         if (assign->type == Assign::ASSIGN) {
-            operation = Load;
+            load_flag = true;
             rhs = rhs->accept(this)->nextExpression;
+            load_flag = false;
 
-            operation = Store;
+            store_flag = true;
             lhs = lhs->accept(this)->nextExpression;
+            store_flag = false;
         } else {
-            operation = Load;
-            rhs = rhs->accept(this)->nextExpression;
-
-            operation = Store;
+            load_flag = true;
             lhs = lhs->accept(this)->nextExpression;
+            load_flag = false;
+
+            load_flag = true;
+            rhs = rhs->accept(this)->nextExpression;
+            load_flag = false;
+
+            store_flag = true;
+            lhs = lhs->accept(this)->nextExpression;
+            store_flag = false;
         }
     }
     fassert(balance == operands.size(), "assign balance broken");
-    operation = Undefined;
 }
 
 void Interpreter::visit(BinaryOp* bin_op) {
-    operation = Load;
+    fassert(operands.size() >= 2, "operand is not enough " + to_<string>(operands.size()) + ", 2 expected");
 
+    load_flag = true;
     bin_op->lhs->accept(this);
+    load_flag = false;
     auto lhs = operands.back();
     operands.pop_back();
 
+    load_flag = true;
     bin_op->rhs->accept(this);
+    load_flag = false;
     auto rhs = operands.back();
     operands.pop_back();
 
-    auto res = operate(lhs, bin_op->m_operation, rhs);
-
-    operands.push_back(res);
+    operands.push_back(operate(lhs, bin_op->m_operation, rhs));
 }
 
 void Interpreter::visit(Call* call) {
@@ -265,11 +281,11 @@ void Interpreter::visit(Dictionary* dict) {
 }
 
 void Interpreter::visit(Id* id) {
-    if (operation == Load) {
+    if (load_flag) {
         auto var = variables.find(id->value);
         fassert((var != variables.end()), (id->value + " undefined"))
         operands.push_back(var->second.second);
-    } else if (operation == Store) {
+    } else if (store_flag) {
         auto var = variables.find(id->value);
         if (var == variables.end()) {
             fassert(variables.insert( { id->value, { 1, operands.back() } }).second, "can't insert variable");
@@ -287,33 +303,36 @@ void Interpreter::visit(RoundBrackets* round_brackets) {
 // Terminals
 
 void Interpreter::visit(Boolean* boolean) {
-    if (operation == Load)
+    if (load_flag)
         operands.push_back(boolean);
+    fassert(!store_flag, "you can't assign to value")
 }
 
 void Interpreter::visit(Integer* integer) {
-    if (operation == Load)
+    if (load_flag)
         operands.push_back(integer);
+    fassert(!store_flag, "you can't assign to value")
 }
 
 void Interpreter::visit(Nil* nil) {
-    if (operation == Load)
+    if (load_flag)
         operands.push_back(nil);
+    fassert(!store_flag, "you can't assign to value")
 }
 
 void Interpreter::visit(Real* real) {
-    if (operation == Load)
+    if (load_flag)
         operands.push_back(real);
+    fassert(!store_flag, "you can't assign to value")
 }
 
 void Interpreter::visit(String* str) {
-    if (operation == Load)
+    if (load_flag)
         operands.push_back(str);
+    fassert(!store_flag, "you can't assign to value")
 }
 
 Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
-    if(a->getType() != b->getType()){
-    }
     switch (a->getType()) {
     case Terminal::Integer: {
 
