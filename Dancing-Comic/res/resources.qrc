@@ -1,8 +1,115 @@
 <RCC>
-  <qresource prefix="/main">
-    <file>icon.png</file>
-  </qresource>
-  <qresource prefix="/fonts">
-    <file>DroidSansMono.ttf</file>
-  </qresource>
+    <qresource prefix="/main">
+        <file>icon.png</file>
+        <file>Add.png</file>
+        <file>Add Appointment.png</file>
+        <file>Add Green Button.png</file>
+        <file>Add To Favorite.png</file>
+        <file>Appointment Cool.png</file>
+        <file>Appointment Urgent.png</file>
+        <file>Audio CD.png</file>
+        <file>Audio Document.png</file>
+        <file>Backup Green Button.png</file>
+        <file>Bandwidth.png</file>
+        <file>Blue Ball.png</file>
+        <file>Cancel Red Button.png</file>
+        <file>CD.png</file>
+        <file>Clear Green Button.png</file>
+        <file>Coherence.png</file>
+        <file>Desktop.png</file>
+        <file>Discussion.png</file>
+        <file>Document.png</file>
+        <file>Donate.png</file>
+        <file>Eject Blue Button.png</file>
+        <file>Export To Audio Document.png</file>
+        <file>Export To Document.png</file>
+        <file>Export To Movie Document.png</file>
+        <file>Export To Picture Document.png</file>
+        <file>Favorite.png</file>
+        <file>Forward Mail.png</file>
+        <file>Fullscreen.png</file>
+        <file>Gear.png</file>
+        <file>Gear Alt.png</file>
+        <file>Get Document.png</file>
+        <file>Get Info Blue Button.png</file>
+        <file>Get Info Purple Button.png</file>
+        <file>Get Mail.png</file>
+        <file>Green Ball.png</file>
+        <file>Grey Ball.png</file>
+        <file>Help Blue Button.png</file>
+        <file>Help Purple Button.png</file>
+        <file>History.png</file>
+        <file>iChat.png</file>
+        <file>iChat Alt.png</file>
+        <file>Import Audio Document.png</file>
+        <file>Import Document.png</file>
+        <file>Import Movie Document.png</file>
+        <file>Import Picture Document.png</file>
+        <file>Internet History.png</file>
+        <file>Mail.png</file>
+        <file>Menu.png</file>
+        <file>Menu Item.png</file>
+        <file>Minus Green Button.png</file>
+        <file>Minus Red Button.png</file>
+        <file>Movie CD.png</file>
+        <file>Movie Document.png</file>
+        <file>Mr. Bomb.png</file>
+        <file>Network.png</file>
+        <file>New Document.png</file>
+        <file>New Mail.png</file>
+        <file>Orange Ball.png</file>
+        <file>Pause.png</file>
+        <file>Pause All.png</file>
+        <file>Pause Blue Button.png</file>
+        <file>Pause Green Button.png</file>
+        <file>Picture CD.png</file>
+        <file>Picture Document.png</file>
+        <file>Play.png</file>
+        <file>Play All.png</file>
+        <file>Play Blue Button.png</file>
+        <file>Play Green Button.png</file>
+        <file>Plugin Green Button.png</file>
+        <file>Purple Ball.png</file>
+        <file>Record Button.png</file>
+        <file>Record Red Button.png</file>
+        <file>Red Ball.png</file>
+        <file>Remove.png</file>
+        <file>Remove Appointment.png</file>
+        <file>Remove Document.png</file>
+        <file>Rename Document.png</file>
+        <file>Run.png</file>
+        <file>Send Document.png</file>
+        <file>Send Mail.png</file>
+        <file>Smiley.png</file>
+        <file>Smiley Blue.png</file>
+        <file>Smiley Sad.png</file>
+        <file>Smiley Sad Blue.png</file>
+        <file>Smiley Star.png</file>
+        <file>Smiley Star Pink.png</file>
+        <file>Smiley Star Sad.png</file>
+        <file>Spotlight Blue Button.png</file>
+        <file>Star.png</file>
+        <file>Stop.png</file>
+        <file>Stop All.png</file>
+        <file>Stop Green Button.png</file>
+        <file>Stop Red Button.png</file>
+        <file>Terminal.png</file>
+        <file>Transfer.png</file>
+        <file>Transfer Document.png</file>
+        <file>Trash Empty.png</file>
+        <file>Trash Full.png</file>
+        <file>Universal Binary.png</file>
+        <file>Unread Mail.png</file>
+        <file>Unread Mail Alt.png</file>
+        <file>User.png</file>
+        <file>Users.png</file>
+        <file>Web Browser.png</file>
+        <file>Write Document.png</file>
+        <file>Yellow Ball.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>DroidSansMono.ttf</file>
+        <file>monof55.ttf</file>
+        <file>monof56.ttf</file>
+    </qresource>
 </RCC>

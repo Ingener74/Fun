@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
-    <height>518</height>
+    <width>1078</width>
+    <height>829</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,108 +17,192 @@
    <iconset resource="resources.qrc">
     <normaloff>:/main/icon.png</normaloff>:/main/icon.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_6">
    <item>
-    <widget class="QSplitter" name="splitter">
+    <widget class="QSplitter" name="mainSplitter">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QPushButton" name="newPushButton">
-           <property name="text">
-            <string>New</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openPushButton">
-           <property name="text">
-            <string>Open</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="savePushButton">
-           <property name="text">
-            <string>Save</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="runPushButton">
-           <property name="text">
-            <string>Run</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="debugCheckBox">
-           <property name="text">
-            <string>Отладка</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="visitorComboBox">
-           <item>
-            <property name="text">
-             <string>Интерпретатор</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Компилятор</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Принтер</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Исходный код</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
+     <widget class="QSplitter" name="codeConsoleSplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QTextEdit" name="codeTextEdit"/>
+           <widget class="QPushButton" name="newPushButton">
+            <property name="text">
+             <string>New</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Add.png</normaloff>:/main/Add.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="openPushButton">
+            <property name="text">
+             <string>Open</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Get Document.png</normaloff>:/main/Get Document.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="savePushButton">
+            <property name="text">
+             <string>Save</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Write Document.png</normaloff>:/main/Write Document.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="runPushButton">
+            <property name="text">
+             <string>Run</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Play.png</normaloff>:/main/Play.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="debugPushButton">
+            <property name="text">
+             <string>Debug</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Run.png</normaloff>:/main/Run.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Step over</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Play All.png</normaloff>:/main/Play All.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>Step in</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/main/Play All.png</normaloff>:/main/Play All.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="debugCheckBox">
+            <property name="text">
+             <string>Отладка</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="visitorComboBox">
+            <item>
+             <property name="text">
+              <string>Интерпретатор</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Отладка</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Компилятор</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Принтер</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
-        </widget>
-       </item>
-      </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Исходный код</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QTextEdit" name="codeTextEdit"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Вывод</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTextEdit" name="consoleTextEdit"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Вывод</string>
+     <widget class="QSplitter" name="variablesSplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QTextEdit" name="consoleTextEdit"/>
-       </item>
-      </layout>
+      <widget class="QGroupBox" name="operandsStackGroupBox">
+       <property name="title">
+        <string>Стек операндов</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QTableView" name="operandsStackTableView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="variableStackGroupBox">
+       <property name="title">
+        <string>Стек переменных</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTreeView" name="variableStackTreeView"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>

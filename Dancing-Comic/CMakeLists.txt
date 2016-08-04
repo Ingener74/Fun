@@ -21,6 +21,8 @@ set(DancingComic_SOURCES
     src/main.cpp
     src/MainWidget.h
     src/MainWidget.cpp
+    src/OperandsController.h
+    src/OperandsController.cpp
 )
 
 if(WIN32)

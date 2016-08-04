@@ -8,8 +8,11 @@ namespace fun {
 using namespace std;
 
 void Interpreter::iterateStatements(Statement* stmts) {
-    while (stmts)
+    while (stmts) {
+        if(debugger)
+            debugger->onBeforeStep();
         stmts = stmts->accept(this)->nextStatement;
+    }
 }
 
 void Interpreter::iterateExpressions(Expression* exprs) {
@@ -30,7 +33,8 @@ void Interpreter::iterateElseIfs(ElseIf* elseifs) {
         elseif = elseif->accept(this)->nextElseIf;
 }
 
-Interpreter::Interpreter() {
+Interpreter::Interpreter(Debugger* debugger) :
+        debugger(debugger) {
 }
 
 Interpreter::~Interpreter() {
@@ -85,6 +89,7 @@ void Interpreter::visit(For* for_stmt) {
 }
 
 void Interpreter::visit(Function* function) {
+    fassert(functions.insert({ function->name->value, function }).second, "can't insert function");
 }
 
 void Interpreter::visit(If* if_stmt) {
@@ -297,7 +302,8 @@ void Interpreter::visit(Id* id) {
 }
 
 void Interpreter::visit(RoundBrackets* round_brackets) {
-    round_brackets->expr->accept(this);
+    if (round_brackets->expr)
+        round_brackets->expr->accept(this);
 }
 
 // Terminals
@@ -405,4 +411,12 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
     }
 }
 
+const Operands &Interpreter::getOperands() const {
+    return operands;
+}
+
+}
+
+const fun::Memory &fun::Interpreter::getMemory() const {
+    return variables;
 }

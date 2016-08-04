@@ -85,3 +85,7 @@ for i = 0; i < 10; nil:
     i = i + 1
 end
 ```
+
+### Скриншотики :)
+
+![Github Logo](/Fun/doc/1.png)

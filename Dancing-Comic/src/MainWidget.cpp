@@ -2,12 +2,14 @@
 #include <sstream>
 
 #include <QtCore/QTimer>
+#include <QtCore/QTextStream>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QFontDatabase>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QMessageBox>
 
+#include "OperandsController.h"
 #include "MainWidget.h"
 
 #include <fun.h>
@@ -46,8 +48,10 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     setupUi(this);
 
     QSettings settings("Venus.Games", "Dancing-Comic");
-    restoreGeometry(settings.value("geom").toByteArray());
-    splitter->restoreState(settings.value("splitter").toByteArray());
+    restoreGeometry(settings.value("window").toByteArray());
+    mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    codeConsoleSplitter->restoreState(settings.value("codeConsoleSplitter").toByteArray());
+    variablesSplitter->restoreState(settings.value("variablesSplitter").toByteArray());
     visitorComboBox->setCurrentIndex(settings.value("visitor").toInt());
 
     int id = QFontDatabase::addApplicationFont(":/fonts/DroidSansMono.ttf");
@@ -63,6 +67,12 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     codeTextEdit->setFont(monospace);
     consoleTextEdit->setFont(monospace);
 
+    QFontMetrics fm(monospace);
+    codeTextEdit->setTabStopWidth(fm.width("    "));
+
+    programFileName = settings.value("program", "").toString();
+    readFileToCodeTextEdit();
+
     _coutBuffer = new TextEditStreambuf(consoleTextEdit);
     _cerrBuffer = new TextEditStreambuf(consoleTextEdit);
 
@@ -74,14 +84,15 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
 
     connect(visitorComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(visitorIndexChanged(int)));
 
-    connect(runPushButton, SIGNAL(clicked()), this, SLOT(run()));
+    connect(newPushButton, SIGNAL(clicked()), this, SLOT(newProgram()));
+    connect(openPushButton, SIGNAL(clicked()), this, SLOT(loadProgram()));
+    connect(savePushButton, SIGNAL(clicked()), this, SLOT(saveProgram()));
+    connect(runPushButton, SIGNAL(clicked()), this, SLOT(runProgram()));
+
+    _operandsController.reset(new OperandsController(operandsStackTableWidget));
 }
 
 MainWidget::~MainWidget() {
-    cout.rdbuf(_coutOrig);
-    cout.rdbuf(_cerrOrig);
-    delete _coutBuffer;
-    delete _cerrBuffer;
 }
 
 void MainWidget::keyPressEvent(QKeyEvent* e) {
@@ -90,13 +101,39 @@ void MainWidget::keyPressEvent(QKeyEvent* e) {
 }
 
 void MainWidget::closeEvent(QCloseEvent*) {
+    cout.rdbuf(_coutOrig);
+    cout.rdbuf(_cerrOrig);
+    delete _coutBuffer;
+    delete _cerrBuffer;
+
     QSettings settings("Venus.Games", "Dancing-Comic");
-    settings.setValue("geom", saveGeometry());
-    settings.setValue("splitter", splitter->saveState());
+    settings.setValue("window", saveGeometry());
+    settings.setValue("mainSplitter", mainSplitter->saveState());
+    settings.setValue("codeConsoleSplitter", codeConsoleSplitter->saveState());
+    settings.setValue("variablesSplitter", variablesSplitter->saveState());
     settings.setValue("visitor", visitorComboBox->currentIndex());
+    if (!programFileName.isEmpty())
+        settings.setValue("program", programFileName);
 }
 
-void MainWidget::run() {
+void MainWidget::newProgram() {
+//    codeTextEdit->clear();
+    int ret = QMessageBox::warning(this, tr("My Application"),
+            tr("The document has been modified.\n"
+                "Do you want to save your changes?"),
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                QMessageBox::Save);
+}
+
+void MainWidget::loadProgram() {
+    programFileName = QFileDialog::getOpenFileName(this, "Open Fun program", "/home", tr("Fun Program (*.fun)"));
+    readFileToCodeTextEdit();
+}
+
+void MainWidget::saveProgram() {
+}
+
+void MainWidget::runProgram() {
     try {
         _coutBuffer->clear();
         _cerrBuffer->clear();
@@ -121,4 +158,18 @@ void MainWidget::visitorIndexChanged(int index){
             visitorComboBox->currentIndex() == 0 ? _interpreter.get() :
             visitorComboBox->currentIndex() == 1 ? _compiler.get() :
             visitorComboBox->currentIndex() == 2 ? _printer.get() : _printer.get();
+}
+
+void MainWidget::readFileToCodeTextEdit() {
+    QFile file(programFileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    codeTextEdit->clear();
+    QTextStream ts(&file);
+    QString line = ts.readLine();
+    while (!line.isNull()) {
+        codeTextEdit->append(line);
+        line = ts.readLine();
+    }
 }

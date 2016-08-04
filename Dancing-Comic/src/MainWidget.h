@@ -9,6 +9,7 @@
 
 class LifeWidget;
 class TextEditStreambuf;
+class OperandsController;
 
 namespace fun{
 class Visitor;
@@ -24,13 +25,22 @@ public:
     void closeEvent(QCloseEvent *) override;
 
 public slots:
-    void run();
+    void newProgram();
+    void loadProgram();
+    void saveProgram();
+    void runProgram();
     void visitorIndexChanged(int index);
+
+    void readFileToCodeTextEdit();
 
 private:
     TextEditStreambuf* _coutBuffer = nullptr, *_cerrBuffer = nullptr;
     std::streambuf *_coutOrig = nullptr, *_cerrOrig = nullptr;
     QSettings _settings;
+
+    QString programFileName;
+
+    std::unique_ptr<OperandsController> _operandsController;
 
     std::unique_ptr<fun::Visitor> _printer, _interpreter, _compiler;
     fun::Visitor* _visitor = nullptr;

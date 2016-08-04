@@ -246,7 +246,7 @@ print
     ;
 
 func
-    : "fun" id "(" ids ")" sttmnts "end"   { $$ = Statement::make<Function>($2, $4, $6); }
+    : "fun" id "(" ids ")" sttmnts "end" { $$ = Statement::make<Function>($2, $4, $6); }
     ;
 
 class
@@ -288,7 +288,7 @@ while
     ;
 
 for
-    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end"   { $$ = Statement::make<For>($2     , $4     , $6     , $8); }
+    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end" { $$ = Statement::make<For>($2, $4, $6, $8); }
     ;
 
 break
