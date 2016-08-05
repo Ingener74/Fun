@@ -43,10 +43,30 @@ public:
     virtual void resume() override {
     }
 
+    class WaitRun {
+        bool _stepOver = false;
+        mutex _mutex;
+        condition_variable _cond;
+
+    public:
+        WaitRun() = default;
+
+        void wait() {
+            unique_lock<mutex> lock{_mutex};
+            while (!_stepOver)
+                _cond.wait(lock);
+            _stepOver = false;
+        }
+
+        void run() {
+            unique_lock<mutex> lock(_mutex);
+            _stepOver = true;
+            _cond.notify_one();
+        }
+    };
+
     virtual void stepOver() override {
-        unique_lock<mutex> lock(_mutex);
-        _stepOver = true;
-        _cond.notify_one();
+        _wr.run();
     }
 
     virtual void stepIn() override {
@@ -65,18 +85,13 @@ public:
     }
 
     virtual void onBeforeStep() override {
-        unique_lock<mutex> lock{_mutex};
-        while(!_stepOver)
-            _cond.wait(lock);
-        _stepOver = false;
+        _wr.wait();
     }
 
     Breakpoints vb;
 
 private:
-    bool _stepOver = false;
-    mutex _mutex;
-    condition_variable _cond;
+    WaitRun _wr;
 };
 
 bool parseAndRunCode(Visitor* visitor, istream& inputStream, bool debug) {
