@@ -3,6 +3,7 @@
 #include "Nodes.h"
 #include "Utils.h"
 #include "Interpreter.h"
+#include "Printer.h"
 
 namespace fun {
 
@@ -46,13 +47,19 @@ void Debugger::stepIn() {
 void Debugger::stepOut() {
 }
 
-void Debugger::onBeforeStep(Statement *) {
+void Debugger::onBeforeStep(Statement * s) {
+    _currentStatement = s;
     _wr.wait();
 }
 
+void Debugger::list() {
+    if(_currentStatement)
+        _currentStatement->accept(_printer);
+}
+
 void Interpreter::iterateStatements(Statement *stmts) {
-    while (stmts)
-        stmts = debug(stmts)->accept(this)->nextStatement;
+while (stmts)
+    stmts = debug(stmts)->accept(this)->nextStatement;
 }
 
 Interpreter::Interpreter(Debugger* debugger) :
@@ -110,14 +117,15 @@ void Interpreter::visit(For* for_stmt) {
     }
 }
 
-void Interpreter::visit(Function* function) {
-//    load = true;
-    operands.push_back(function);
-//    load = false;
+void Interpreter::visit(Function *function) {
+    if (load || function->name)
+        operands.push_back(function);
 
-    store = true;
-    function->name->accept(this);
-    store = false;
+    if (function->name) {
+        store = true;
+        debug(function->name)->accept(this);
+        store = false;
+    }
 }
 
 void Interpreter::visit(If* if_stmt) {
@@ -354,8 +362,11 @@ void Interpreter::visit(Call* call) {
             return_flag = false;
             break;
         }
-
         stmt = debug(stmt)->accept(this)->nextStatement;
+        if (return_flag) {
+            return_flag = false;
+            break;
+        }
     }
 }
 

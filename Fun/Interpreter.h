@@ -40,6 +40,7 @@ public:
 using Breakpoints = std::vector<Breakpoint>;
 
 class Interpreter;
+class Printer;
 
 class Debugger {
 public:
@@ -65,7 +66,8 @@ public:
         }
     };
 
-    Debugger() = default;
+    Debugger(Printer *printer) : _printer(printer) {
+    }
     virtual ~Debugger() = default;
 
     virtual void setBreakpoint(const Breakpoint &breakpoint);
@@ -86,9 +88,14 @@ public:
     virtual void onOperandsChanged(const Operands&) = 0;
     virtual void onMemoryChanged(const Memory&) = 0;
 
+    virtual void list();
+
 protected:
     Breakpoints vb;
     WaitRun _wr;
+
+    Printer* _printer = nullptr;
+    Statement* _currentStatement = nullptr;
 };
 
 class Interpreter: public Visitor {

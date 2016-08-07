@@ -15,7 +15,7 @@ using namespace fun;
 
 class ConsoleDebugger : public Debugger {
 public:
-    ConsoleDebugger() {
+    ConsoleDebugger(Printer* printer): Debugger(printer) {
     }
 
     virtual ~ConsoleDebugger() {
@@ -57,10 +57,10 @@ int main(int argc, char* argv[]) {
             cout << options.help({ "" }) << endl;
         }
 
-        ConsoleDebugger consoleDebugger;
+        Printer printer;
+        ConsoleDebugger consoleDebugger(&printer);
         Interpreter interpret(options.count("debug") ? &consoleDebugger : nullptr);
         Compiler compiler;
-        Printer printer;
 
         Visitor* visitor = nullptr;
 
@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
                     {Terminal::Type::Integer, "Integer"},
                     {Terminal::Type::Real, "Real"},
                     {Terminal::Type::Nil, "Nil"},
+                    {Terminal::Type::Function, "Function"},
                     {Terminal::Type::Object, "Object"},
             };
 
@@ -119,6 +120,7 @@ int main(int argc, char* argv[]) {
 
                 auto stepOver = [&consoleDebugger] {
                     consoleDebugger.stepOver();
+                    consoleDebugger.list();
                     return 1;
                 };
 
@@ -133,6 +135,11 @@ int main(int argc, char* argv[]) {
 
                 auto quitCmd = []{
                     return 0;
+                };
+
+                auto listCmd = [&consoleDebugger]{
+                    consoleDebugger.list();
+                    return 1;
                 };
 
                 auto breakpointCmd = [&tokens]{
@@ -161,6 +168,8 @@ int main(int argc, char* argv[]) {
                         {"breakpoint", breakpointCmd},
                         {"b", breakpointCmd},
                         {"quit", quitCmd},
+                        {"list", listCmd},
+                        {"l", listCmd},
                 };
 
                 if (tokens.empty())

@@ -96,7 +96,8 @@ void Printer::visit(For* for_stmt) {
 
 void Printer::visit(Function* function) {
     cout << "fun ";
-    function->name->accept(this);
+    if(function->name)
+        function->name->accept(this);
     cout << "(";
     if (function->args) {
         auto arg = function->args;

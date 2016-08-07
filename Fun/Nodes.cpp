@@ -37,9 +37,7 @@ ACCEPT_E(Exception)
 
 ACCEPT_E(For)
 
-ACCEPT(Function, {
-    fassert(name, "Function must have the name");
-})
+ACCEPT_E(Function)
 
 ACCEPT(If, {
     fassert(cond, "If must have the condition expression");

@@ -167,6 +167,7 @@ throw           Throw оператор (выброс исключений)
 %type <assign_type>          assign
 %type <expr_type>            exprs
 %type <func_type>            func
+%type <func_type>            fun_expr
 %type <import_type>          import
 %type <print_type>           print
 %type <ifelseifselse_type>   ifelifselse
@@ -347,8 +348,13 @@ expr
     | expr "(" exprs ")" { $$ = Statement::make<Call>($1, $3);                           }
     | "(" expr ")"       { $$ = Statement::make<RoundBrackets>($2);                      }
     // | dots               { $$ = $1; }
+    | fun_expr           { $$ = $1; }
     | dictionary         { $$ = $1; }
     | index              { $$ = $1; }
+    ;
+
+fun_expr
+    : "fun" "(" ids ")" sttmnts "end" { $$ = Statement::make<Function>(nullptr, $3, $5); }
     ;
 
 index

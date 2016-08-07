@@ -22,5 +22,32 @@ foo = test3()
 
 print "foo = " + foo
 
+test4 = fun(a) 
+	print "Test 4 success " + a
+	ret a + 43
+end
+
+bar = test4(foo)
+
+print "bar = " + bar
+
+fun()
+	print "Test 5 success"
+end()
+
+fun(b)
+	print "Test 6 success " + b
+end(bar)
+
+fun(f)
+	print "Test 7 success " + f()
+end(fun()
+	ret "Test 8 success "
+end)
+
+print "Test 9 " + fun()
+	ret "success"
+end()
+
 print "Function tests"
 
