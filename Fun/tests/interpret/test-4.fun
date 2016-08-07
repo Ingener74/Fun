@@ -49,5 +49,9 @@ print "Test 9 " + fun()
 	ret "success"
 end()
 
+fun()
+	ret fun() print "Test 10 success" end
+end()()
+
 print "Function tests"
 
