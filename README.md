@@ -85,6 +85,39 @@ for i = 0; i < 10; nil:
     i = i + 1
 end
 ```
+5. Функции
+```
+fun function1()
+    print "function1"
+end
+
+function1()
+
+fun function2(a)
+    print "function 2 " + a
+end
+function2(42)
+
+fun function3(a)
+    ret 42 + a
+end
+foo = function3(43)
+print "function 3 result " + foo
+
+fun() 
+    print "function 4" 
+end()
+
+fun(f)
+    print "function 5 " + f()
+end(fun()
+    ret "function 6"
+end)
+
+fun()
+    ret fun() print "function 7" end
+end()()
+```
 
 ### Скриншотики :)
 
