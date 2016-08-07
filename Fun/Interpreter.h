@@ -3,6 +3,9 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
+#include <mutex>
+#include <condition_variable>
 #include <Visitor.h>
 
 namespace fun {
@@ -22,6 +25,14 @@ public:
     virtual ~Breakpoint() {
     }
 
+    bool operator==(const Breakpoint &rhs) const {
+        return module == rhs.module && line == rhs.line;
+    }
+
+    bool operator!=(const Breakpoint &rhs) const {
+        return !(rhs == *this);
+    }
+
     std::string module;
     int line;
 };
@@ -32,28 +43,52 @@ class Interpreter;
 
 class Debugger {
 public:
+    class WaitRun {
+        bool _stepOver = false;
+        std::mutex _mutex;
+        std::condition_variable _cond;
+
+    public:
+        WaitRun() = default;
+
+        void wait() {
+            std::unique_lock<std::mutex> lock{_mutex};
+            while (!_stepOver)
+                _cond.wait(lock);
+            _stepOver = false;
+        }
+
+        void run() {
+            std::unique_lock<std::mutex> lock(_mutex);
+            _stepOver = true;
+            _cond.notify_one();
+        }
+    };
+
     Debugger() = default;
     virtual ~Debugger() = default;
 
-    virtual void setBreakpoint(const Breakpoint&) = 0;
-    virtual void enableBreakpoint(const Breakpoint&) = 0;
-    virtual void disableBreakpoint(const Breakpoint&) = 0;
-    virtual void removeBreakpoint(const Breakpoint&) = 0;
-    virtual const std::vector<Breakpoint>& getBreakpoints() const = 0;
+    virtual void setBreakpoint(const Breakpoint &breakpoint);
+    virtual void enableBreakpoint(const Breakpoint &breakpoint);
+    virtual void disableBreakpoint(const Breakpoint &breakpoint);
+    virtual void removeBreakpoint(const Breakpoint &breakpoint);
+    virtual const Breakpoints& getBreakpoints() const;
+
+    virtual void pause();
+    virtual void resume();
+    virtual void stepOver();
+    virtual void stepIn();
+    virtual void stepOut();
+
+    virtual void onBeforeStep(Statement *);
 
     virtual void onCatchBreakpoint(const Breakpoint&) = 0;
-
-    virtual void onBeforeStep() = 0;
-
-    virtual void pause() = 0;
-    virtual void resume() = 0;
-
-    virtual void stepOver() = 0;
-    virtual void stepIn() = 0;
-    virtual void stepOut() = 0;
-
     virtual void onOperandsChanged(const Operands&) = 0;
     virtual void onMemoryChanged(const Memory&) = 0;
+
+protected:
+    Breakpoints vb;
+    WaitRun _wr;
 };
 
 class Interpreter: public Visitor {
@@ -63,11 +98,6 @@ public:
 
 
     virtual void iterateStatements(Statement*);
-    virtual void iterateExpressions(Expression*);
-    virtual void iterateIds(Id*);
-    virtual void iterateFunctions(Function*);
-    virtual void iterateAssigns(Assign*);
-    virtual void iterateElseIfs(ElseIf*);
 
     virtual void visit(Break*);
     virtual void visit(Continue*);
@@ -107,8 +137,6 @@ private:
 //    std::vector<>
     Memory variables;
 
-    std::map<std::string, Function*> functions;
-
 //    std::vector<std::map<std::string, std::pair<int, Terminal*>>> vars;
 
     template<typename T, typename ... Args>
@@ -120,14 +148,23 @@ private:
     }
     std::vector<std::unique_ptr<Terminal>> mem;
 
-    bool load_flag = false;
-    bool store_flag = false;
+    bool load = false;
+    bool store = false;
     bool break_flag = false;
     bool continue_flag = false;
+    bool return_flag = false;
+
+    // std::vector<Statement*> instructionPointerStack;
 
     Terminal* operate(Terminal* a, BinaryOp::Op operation, Terminal* b);
 
     Debugger* debugger = nullptr;
+
+    template<typename TStatement>
+    TStatement* debug(TStatement *stmt) {
+        if (debugger) debugger->onBeforeStep(stmt);
+        return stmt;
+    }
 };
 
 }

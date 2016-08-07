@@ -11,12 +11,16 @@
 
 class FunLexer : public yyFlexLexer {
 public:
-    FunLexer(std::istream*);
+    FunLexer(const std::string& filename, std::istream*);
     virtual ~FunLexer();
 
-    int yylex(fun::FunParser::semantic_type* yylval);
+    int yylex(fun::FunParser::semantic_type* yylval, fun::FunParser::location_type* yylloc);
 
 private:
     int yylex();
     fun::FunParser::semantic_type* yylval = nullptr;
+    fun::FunParser::location_type* yylloc = nullptr;
+    std::string _filename;
+    int line = 1;
+    int column = 0;
 };

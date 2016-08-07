@@ -5,6 +5,7 @@
 
 %define api.namespace {fun}
 %define parser_class_name{FunParser}
+%locations
 
 %code requires{
 
@@ -59,7 +60,7 @@ void yyerror(const char* );
 // %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
 
 %code{
-int yylex(fun::FunParser::semantic_type* , FunLexer&);
+int yylex(fun::FunParser::semantic_type*, fun::location*, FunLexer&);
 }
 
 %token <integer>             INTEGER
@@ -391,11 +392,11 @@ exprs
 
 #include <FunLexer.h>
 
-int yylex(fun::FunParser::semantic_type* yylval, FunLexer& myLexer) {
-    return myLexer.yylex(yylval);
+int yylex(fun::FunParser::semantic_type* yylval, fun::location* yylloc, FunLexer& myLexer) {
+    return myLexer.yylex(yylval, yylloc);
 }
 
-void fun::FunParser::error(const std::string& message) {
-    cerr << "error: " << message << endl;
+void fun::FunParser::error(const location& loc, const std::string& message) {
+    cerr << "error: " << loc << ": " << message << endl;
 }
 

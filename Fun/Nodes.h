@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <location.hh>
 
 namespace fun {
 
@@ -24,13 +25,14 @@ public:
     }
 
     Statement* nextStatement = nullptr;
+    location location;
 
     static void clear();
 
     static Statement* entryPoint;
+
 protected:
     static std::vector<std::unique_ptr<Statement>> statements;
-
 };
 
 class Break: public Statement {
@@ -96,22 +98,6 @@ public:
 
     Expression* initial = nullptr, *condition = nullptr, *increment = nullptr;
     Statement* stmts = nullptr;
-};
-
-class Function: public Statement {
-public:
-    Function(Id* id, Id* args = nullptr, Statement* scope = nullptr) :
-            name(id), args(args), stmts(scope) {
-    }
-    virtual ~Function() = default;
-
-    virtual Function* accept(Visitor*);
-
-    Id* name = nullptr;
-    Id* args = nullptr;
-    Statement* stmts = nullptr;
-
-    Function* nextFunction = nullptr;
 };
 
 class If: public Statement {
@@ -375,6 +361,26 @@ public:
     virtual bool toBoolean() const { return false; }
     virtual long long toInteger() const { return 0; }
     virtual double toReal() const { return 0.0; }
+};
+
+class Function: public Terminal {
+public:
+    Function(Id* id, Id* args = nullptr, Statement* scope = nullptr) :
+            name(id), args(args), stmts(scope) {
+    }
+    virtual ~Function() = default;
+
+    virtual Function* accept(Visitor*);
+
+    virtual Type getType() const {
+        return Terminal::Function;
+    }
+
+    Id* name = nullptr;
+    Id* args = nullptr;
+    Statement* stmts = nullptr;
+
+    Function* nextFunction = nullptr;
 };
 
 class Boolean: public Terminal {

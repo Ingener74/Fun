@@ -13,66 +13,12 @@
 using namespace std;
 using namespace fun;
 
-class ConsoleDebugger: public Debugger{
+class ConsoleDebugger : public Debugger {
 public:
     ConsoleDebugger() {
     }
 
     virtual ~ConsoleDebugger() {
-    }
-
-    virtual void setBreakpoint(const Breakpoint &breakpoint) override {
-    }
-
-    virtual void enableBreakpoint(const Breakpoint &breakpoint) override {
-    }
-
-    virtual void disableBreakpoint(const Breakpoint &breakpoint) override {
-    }
-
-    virtual void removeBreakpoint(const Breakpoint &breakpoint) override {
-    }
-
-    virtual const vector<Breakpoint> &getBreakpoints() const override {
-        return vb;
-    }
-
-    virtual void pause() override {
-    }
-
-    virtual void resume() override {
-    }
-
-    class WaitRun {
-        bool _stepOver = false;
-        mutex _mutex;
-        condition_variable _cond;
-
-    public:
-        WaitRun() = default;
-
-        void wait() {
-            unique_lock<mutex> lock{_mutex};
-            while (!_stepOver)
-                _cond.wait(lock);
-            _stepOver = false;
-        }
-
-        void run() {
-            unique_lock<mutex> lock(_mutex);
-            _stepOver = true;
-            _cond.notify_one();
-        }
-    };
-
-    virtual void stepOver() override {
-        _wr.run();
-    }
-
-    virtual void stepIn() override {
-    }
-
-    virtual void stepOut() override {
     }
 
     virtual void onOperandsChanged(const Operands &operands) override {
@@ -83,19 +29,10 @@ public:
 
     virtual void onCatchBreakpoint(const Breakpoint &breakpoint) override {
     }
-
-    virtual void onBeforeStep() override {
-        _wr.wait();
-    }
-
-    Breakpoints vb;
-
-private:
-    WaitRun _wr;
 };
 
-bool parseAndRunCode(Visitor* visitor, istream& inputStream, bool debug) {
-    FunLexer lexer(&inputStream);
+bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
+    FunLexer lexer(filename, &inputStream);
     FunParser parser(lexer);
     parser.set_debug_level(debug);
     bool result = parser.parse();
@@ -134,12 +71,17 @@ int main(int argc, char* argv[]) {
         else
             visitor = &printer;
 
-        ifstream file(options["file"].as<string>());
+        auto& filename = options["file"].as<string>();
+        ifstream file(filename);
 
         if (options.count("file") && file.is_open()) {
 
-            thread th{[visitor, &file, &options]{
-                parseAndRunCode(visitor, file, false/*options.count("debug")*/);
+            thread th{[visitor, &file, &options, &filename]{
+                try {
+                    parseAndRunCode(visitor, filename, file, false);
+                } catch (std::exception &e) {
+                    cerr << e.what() << endl;
+                }
             }};
 
             static map<Terminal::Type, string> types{
@@ -254,7 +196,7 @@ int main(int argc, char* argv[]) {
                     continue;
                 }
 
-                parseAndRunCode(visitor, sourceStream, options.count("debug"));
+                parseAndRunCode(visitor, {}, sourceStream, options.count("debug"));
 
                 sourceStream.clear();
             }

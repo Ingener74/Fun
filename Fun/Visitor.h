@@ -8,11 +8,6 @@ public:
     virtual ~Visitor();
 
     virtual void iterateStatements(class Statement*){}
-    virtual void iterateExpressions(class Expression*){}
-    virtual void iterateIds(class Id*){}
-    virtual void iterateFunctions(class Function*){}
-    virtual void iterateAssigns(class Assign*){}
-    virtual void iterateElseIfs(class ElseIf*){}
 
     virtual void visit(class Statement*){}
     virtual void visit(class Break*){}
