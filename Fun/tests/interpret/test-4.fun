@@ -53,5 +53,8 @@ fun()
 	ret fun() print "Test 10 success" end
 end()()
 
-print "Function tests"
+fun()
+	ret fun(a) print "Test 11 " + a end
+end()("success")
+
 
