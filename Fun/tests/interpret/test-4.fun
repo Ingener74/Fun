@@ -2,13 +2,11 @@
 fun test1()
 	print "Test 1 success"
 end
-
 test1()
 
 fun test2(foo)
 	print "Test 2 " + foo
 end
-
 test2("success")
 
 fun test3()
@@ -57,4 +55,18 @@ fun()
 	ret fun(a) print "Test 11 " + a end
 end()("success")
 
+# a = 40
+# fun test12(foo)
+# 	ret a + foo
+# end
+# 
+# fun test13(bar)
+# 	ret test12(bar)
+# end
+# 
+# if test13(40) == 80:
+# 	print "Test 13 success"
+# else
+# 	print "Test 13 fail"
+# end
 

@@ -31,7 +31,7 @@ public:
 OperandsController::OperandsController(QTableWidget* table) :
         _tableWidget(table) {
     _tableModel = new VariableTable;
-    _tableWidget->setModel(_tableModel);
+//    _tableWidget->setModel(_tableModel);
 }
 
 OperandsController::~OperandsController() {

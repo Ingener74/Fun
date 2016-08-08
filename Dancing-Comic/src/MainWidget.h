@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <thread>
 
 #include <QtCore/QSettings>
 #include <QtWidgets/QWidget>
@@ -44,4 +45,5 @@ private:
 
     std::unique_ptr<fun::Visitor> _printer, _interpreter, _compiler;
     fun::Visitor* _visitor = nullptr;
+    std::thread _th;
 };

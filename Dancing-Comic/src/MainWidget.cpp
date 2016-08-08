@@ -89,7 +89,7 @@ MainWidget::MainWidget(QWidget* parent, Qt::WindowFlags f) :
     connect(savePushButton, SIGNAL(clicked()), this, SLOT(saveProgram()));
     connect(runPushButton, SIGNAL(clicked()), this, SLOT(runProgram()));
 
-    _operandsController.reset(new OperandsController(operandsStackTableWidget));
+//    _operandsController.reset(new OperandsController(operandsStackTableWidget));
 }
 
 MainWidget::~MainWidget() {
@@ -134,23 +134,28 @@ void MainWidget::saveProgram() {
 }
 
 void MainWidget::runProgram() {
-    try {
-        _coutBuffer->clear();
-        _cerrBuffer->clear();
-        consoleTextEdit->setText("");
+    _coutBuffer->clear();
+    _cerrBuffer->clear();
+    consoleTextEdit->setText("");
 
-        stringstream ss;
+    if (_th.joinable())
+        _th.join();
 
-        ss << codeTextEdit->toPlainText().toStdString();
+    _th = std::thread([=] {
+        try {
+            stringstream ss;
 
-        FunLexer lexer(&ss);
-        fun::FunParser parser(lexer);
-        parser.set_debug_level(debugCheckBox->isChecked());
-        parser.parse();
-        _visitor->iterateStatements(fun::Statement::entryPoint);
-    } catch (const exception& e) {
-        cerr << e.what() << endl;
-    }
+            ss << codeTextEdit->toPlainText().toStdString();
+
+            FunLexer lexer(programFileName.toStdString(), &ss);
+            fun::FunParser parser(lexer);
+            parser.set_debug_level(debugCheckBox->isChecked());
+            parser.parse();
+            _visitor->iterateStatements(fun::Statement::entryPoint);
+        } catch (const exception &e) {
+            cerr << e.what() << endl;
+        }
+    });
 }
 
 void MainWidget::visitorIndexChanged(int index){
