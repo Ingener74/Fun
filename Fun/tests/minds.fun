@@ -18,6 +18,8 @@
 result = native.ccall("c_function_name_add", 10, 20)
 
 # if and for expression like in python
+foo = foo else 20
+
 foo = 10 if x < 10 else 20
 
 foo = 10 if x < 10 else 
@@ -54,20 +56,19 @@ assert(y == 20)
 
 # dictionary example
 dictionaryExample = {
-	integerField   = 42,
-	realField      = 3.1415,
-	functionField  = fun() 
-		print "integer value " + self.realField
-	end,
-	booleanField   = false,
-	objectField    = Dog("Barky"),
-	stringField    = "Mac OS",
-	nilField       = null,
+	integerField   = 42
+	realField      = 3.1415
+	functionField  = fun(self) ret "real field " + self.realField end
+	booleanField   = false
+	objectField    = Dog("Barky")
+	stringField    = "Mac OS"
+	nilField       = nil
 }
 
+print "dict function field return " + dictionaryExample.functionField()
 
 class TaskQueue
-	fun __init__()
+	fun __init__(self)
 		self.processList = {
 			firstWork = fun()
 				print "do hard work"
@@ -78,26 +79,26 @@ class TaskQueue
 		self.th = thread.create(self)
 	end
 
-	fun __call__()
+	fun __call__(self)
 		isw
-		lock(isWork) isw = isWork end
+		lock(self.isWork) isw = self.isWork end
 		while isw:
 			proc
-			lock(processList) 
-				while processList.len() <= 0 and isw:
-					processList.wait()
+			lock(self.processList) 
+				while self.processList.len() <= 0 and isw:
+					self.processList.wait()
 				end
-				if process.len() <= 0:
+				if self.processList.len() <= 0:
 					continue
 				end
-				proc = processList[0] 
-				processList.remove(0)
+				proc = self.processList[0] 
+				self.processList.remove(0)
 			end
 			proc()
 		end
 	end
 
-	fun addWork(work)
+	fun addWork(self, work)
 		lock(self.processList)
 			self.processList.append(work)
 			self.processList.notifyOne()
@@ -105,11 +106,14 @@ class TaskQueue
 		ret self
 	end
 
-	fun stop()
-		lock(isWork)
-			isWork = false
+	fun stop(self)
+		lock(self.isWork)
+			self.isWork = false
 		end
-		processList.notifyOne()
+		self.processList.notifyOne()
+		if self.th.isJoinable():
+			self.th.join()
+		end
 	end
 end
 
