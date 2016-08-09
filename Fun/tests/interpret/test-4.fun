@@ -70,3 +70,24 @@ end()("success")
 # 	print "Test 13 fail"
 # end
 
+# recursion
+fun test14(a)
+	if a < 10:
+		print "a = " + a
+		test14(a + 1)
+	end
+end
+test14(0)
+
+# not work yet
+fun fib(n)
+	if n > 2:
+		ret (fib(n - 1) + fib(n - 2))
+	else
+		ret 1
+	end
+end
+
+for i = 0; i < 12; i = i + 1:
+	print "fib(" + i + ") = " + fib(i)
+end
