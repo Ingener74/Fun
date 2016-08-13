@@ -1,18 +1,47 @@
 cmake_minimum_required(VERSION 3.0)
 
 
-include_directories(
-    Fun
-    ${CMAKE_BINARY_DIR}/Fun
-    cxxopts/src
-)
-
 if(MSVC)
 	add_definitions(/DYY_NO_UNISTD_H)
 else()
     add_definitions(-std=c++11)
 endif()
 
+unset(BUILD_PLATFORM)
+if(MINGW OR MSYS)
+    message(STATUS "MinGW or MSYS build")
+    set(BUILD_PLATFORM msys_mingw)
+elseif(EMSCRIPTEN)
+    message(STATUS "Emscripten build")
+    set(BUILD_PLATFORM emscripten)
+elseif(ANDROID)
+    message(STATUS "Android build")
+    set(BUILD_PLATFORM android)
+elseif(APPLE)
+    message(STATUS "MacOS build")
+    set(BUILD_PLATFORM macos)
+else()
+    message(STATUS "Linux build")
+    set(BUILD_PLATFORM linux)
+endif()
+
+set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
+
+set(3RDPARTY_INSTALL ${SYSROOT})
+
+if(NOT EXISTS ${SYSROOT})
+    add_subdirectory(3rdparty)
+endif()
+
+include_directories(
+    Fun
+    ${CMAKE_BINARY_DIR}/Fun
+    cxxopts/src
+    ${SYSROOT}/include
+)
+link_directories(
+        ${SYSROOT}/lib
+)
 
 option(ENABLE_DESERTED_XYLOPHONE "Enable Deserted-Xylophone" OFF)
 if(ENABLE_DESERTED_XYLOPHONE)

@@ -1,0 +1,63 @@
+diff -Naur b/Foundation/src/pocomsg.h a/Foundation/src/pocomsg.h
+--- b/Foundation/src/pocomsg.h	1970-01-01 00:00:00 +0000
++++ a/Foundation/src/pocomsg.h	2016-08-13 12:25:51 +0000
+@@ -0,0 +1,14 @@
++#ifndef POCOMSG_H_
++#define POCOMSG_H_
++
++#define POCO_CTG_FATAL                   0x00000001L
++#define POCO_CTG_CRITICAL                0x00000002L
++#define POCO_CTG_ERROR                   0x00000003L
++#define POCO_CTG_WARNING                 0x00000004L
++#define POCO_CTG_NOTICE                  0x00000005L
++#define POCO_CTG_INFORMATION             0x00000006L
++#define POCO_CTG_DEBUG                   0x00000007L
++#define POCO_CTG_TRACE                   0x00000008L
++#define POCO_MSG_LOG                     0x00001000L
++
++#endif
+\ No newline at end of file
+diff -Naur b/cmake/DefinePlatformSpecifc.cmake a/cmake/DefinePlatformSpecifc.cmake
+--- b/cmake/DefinePlatformSpecifc.cmake	2016-07-20 17:27:25 +0000
++++ a/cmake/DefinePlatformSpecifc.cmake	2016-08-13 12:23:37 +0000
+@@ -107,8 +107,7 @@
+ endif(CMAKE_SYSTEM MATCHES "SunOS")
+ 
+ if (CMAKE_COMPILER_IS_MINGW)
+-  add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400  -DPOCO_WIN32_UTF8)
+-  add_definitions(-D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
++  add_definitions(-D_WIN32 -DWINVER=0x501 -DPOCO_NO_FPENVIRONMENT -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE)
+ endif (CMAKE_COMPILER_IS_MINGW)
+ 
+ # SunPro C++
+diff -Naur b/cmake/PocoMacros.cmake a/cmake/PocoMacros.cmake
+--- b/cmake/PocoMacros.cmake	2016-07-20 17:27:25 +0000
++++ a/cmake/PocoMacros.cmake	2016-08-13 12:17:06 +0000
+@@ -27,13 +27,13 @@
+       set(kit81_bindir "${kit81_dir}/bin/x86")
+     endif (X64)
+   endif ()
++  if(MINGW)
++  find_program(CMAKE_MC_COMPILER windmc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}"
++    DOC "path to message compiler")
++  else()
+   find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}"
+     DOC "path to message compiler")
+-  if (NOT CMAKE_MC_COMPILER)
+-    message(FATAL_ERROR "message compiler not found: required to build")
+-  endif (NOT CMAKE_MC_COMPILER)
+-  message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
+-  mark_as_advanced(CMAKE_MC_COMPILER)
++  endif()
+ endif(WIN32)
+ 
+ #===============================================================================
+@@ -163,7 +163,7 @@
+             add_custom_command(
+                 OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${hdr}
+                 DEPENDS ${msg}
+-                COMMAND ${CMAKE_MC_COMPILER}
++                COMMAND "" ${CMAKE_MC_COMPILER}
+                 ARGS
+                     -h ${CMAKE_CURRENT_BINARY_DIR}
+                     -r ${CMAKE_CURRENT_BINARY_DIR}

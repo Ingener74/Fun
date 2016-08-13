@@ -6,6 +6,10 @@
 #include <unordered_set>
 #include <mutex>
 #include <condition_variable>
+
+#include <Poco/Mutex.h>
+#include <Poco/Condition.h>
+
 #include <Visitor.h>
 
 namespace fun {
@@ -46,23 +50,23 @@ class Debugger {
 public:
     class WaitRun {
         bool _stepOver = false;
-        std::mutex _mutex;
-        std::condition_variable _cond;
+        Poco::Mutex _mutex;
+        Poco::Condition _cond;
 
     public:
         WaitRun() = default;
 
         void wait() {
-            std::unique_lock<std::mutex> lock{_mutex};
+            Poco::Mutex::ScopedLock lock{_mutex};
             while (!_stepOver)
-                _cond.wait(lock);
+                _cond.wait(_mutex);
             _stepOver = false;
         }
 
         void run() {
-            std::unique_lock<std::mutex> lock(_mutex);
+            Poco::Mutex::ScopedLock lock(_mutex);
             _stepOver = true;
-            _cond.notify_one();
+            _cond.signal();
         }
     };
 

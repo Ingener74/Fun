@@ -34,7 +34,12 @@ else()
 	add_executable(DancingComic ${DancingComic_SOURCES})
 endif()
 
-target_link_libraries(DancingComic Qt5::Widgets Qt5::Core Fun)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	target_link_libraries(DancingComic Qt5::Widgets Qt5::Core Fun PocoFoundationd)
+else()
+	target_link_libraries(DancingComic Qt5::Widgets Qt5::Core Fun PocoFoundation)
+endif()
+
 
 install(TARGETS DancingComic DESTINATION bin)
 

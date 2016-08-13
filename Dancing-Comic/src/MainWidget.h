@@ -8,6 +8,8 @@
 
 #include "ui_mainwidget.h"
 
+#include <Poco/Thread.h>
+
 class LifeWidget;
 class TextEditStreambuf;
 class OperandsController;
@@ -45,5 +47,5 @@ private:
 
     std::unique_ptr<fun::Visitor> _printer, _interpreter, _compiler;
     fun::Visitor* _visitor = nullptr;
-    std::thread _th;
+    Poco::Thread _th;
 };

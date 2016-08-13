@@ -10,9 +10,10 @@
 #include <QtWidgets/QMessageBox>
 
 #include "OperandsController.h"
-#include "MainWidget.h"
 
 #include <fun.h>
+
+#include "MainWidget.h"
 
 using namespace std;
 
@@ -138,10 +139,10 @@ void MainWidget::runProgram() {
     _cerrBuffer->clear();
     consoleTextEdit->setText("");
 
-    if (_th.joinable())
+    if (_th.isRunning())
         _th.join();
 
-    _th = std::thread([=] {
+    _th.startFunc([=] {
         try {
             stringstream ss;
 

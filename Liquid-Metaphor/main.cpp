@@ -2,16 +2,16 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 
 #include <cxxopts.hpp>
 
 #include <fun.h>
 
+#include <Poco/Thread.h>
+
 using namespace std;
 using namespace fun;
+using namespace Poco;
 
 class ConsoleDebugger : public Debugger {
 public:
@@ -76,13 +76,14 @@ int main(int argc, char* argv[]) {
 
         if (options.count("file") && file.is_open()) {
 
-            thread th{[visitor, &file, &options, &filename]{
+            Thread th;
+            th.startFunc([visitor, &file, &options, &filename]{
                 try {
                     parseAndRunCode(visitor, filename, file, false);
                 } catch (std::exception &e) {
                     cerr << e.what() << endl;
                 }
-            }};
+            });
 
             static map<Terminal::Type, string> types{
                     {Terminal::Type::Boolean, "Boolean"},
@@ -187,7 +188,7 @@ int main(int argc, char* argv[]) {
                 }
                 lastCmd = tokens;
             }
-            if (th.joinable()) {
+            if (th.isRunning()) {
                 th.join();
             }
         } else {
