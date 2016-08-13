@@ -25,7 +25,7 @@ public:
     }
 
     Statement* nextStatement = nullptr;
-    location location;
+    location loc;
 
     static void clear();
 
