@@ -5,34 +5,31 @@
 #include <string>
 #include <location.hh>
 
+#include <Poco/RefCountedObject.h>
+
 namespace fun {
 
 class Visitor;
 
-class Statement {
+class Statement : public Poco::RefCountedObject {
 public:
-    Statement() = default;
-    virtual ~Statement() = default;
+    Statement();
+    virtual ~Statement();
 
     virtual Statement* accept(Visitor*) = 0;
-
-    template<typename T, typename ... Args>
-    static T* make(Args&& ... args) {
-        std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
-        T* result = node.get();
-        statements.push_back(std::move(node));
-        return result;
-    }
 
     Statement* nextStatement = nullptr;
     location loc;
 
+    static int statementCounter(){
+        return stmtCounter;
+    }
+
+public:
+    static Statement* entryPoint;
     static void clear();
 
-    static Statement* entryPoint;
-
-protected:
-    static std::vector<std::unique_ptr<Statement>> statements;
+    static int stmtCounter;
 };
 
 class Break: public Statement {
@@ -51,7 +48,7 @@ public:
     Class(Id* name, Id* derived, Statement* stmts) :
             name(name), derived(derived), stmts(stmts) {
     }
-    virtual ~Class() = default;
+    virtual ~Class();
 
     virtual Class* accept(Visitor*);
 
@@ -74,7 +71,7 @@ public:
             Statement* catchStmts = nullptr) :
             tryStmts(tryStmts), errorClasses(errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
     }
-    virtual ~Exception() = default;
+    virtual ~Exception();
 
     virtual Exception* accept(Visitor*);
 
@@ -92,7 +89,7 @@ public:
             Statement* stmts = nullptr) :
             initial(initial), condition(condition), increment(increment), stmts(stmts) {
     }
-    virtual ~For() = default;
+    virtual ~For();
 
     virtual For* accept(Visitor*);
 
@@ -105,7 +102,7 @@ public:
     If(Expression* cond, Statement* stmts = nullptr) :
             cond(cond), stmts(stmts){
     }
-    virtual ~If() = default;
+    virtual ~If();
 
     virtual If* accept(Visitor*);
 
@@ -118,7 +115,7 @@ public:
     ElseIf(Expression* cond = nullptr, Statement* stmts = nullptr) :
             cond(cond), stmts(stmts) {
     }
-    virtual ~ElseIf() = default;
+    virtual ~ElseIf();
 
     virtual ElseIf* accept(Visitor*);
 
@@ -134,7 +131,7 @@ public:
     Else(Statement* stmts = nullptr) :
             stmts(stmts) {
     }
-    virtual ~Else() = default;
+    virtual ~Else();
 
     virtual Else* accept(Visitor*);
 
@@ -146,7 +143,7 @@ public:
     IfElseIfsElse(If* ifStmts = nullptr, ElseIf* elseIfsStmts = nullptr, Else* elseStmts = nullptr) :
             ifStmts(ifStmts), elseIfsStmts(elseIfsStmts), elseStmts(elseStmts) {
     }
-    virtual ~IfElseIfsElse() = default;
+    virtual ~IfElseIfsElse();
 
     virtual IfElseIfsElse* accept(Visitor*);
 
@@ -160,7 +157,7 @@ public:
     Import(Id* library) :
             id(library) {
     }
-    virtual ~Import() = default;
+    virtual ~Import();
 
     virtual Import* accept(Visitor*);
 
@@ -172,7 +169,7 @@ public:
     Print(Expression* expr) :
             expression(expr) {
     }
-    virtual ~Print() = default;
+    virtual ~Print();
 
     virtual Print* accept(Visitor*);
 
@@ -184,7 +181,7 @@ public:
     Return(Expression* expr = nullptr) :
             expression(expr) {
     }
-    virtual ~Return() = default;
+    virtual ~Return();
 
     virtual Return* accept(Visitor*);
 
@@ -196,7 +193,7 @@ public:
     Throw(Expression* exression = nullptr) :
             expression(exression) {
     }
-    virtual ~Throw() = default;
+    virtual ~Throw();
 
     virtual Throw* accept(Visitor*);
 
@@ -208,7 +205,7 @@ public:
     While(Expression* cond = nullptr, Statement* stmts = nullptr) :
             cond(cond), stmts(stmts) {
     }
-    virtual ~While() = default;
+    virtual ~While();
 
     virtual While* accept(Visitor*);
 
@@ -219,7 +216,7 @@ public:
 class Expression: public Statement {
 public:
     Expression() = default;
-    virtual ~Expression() = default;
+    virtual ~Expression();
 
     virtual Expression* accept(Visitor*) = 0;
 
@@ -236,7 +233,7 @@ public:
     Assign(Expression* ids, Expression* exprs, Type type = ASSIGN) :
             ids(ids), exprs(exprs), type(type) {
     }
-    virtual ~Assign() = default;
+    virtual ~Assign();
 
     virtual Assign* accept(Visitor*);
 
@@ -268,7 +265,7 @@ public:
     BinaryOp(Op op, Expression* lhs, Expression* rhs) :
             m_operation(op), lhs(lhs), rhs(rhs) {
     }
-    virtual ~BinaryOp() = default;
+    virtual ~BinaryOp();
 
     virtual BinaryOp* accept(Visitor*);
 
@@ -281,7 +278,7 @@ public:
     Call(Expression* callable, Expression* arg = nullptr) :
             callable(callable), arguments(arg) {
     }
-    virtual ~Call() = default;
+    virtual ~Call();
 
     virtual Call* accept(Visitor*);
 
@@ -294,11 +291,11 @@ public:
     Dictionary(Assign* assign) :
             assign(assign) {
     }
-    virtual ~Dictionary() = default;
+    virtual ~Dictionary();
 
     virtual Dictionary* accept(Visitor*);
 
-    Assign* assign;
+    Assign* assign = nullptr;
 };
 
 class Id: public Expression {
@@ -306,15 +303,13 @@ public:
     Id(const std::string& value) :
             value(value) {
     }
-    virtual ~Id() = default;
+    virtual ~Id();
 
     virtual Id* accept(Visitor*);
 
     Id* nextId = nullptr;
 
     std::string value;
-
-    static void apply(Id*, Visitor*);
 };
 
 class Index: public Expression {
@@ -322,7 +317,7 @@ public:
     Index(Expression* indexable, Expression* arg) :
             indexable(indexable), arg(arg) {
     }
-    virtual ~Index() = default;
+    virtual ~Index();
 
     virtual Index* accept(Visitor*);
 
@@ -335,7 +330,7 @@ public:
     RoundBrackets(Expression* expr) :
             expr(expr) {
     }
-    virtual ~RoundBrackets() = default;
+    virtual ~RoundBrackets();
 
     virtual RoundBrackets* accept(Visitor*);
 
@@ -368,7 +363,7 @@ public:
     Function(Id* id, Id* args = nullptr, Statement* scope = nullptr) :
             name(id), args(args), stmts(scope) {
     }
-    virtual ~Function() = default;
+    virtual ~Function();
 
     virtual Function* accept(Visitor*);
 

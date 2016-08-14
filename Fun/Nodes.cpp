@@ -3,6 +3,8 @@
 #include "Utils.h"
 #include "Nodes.h"
 
+#define SAFE_RELEASE(x) if (x) x->release();
+
 #define ACCEPT(CLASS, BODY)        \
 CLASS* CLASS::accept(Visitor* v) { \
     fassert(v, "Visitor is null"); \
@@ -18,11 +20,20 @@ namespace fun {
 using namespace std;
 
 Statement* Statement::entryPoint = nullptr;
-vector<unique_ptr<Statement>> Statement::statements;
+int Statement::stmtCounter = 0;
+
+Statement::Statement() {
+    stmtCounter++;
+}
+
+Statement::~Statement(){
+    stmtCounter--;
+    SAFE_RELEASE(nextStatement)
+}
 
 void Statement::clear() {
     entryPoint = nullptr;
-    statements.clear();
+    entryPoint->release();
 }
 
 ACCEPT_E(Break)
@@ -30,28 +41,75 @@ ACCEPT_E(Break)
 ACCEPT(Class, {
     fassert(name, "Class must have the name");
 })
+Class::~Class() {
+    SAFE_RELEASE(name)
+    SAFE_RELEASE(derived)
+    SAFE_RELEASE(stmts)
+}
 
 ACCEPT_E(Continue)
 
 ACCEPT_E(Exception)
 
+Exception::~Exception(){
+    SAFE_RELEASE(tryStmts)
+    SAFE_RELEASE(errorClasses)
+    SAFE_RELEASE(errorObject)
+    SAFE_RELEASE(catchStmts)
+}
+
 ACCEPT_E(For)
 
+For::~For(){
+    SAFE_RELEASE(initial)
+    SAFE_RELEASE(condition)
+    SAFE_RELEASE(increment)
+    SAFE_RELEASE(stmts)
+}
+
 ACCEPT_E(Function)
+
+Function::~Function(){
+    SAFE_RELEASE(name)
+    SAFE_RELEASE(args)
+    SAFE_RELEASE(stmts)
+    SAFE_RELEASE(nextFunction)
+}
 
 ACCEPT(If, {
     fassert(cond, "If must have the condition expression");
 })
 
+If::~If(){
+    SAFE_RELEASE(cond)
+    SAFE_RELEASE(stmts)
+}
+
 ACCEPT(ElseIf, {
     fassert(cond, "Else If must have the condition expression");
 })
 
+ElseIf::~ElseIf(){
+    SAFE_RELEASE(cond)
+    SAFE_RELEASE(stmts)
+    SAFE_RELEASE(nextElseIf)
+}
+
 ACCEPT_E(Else)
+
+Else::~Else(){
+    SAFE_RELEASE(stmts)
+}
 
 ACCEPT(IfElseIfsElse, {
     fassert(ifStmts, "If Elif Else must have the if statement");
 })
+
+IfElseIfsElse::~IfElseIfsElse(){
+    SAFE_RELEASE(ifStmts)
+    SAFE_RELEASE(elseIfsStmts)
+    SAFE_RELEASE(elseStmts)
+}
 
 void ElseIf::apply(ElseIf* elseIf, Visitor* v) {
     while (elseIf)
@@ -62,27 +120,58 @@ ACCEPT(Import, {
     fassert(id, "Import must have an id");
 })
 
+Import::~Import(){
+    SAFE_RELEASE(id)
+}
+
 ACCEPT(Print, {
     fassert(expression, "Print must have the expressions")
 })
 
+Print::~Print(){
+    SAFE_RELEASE(expression)
+}
+
 ACCEPT_E(Return)
 
+Return::~Return(){
+    SAFE_RELEASE(expression)
+}
+
 ACCEPT_E(Throw)
+
+Throw::~Throw(){
+    SAFE_RELEASE(expression)
+}
 
 ACCEPT(While, {
     fassert(cond, "While must have the condition expression");
 })
+
+While::~While(){
+    SAFE_RELEASE(cond)
+    SAFE_RELEASE(stmts)
+}
 
 void Expression::apply(Expression* expression, Visitor* v) {
     while (expression)
         expression = expression->accept(v)->nextExpression;
 }
 
+Expression::~Expression(){
+    SAFE_RELEASE(nextExpression)
+}
+
 ACCEPT(Assign, {
     fassert(ids, "Assign must have name")
     fassert(exprs, "Assign must have value")
 })
+
+Assign::~Assign(){
+    SAFE_RELEASE(ids)
+    SAFE_RELEASE(exprs)
+    SAFE_RELEASE(nextAssign)
+}
 
 void Assign::apply(Assign* assign, Visitor* v) {
     while (assign)
@@ -94,27 +183,48 @@ ACCEPT(BinaryOp, {
     fassert(rhs, "Binary operation must have right side expression")
 })
 
+BinaryOp::~BinaryOp(){
+    SAFE_RELEASE(lhs)
+    SAFE_RELEASE(rhs)
+}
+
 ACCEPT(Call, {
     fassert(callable, "Call expression must have name")
 })
 
+Call::~Call(){
+    SAFE_RELEASE(callable)
+    SAFE_RELEASE(arguments)
+}
+
 ACCEPT_E(Dictionary)
 
+Dictionary::~Dictionary(){
+    SAFE_RELEASE(assign)
+}
+
 ACCEPT_E(Id)
+
+Id::~Id(){
+    SAFE_RELEASE(nextId)
+}
 
 ACCEPT(Index, {
     fassert(indexable, "Index expression must have name")
 })
 
+Index::~Index(){
+    SAFE_RELEASE(indexable)
+    SAFE_RELEASE(arg)
+}
 //ACCEPT(ForExpression, {
 //})
 
-void Id::apply(Id* id, Visitor* v) {
-    while (id)
-        id = id->accept(v)->nextId;
-}
-
 ACCEPT_E(RoundBrackets)
+
+RoundBrackets::~RoundBrackets(){
+    SAFE_RELEASE(expr)
+}
 
 ACCEPT_E(Boolean)
 

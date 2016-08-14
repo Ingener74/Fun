@@ -5,9 +5,9 @@
 
 #include <cxxopts.hpp>
 
-#include <fun.h>
-
 #include <Poco/Thread.h>
+
+#include <fun.h>
 
 using namespace std;
 using namespace fun;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
 
                 auto variablesCmd = [&interpret]{
                     cout << "########### Memory #############" << endl;
-                    for (auto &i: interpret.getMemory()) cout << types[i.second.second->getType()] << " " << i.first << " == " << i.second.second->toString() << " (" << i.second.first << ")" << endl;
+                    for (auto &i: interpret.getMemory()) cout << types[i.second->getType()] << " " << i.first << " == " << i.second->toString() << " (" << i.second->referenceCount() << ")" << endl;
                     cout << "################################" << endl;
                     return 1;
                 };

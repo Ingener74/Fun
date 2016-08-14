@@ -58,8 +58,8 @@ void Debugger::list() {
 }
 
 void Interpreter::iterateStatements(Statement *stmts) {
-while (stmts)
-    stmts = debug(stmts)->accept(this)->nextStatement;
+    while (stmts)
+        stmts = debug(stmts)->accept(this)->nextStatement;
 }
 
 Interpreter::Interpreter(Debugger* debugger) :
@@ -71,10 +71,12 @@ Interpreter::~Interpreter() {
 
 void Interpreter::visit(Break* break_stmt) {
     break_flag = true;
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Continue* continue_stmt) {
     continue_flag = true;
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(For* for_stmt) {
@@ -90,6 +92,8 @@ void Interpreter::visit(For* for_stmt) {
         load = false;
 
         if (operands.back()->toBoolean()) {
+
+            operands.back()->release();
             operands.pop_back();
 
             auto stmt = for_stmt->stmts;
@@ -111,10 +115,13 @@ void Interpreter::visit(For* for_stmt) {
             fassert(for_stmt->increment, "for must have increment expression")
             debug(for_stmt->increment)->accept(this);
         } else {
+            operands.back()->release();
             operands.pop_back();
             break;
         }
     }
+
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Function *function) {
@@ -214,9 +221,11 @@ void Interpreter::visit(IfElseIfsElse* ifelseifselse_stmt) {
             else_stmt->accept(this);
         }
     }
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Import* import_stmt) {
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Print* print) {
@@ -224,7 +233,11 @@ void Interpreter::visit(Print* print) {
     debug(print->expression)->accept(this);
     load = false;
     cout << operands.back()->toString() << endl;
+
+    operands.back()->release();
     operands.pop_back();
+
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Return *return_stmt) {
@@ -235,6 +248,7 @@ void Interpreter::visit(Return *return_stmt) {
         load = false;
     }
     return_flag = true;
+//    fassert(operands.empty(), "operands not empty after statement") // return is expression maybe
 }
 
 void Interpreter::visit(While* while_stmt) {
@@ -265,6 +279,7 @@ void Interpreter::visit(While* while_stmt) {
             break;
         }
     }
+    fassert(operands.empty(), "operands not empty after statement")
 }
 
 void Interpreter::visit(Class* class_stmt) {
@@ -303,11 +318,14 @@ void Interpreter::visit(Assign* assign) {
             store = false;
         }
     }
-    fassert(balance == operands.size(), "assign balance broken");
+//    fassert(balance == operands.size(), "assign balance broken");
+
+    fassert(operands.empty(), "operands not empty after statement") // assign maybe statement
+//    fassert(!operands.empty(), "operands empty after expression")
 }
 
 void Interpreter::visit(BinaryOp* bin_op) {
-    fassert(operands.size() >= 2, "operand is not enough " + to_<string>(operands.size()) + ", 2 expected");
+    fassert(operands.size() >= 2, "not enough operands " + to_<string>(operands.size()) + " 2 expected");
 
     load = true;
     debug(bin_op->lhs)->accept(this);
@@ -322,6 +340,11 @@ void Interpreter::visit(BinaryOp* bin_op) {
     operands.pop_back();
 
     operands.push_back(operate(lhs, bin_op->m_operation, rhs));
+
+    lhs->release();
+    rhs->release();
+
+    fassert(!operands.empty(), "operands empty after expression")
 }
 
 void Interpreter::visit(Call* call) {
@@ -368,6 +391,8 @@ void Interpreter::visit(Call* call) {
             break;
         }
     }
+
+    fassert(!operands.empty(), "operands empty after expression")
 }
 
 void Interpreter::visit(Dictionary* dict) {
@@ -376,54 +401,81 @@ void Interpreter::visit(Dictionary* dict) {
 void Interpreter::visit(Id* id) {
     if (load) {
         auto var = variables.find(id->value);
-        fassert((var != variables.end()), (id->value + " undefined"));
-        operands.push_back(var->second.second);
+        fassert(var != variables.end(), id->value + " undefined");
+        operands.push_back(var->second);
+        var->second->duplicate();
+
+        fassert(!operands.empty(), "operands empty after expression")
     } else if (store) {
         fassert(operands.size() > 0, "have no operands");
+
         auto var = variables.find(id->value);
-        if (var == variables.end()) {
-            fassert(variables.insert( { id->value, { 1, operands.back() } }).second, "can't insert variable");
-        } else {
-            var->second = {1, operands.back()};
-        }
+
+        auto val = operands.back();
         operands.pop_back();
+
+        if (var == variables.end()) {
+            auto it = variables.insert({id->value, val});
+            fassert(it.second, "can't store top operands value in " + id->value);
+        } else {
+            var->second = val;
+        }
+
+        fassert(!operands.empty(), "operands empty after expression")
     }
 }
 
 void Interpreter::visit(RoundBrackets* round_brackets) {
-    if (round_brackets->expr)
+    if (round_brackets->expr){
         debug(round_brackets->expr)->accept(this);
+        fassert(!operands.empty(), "operands empty after expression")
+    }
 }
 
 // Terminals
 
-void Interpreter::visit(Boolean* boolean) {
-    if (load)
+void Interpreter::visit(Boolean *boolean) {
+    if (load) {
         operands.push_back(boolean);
+        boolean->duplicate();
+        fassert(!operands.empty(), "operands empty after expression")
+    }
     fassert(!store, "you can't assign to value")
 }
 
-void Interpreter::visit(Integer* integer) {
-    if (load)
+void Interpreter::visit(Integer *integer) {
+    if (load) {
         operands.push_back(integer);
+        integer->duplicate();
+        fassert(!operands.empty(), "operands empty after expression")
+    }
     fassert(!store, "you can't assign to value")
 }
 
-void Interpreter::visit(Nil* nil) {
-    if (load)
+void Interpreter::visit(Nil *nil) {
+    if (load) {
         operands.push_back(nil);
+        nil->duplicate();
+        fassert(!operands.empty(), "operands empty after expression")
+    }
     fassert(!store, "you can't assign to value")
 }
 
-void Interpreter::visit(Real* real) {
-    if (load)
+void Interpreter::visit(Real *real) {
+    if (load) {
         operands.push_back(real);
+        real->duplicate();
+        fassert(!operands.empty(), "operands empty after expression")
+    }
     fassert(!store, "you can't assign to value")
 }
 
-void Interpreter::visit(String* str) {
-    if (load)
+void Interpreter::visit(String *str) {
+    if (load) {
         operands.push_back(str);
+        str->duplicate();
+        fassert(!operands.empty(), "operands empty after expression")
+    }
     fassert(!store, "you can't assign to value")
 }
 
@@ -435,18 +487,18 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toInteger();
 
         switch (op) {
-        case BinaryOp::ADD: { return create<Integer>(lhs + rhs); }
-        case BinaryOp::SUB: { return create<Integer>(lhs - rhs); }
-        case BinaryOp::MUL: { return create<Integer>(lhs * rhs); }
-        case BinaryOp::DIV: { return create<Integer>(lhs / rhs); }
-        case BinaryOp::MOD: { return create<Integer>(lhs % rhs); }
+        case BinaryOp::ADD: { return new Integer(lhs + rhs); }
+        case BinaryOp::SUB: { return new Integer(lhs - rhs); }
+        case BinaryOp::MUL: { return new Integer(lhs * rhs); }
+        case BinaryOp::DIV: { return new Integer(lhs / rhs); }
+        case BinaryOp::MOD: { return new Integer(lhs % rhs); }
 
-        case BinaryOp::EQUAL:      { return create<Boolean>(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return create<Boolean>(lhs != rhs); }
-        case BinaryOp::MORE:       { return create<Boolean>(lhs >  rhs); }
-        case BinaryOp::MORE_EQUAL: { return create<Boolean>(lhs >= rhs); }
-        case BinaryOp::LESS:       { return create<Boolean>(lhs <  rhs); }
-        case BinaryOp::LESS_EQUAL: { return create<Boolean>(lhs <= rhs); }
+        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOp::MORE:       { return new Boolean(lhs >  rhs); }
+        case BinaryOp::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
+        case BinaryOp::LESS:       { return new Boolean(lhs <  rhs); }
+        case BinaryOp::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
         default:
             fassert(false, "unsupported operation");
         }
@@ -456,17 +508,17 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toReal();
 
         switch (op) {
-        case BinaryOp::ADD: { return create<Real>(lhs + rhs); }
-        case BinaryOp::SUB: { return create<Real>(lhs - rhs); }
-        case BinaryOp::MUL: { return create<Real>(lhs * rhs); }
-        case BinaryOp::DIV: { return create<Real>(lhs / rhs); }
+        case BinaryOp::ADD: { return new Real(lhs + rhs); }
+        case BinaryOp::SUB: { return new Real(lhs - rhs); }
+        case BinaryOp::MUL: { return new Real(lhs * rhs); }
+        case BinaryOp::DIV: { return new Real(lhs / rhs); }
 
-        case BinaryOp::EQUAL:      { return create<Boolean>(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return create<Boolean>(lhs != rhs); }
-        case BinaryOp::MORE:       { return create<Boolean>(lhs >  rhs); }
-        case BinaryOp::MORE_EQUAL: { return create<Boolean>(lhs >= rhs); }
-        case BinaryOp::LESS:       { return create<Boolean>(lhs <  rhs); }
-        case BinaryOp::LESS_EQUAL: { return create<Boolean>(lhs <= rhs); }
+        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOp::MORE:       { return new Boolean(lhs >  rhs); }
+        case BinaryOp::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
+        case BinaryOp::LESS:       { return new Boolean(lhs <  rhs); }
+        case BinaryOp::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
         default:
             fassert(false, "unsupported operation");
         }
@@ -476,10 +528,10 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toString();
 
         switch (op) {
-        case BinaryOp::ADD: { return create<String>(lhs + rhs); }
+        case BinaryOp::ADD: { return new String(lhs + rhs); }
 
-        case BinaryOp::EQUAL:      { return create<Boolean>(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return create<Boolean>(lhs != rhs); }
+        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassert(false, "unsupported operation");
         }
@@ -489,8 +541,8 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toBoolean();
 
         switch (op) {
-        case BinaryOp::EQUAL:      { return create<Boolean>(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return create<Boolean>(lhs != rhs); }
+        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassert(false, "unsupported operation");
         }

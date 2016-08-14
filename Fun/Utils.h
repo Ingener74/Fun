@@ -21,9 +21,9 @@ Res to_(Arg&& arg) {
 }
 
 #define fassert(condition, message) \
-    if(!condition) \
+    if(!(condition)) \
         throw std::runtime_error( \
-                std::string("Error: ") + std::string(message) + std::string("\n") + \
+                std::string("Error: ") + std::string((message)) + std::string("\n") + \
                 std::string("At: ") + std::string(__FILE__) + std::string(": ") + to_<std::string>(__LINE__));
 
 class Utils {

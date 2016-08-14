@@ -18,8 +18,8 @@ class Terminal;
 
 using Operands = std::vector<Terminal*>;
 
-//using Memory = std::vector<std::unordered_map<std::string, std::pair<int, Terminal*>>>;
-using Memory = std::unordered_map<std::string, std::pair<int, Terminal*>>;
+//using Memory = std::vector<std::unordered_map<std::string, Terminal*>>;
+using Memory = std::unordered_map<std::string, Terminal*>;
 
 class Breakpoint {
 public:
@@ -145,19 +145,7 @@ public:
 private:
     Operands operands;
 
-//    std::vector<>
     Memory variables;
-
-//    std::vector<std::map<std::string, std::pair<int, Terminal*>>> vars;
-
-    template<typename T, typename ... Args>
-    T* create(Args&& ... args) {
-        std::unique_ptr<T> node(new T(std::forward<Args>(args)...));
-        T* result = node.get();
-        mem.push_back(std::move(node));
-        return result;
-    }
-    std::vector<std::unique_ptr<Terminal>> mem;
 
     bool load = false;
     bool store = false;

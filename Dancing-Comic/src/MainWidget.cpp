@@ -10,10 +10,9 @@
 #include <QtWidgets/QMessageBox>
 
 #include "OperandsController.h"
+#include "MainWidget.h"
 
 #include <fun.h>
-
-#include "MainWidget.h"
 
 using namespace std;
 
