@@ -23,16 +23,20 @@ Interpreter::~Interpreter() {
 }
 
 void Interpreter::visit(Break* break_stmt) {
+    auto ops = operands.size();
     break_flag = true;
-    fassertl(operands.empty(), break_stmt->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, break_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Continue* continue_stmt) {
+    auto ops = operands.size();
     continue_flag = true;
-    fassertl(operands.empty(), continue_stmt->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, continue_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(For* for_stmt) {
+    auto ops = operands.size();
+
     fassertl(for_stmt->initial, for_stmt->loc, "for must have initial expression")
     load = true;
     debug(for_stmt->initial)->accept(this);
@@ -71,12 +75,14 @@ void Interpreter::visit(For* for_stmt) {
         }
     }
 
-    fassertl(operands.empty(), for_stmt->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, for_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Function *function) {
-    if (load || function->name)
+    if (load || function->name){
         operands.push_back(function);
+        function->duplicate();
+    }
 
     if (function->name) {
         store = true;
@@ -86,7 +92,7 @@ void Interpreter::visit(Function *function) {
 }
 
 void Interpreter::visit(If* if_stmt) {
-
+    auto ops = operands.size();
     load = true;
     debug(if_stmt->cond)->accept(this);
     load = false;
@@ -110,9 +116,11 @@ void Interpreter::visit(If* if_stmt) {
             stmt = debug(stmt)->accept(this)->nextStatement;
         }
     }
+    fassertl(operands.size() == ops + 1, if_stmt->loc, "operands balance broken after statement");
 }
 
 void Interpreter::visit(ElseIf* elseif_stmt) {
+    auto ops = operands.size();
     load = true;
     debug(elseif_stmt->cond)->accept(this);
     load = false;
@@ -135,9 +143,11 @@ void Interpreter::visit(ElseIf* elseif_stmt) {
             stmt = debug(stmt)->accept(this)->nextStatement;
         }
     }
+    fassertl(operands.size() == ops, elseif_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Else* else_stmt) {
+    auto ops = operands.size();
     auto stmt = else_stmt->stmts;
     while (stmt) {
         if (break_flag) {
@@ -150,9 +160,12 @@ void Interpreter::visit(Else* else_stmt) {
         }
         stmt = debug(stmt)->accept(this)->nextStatement;
     }
+    fassertl(operands.size() == ops + 1, else_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(IfElseIfsElse* ifelseifselse_stmt) {
+    auto ops = operands.size();
+
     ifelseifselse_stmt->ifStmts->accept(this);
     if (!operands.back()->toBoolean()) {
         RELEASE_TOP
@@ -178,14 +191,17 @@ void Interpreter::visit(IfElseIfsElse* ifelseifselse_stmt) {
     }else{
         RELEASE_TOP
     }
-    fassertl(operands.empty(), ifelseifselse_stmt->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, ifelseifselse_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Import* import_stmt) {
-    fassertl(operands.empty(), import_stmt->loc, "operands not empty after statement")
+    auto ops = operands.size();
+    fassertl(operands.size() == ops, import_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Print* print) {
+    auto ops = operands.size();
+
     load = true;
     debug(print->expression)->accept(this);
     load = false;
@@ -194,7 +210,7 @@ void Interpreter::visit(Print* print) {
     operands.back()->release();
     operands.pop_back();
 
-    fassertl(operands.empty(), print->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, print->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Return *return_stmt) {
@@ -209,6 +225,7 @@ void Interpreter::visit(Return *return_stmt) {
 }
 
 void Interpreter::visit(While* while_stmt) {
+    auto ops = operands.size();
     while (true) {
         load = true;
         debug(while_stmt->cond)->accept(this);
@@ -236,7 +253,7 @@ void Interpreter::visit(While* while_stmt) {
             break;
         }
     }
-    fassertl(operands.empty(), while_stmt->loc, "operands not empty after statement")
+    fassertl(operands.size() == ops, while_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Class* class_stmt) {
@@ -282,7 +299,7 @@ void Interpreter::visit(Assign* assign) {
 }
 
 void Interpreter::visit(BinaryOp* bin_op) {
-//    fassert(operands.size() >= 2, "not enough operands " + to_<string>(operands.size()) + " 2 expected");
+    auto ops = operands.size();
 
     load = true;
     debug(bin_op->lhs)->accept(this);
@@ -307,7 +324,7 @@ void Interpreter::visit(BinaryOp* bin_op) {
     lhs->release();
     rhs->release();
 
-    fassertl(!operands.empty(), bin_op->loc, "operands empty after expression")
+    fassertl(operands.size() == (ops + 1), bin_op->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Call* call) {
@@ -462,6 +479,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
+        break;
     }
     case Terminal::Real: {
         auto lhs = a->toReal();
@@ -482,6 +500,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
+        break;
     }
     case Terminal::String: {
         auto lhs = a->toString();
@@ -494,7 +513,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
+
         }
+        break;
     }
     case Terminal::Boolean:{
         auto lhs = a->toBoolean();
@@ -506,6 +527,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
+        break;
     }
     default:
         fassertl(false, a->loc + b->loc, "unsupported operation");

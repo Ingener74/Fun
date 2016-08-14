@@ -38,7 +38,7 @@ fun(b)
 end(bar)
 
 fun(f)
-	print "Test 7 success " + f()
+	print "Test 7 success \n" + f()
 end(fun()
 	ret "Test 8 success "
 end)
