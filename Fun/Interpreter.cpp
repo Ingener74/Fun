@@ -3,69 +3,12 @@
 #include "Nodes.h"
 #include "Utils.h"
 #include "Interpreter.h"
-#include "Printer.h"
 
 namespace fun {
 
 using namespace std;
 
 #define RELEASE_TOP operands.back()->release(); operands.pop_back();
-
-void Debugger::setBreakpoint(const Breakpoint &breakpoint) {
-    vb.push_back(breakpoint);
-
-    stringstream ss;
-    ss.seekg(0);
-}
-
-void Debugger::enableBreakpoint(const Breakpoint &breakpoint) {
-}
-
-void Debugger::disableBreakpoint(const Breakpoint &breakpoint) {
-}
-
-void Debugger::removeBreakpoint(const Breakpoint &breakpoint) {
-    auto it = find(begin(vb), end(vb), breakpoint);
-    if(it == vb.end())
-        return;
-    vb.erase(it);
-}
-
-const Breakpoints& Debugger::getBreakpoints() const {
-    return vb;
-}
-
-void Debugger::pause() {
-}
-
-void Debugger::resume() {
-    _wr.run();
-}
-
-void Debugger::stepOver() {
-    _wr.run();
-}
-
-void Debugger::stepIn() {
-}
-
-void Debugger::stepOut() {
-}
-
-void Debugger::onBeforeStep(Statement * s) {
-    _currentStatement = s;
-    for(auto& b: vb){
-        if(b.line == s->loc.begin.line){
-            _wr.wait();
-        }
-    }
-//    _wr.wait();
-}
-
-void Debugger::list() {
-    if(_currentStatement)
-        _currentStatement->accept(_printer);
-}
 
 void Interpreter::iterateStatements(Statement *stmts) {
     while (stmts)
@@ -375,8 +318,8 @@ void Interpreter::visit(Call* call) {
     /*
      * Get callable object
      */
-    fassert(operands.size() > 0, "callable not found");
-    fassert(operands.back()->getType() == Terminal::Function, "must be callable");
+    fassertl(operands.size() > 0, call->loc, "callable not found");
+    fassertl(operands.back()->getType() == Terminal::Function, call->loc, "must be callable");
     auto function = dynamic_cast<Function*>(operands.back());
     operands.pop_back();
 
@@ -401,16 +344,13 @@ void Interpreter::visit(Call* call) {
     auto stmt = function->stmts;
 
     while (stmt) {
-        if (return_flag) {
-            return_flag = false;
-            break;
-        }
         stmt = debug(stmt)->accept(this)->nextStatement;
         if (return_flag) {
             return_flag = false;
             break;
         }
     }
+    function->release();
 
 //    fassert(!operands.empty(), "operands empty after expression")
 }
@@ -572,11 +512,11 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
     }
 }
 
-const Operands &Interpreter::getOperands() const {
+const std::vector<Terminal*> &Interpreter::getOperands() const {
     return operands;
 }
 
-const Memory& Interpreter::getMemory() const {
+const std::unordered_map<std::string, Terminal*>& Interpreter::getMemory() const {
     return variables;
 }
 

@@ -21,10 +21,10 @@ public:
     virtual ~ConsoleDebugger() {
     }
 
-    virtual void onOperandsChanged(const Operands &operands) override {
+    virtual void onOperandsChanged(const std::vector<Terminal*> &operands) override {
     }
 
-    virtual void onMemoryChanged(const Memory &memory) override {
+    virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>& memory) override {
     }
 
     virtual void onCatchBreakpoint(const Breakpoint &breakpoint) override {

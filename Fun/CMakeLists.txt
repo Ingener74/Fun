@@ -34,6 +34,9 @@ add_library(
         
         Nodes.cpp
         Nodes.h
+
+        Debugger.cpp
+        Debugger.h
         
         Visitor.cpp
         Visitor.h

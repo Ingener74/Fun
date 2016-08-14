@@ -11,102 +11,19 @@
 #include <Poco/Condition.h>
 
 #include <Visitor.h>
+#include "Nodes.h"
+#include "Debugger.h"
 
 namespace fun {
 
 class Terminal;
 
-using Operands = std::vector<Terminal*>;
-
-//using Memory = std::vector<std::unordered_map<std::string, Terminal*>>;
-using Memory = std::unordered_map<std::string, Terminal*>;
-
-class Breakpoint {
-public:
-    Breakpoint(const std::string& module = {}, int line = 0) :
-            module(module), line(line) {
-    }
-    virtual ~Breakpoint() {
-    }
-
-    bool operator==(const Breakpoint &rhs) const {
-        return module == rhs.module && line == rhs.line;
-    }
-
-    bool operator!=(const Breakpoint &rhs) const {
-        return !(rhs == *this);
-    }
-
-    std::string module;
-    int line;
-};
-
-using Breakpoints = std::vector<Breakpoint>;
-
 class Interpreter;
-class Printer;
-
-class Debugger {
-public:
-    class WaitRun {
-        bool _stepOver = false;
-        Poco::Mutex _mutex;
-        Poco::Condition _cond;
-
-    public:
-        WaitRun() = default;
-
-        void wait() {
-            Poco::Mutex::ScopedLock lock{_mutex};
-            while (!_stepOver)
-                _cond.wait(_mutex);
-            _stepOver = false;
-        }
-
-        void run() {
-            Poco::Mutex::ScopedLock lock(_mutex);
-            _stepOver = true;
-            _cond.signal();
-        }
-    };
-
-    Debugger(Printer *printer) : _printer(printer) {
-    }
-    virtual ~Debugger() = default;
-
-    virtual void setBreakpoint(const Breakpoint &breakpoint);
-    virtual void enableBreakpoint(const Breakpoint &breakpoint);
-    virtual void disableBreakpoint(const Breakpoint &breakpoint);
-    virtual void removeBreakpoint(const Breakpoint &breakpoint);
-    virtual const Breakpoints& getBreakpoints() const;
-
-    virtual void pause();
-    virtual void resume();
-    virtual void stepOver();
-    virtual void stepIn();
-    virtual void stepOut();
-
-    virtual void onBeforeStep(Statement *);
-
-    virtual void onCatchBreakpoint(const Breakpoint&) = 0;
-    virtual void onOperandsChanged(const Operands&) = 0;
-    virtual void onMemoryChanged(const Memory&) = 0;
-
-    virtual void list();
-
-protected:
-    Breakpoints vb;
-    WaitRun _wr;
-
-    Printer* _printer = nullptr;
-    Statement* _currentStatement = nullptr;
-};
 
 class Interpreter: public Visitor {
 public:
     Interpreter(Debugger* = nullptr);
     virtual ~Interpreter();
-
 
     virtual void iterateStatements(Statement*);
 
@@ -139,13 +56,12 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    const Operands& getOperands() const;
-    const Memory& getMemory() const;
+    const std::vector<Terminal*>& getOperands() const;
+    const std::unordered_map<std::string, Terminal*>& getMemory() const;
 
 private:
-    Operands operands;
-
-    Memory variables;
+    std::vector<Terminal*> operands;
+    std::unordered_map<std::string, Terminal*> variables;
 
     bool load = false;
     bool store = false;
