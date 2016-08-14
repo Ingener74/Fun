@@ -5,6 +5,8 @@
 
 %{
 
+#include <sstream>
+
 using namespace std;
 
 #include <FunParser.hpp>
@@ -21,6 +23,14 @@ using namespace std;
 	LOCATION_FULL(line, column, line, column + size); \
 	column += size;
 
+// ["][^"]*["] {
+//    yylval->str = new string(yytext + 1, yyleng - 2);
+//    return fun::FunParser::token::STRING;
+// }
+
+stringstream ss;
+int str_start_line = 0, str_start_column = 0;
+
 %}
 
 %option noyywrap
@@ -31,6 +41,7 @@ DIGIT    [0-9]
 ID       [a-zA-Z_][a-zA-Z_0-9]*
 
 %x comment
+%x strng
 
 %%
 
@@ -107,9 +118,69 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
     return fun::FunParser::token::ID;
 }
 
-["][^"]*["] {
-    yylval->str = new string(yytext + 1, yyleng - 2);
+\" {
+    str_start_line = line;
+    str_start_column = ++column;
+    ss.str(""); BEGIN(strng);
+}
+<strng>\" {
+    BEGIN(INITIAL);
+    yylval->str = new string(ss.str()); 
+    LOCATION_FULL(str_start_line, str_start_column, line, column)
     return fun::FunParser::token::STRING;
+}
+<strng>\n {
+	throw std::runtime_error("error - unterminated string constant");
+}
+<strng>\\[0-7]{1,3} {
+	/* octal escape sequence */
+	int result;
+     
+    (void) sscanf( yytext + 1, "%o", &result );
+     
+    if ( result > 0xff )
+    {
+    	throw std::runtime_error("error, constant is out-of-bounds");
+    	ss << result;
+	}
+}
+<strng>\\[0-9]+ {
+	/* generate error - bad escape sequence; something
+	*  like '\48' or '\0777777'
+	*/
+	throw std::runtime_error("error - bad escape sequence");
+}
+<strng>\\n {
+	ss << '\n'; 
+	column = 0; 
+	line++;
+}
+<strng>\\t {
+	ss << '\t';
+	column++; 
+}
+<strng>\\r {
+	ss << '\r';
+	column++;
+}
+<strng>\\b {
+	ss << '\b';
+	column++;
+}
+<strng>\\f {
+	ss << '\f';
+	column++;
+}
+<strng>\\(.|\n) {
+	ss << yytext[1]; column++;
+}
+<strng>[^\\\n\"]+ {
+	char *yptr = yytext;
+	while ( *yptr )
+	{
+		column++; 
+		ss << *yptr++;
+	}
 }
 
 "#"           { column++;           BEGIN(comment); }
@@ -120,7 +191,7 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 [\t] { column++; };
 [\n] { column = 0; line++; };
 
-. { cerr << "Invalid symbol " << yytext << endl; }
+. { cerr << "Invalid symbol " << yytext << endl; throw std::runtime_error(std::string("Invalid symbol ") + yytext); }
 
 %%
 

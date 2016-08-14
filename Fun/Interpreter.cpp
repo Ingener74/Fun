@@ -13,6 +13,9 @@ using namespace std;
 
 void Debugger::setBreakpoint(const Breakpoint &breakpoint) {
     vb.push_back(breakpoint);
+
+    stringstream ss;
+    ss.seekg(0);
 }
 
 void Debugger::enableBreakpoint(const Breakpoint &breakpoint) {
