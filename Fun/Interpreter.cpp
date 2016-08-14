@@ -51,7 +51,12 @@ void Debugger::stepOut() {
 
 void Debugger::onBeforeStep(Statement * s) {
     _currentStatement = s;
-    _wr.wait();
+    for(auto& b: vb){
+        if(b.line == s->loc.begin.line){
+            _wr.wait();
+        }
+    }
+//    _wr.wait();
 }
 
 void Debugger::list() {

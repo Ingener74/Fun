@@ -76,6 +76,9 @@ int main(int argc, char* argv[]) {
 
         if (options.count("file") && file.is_open()) {
 
+            if(options.count("debug"))
+                consoleDebugger.setBreakpoint({"", 1});
+
             Thread th;
             th.startFunc([visitor, &file, &options, &filename]{
                 try {
@@ -143,8 +146,15 @@ int main(int argc, char* argv[]) {
                     return 1;
                 };
 
-                auto breakpointCmd = [&tokens]{
+                auto breakpointCmd = [&tokens, &consoleDebugger]{
                     cout << "breakpoint " << tokens.size() << endl;
+                    if(tokens.size() < 2)
+                        throw std::runtime_error("breakpoint command not enough arguments; Usage: b 100");
+                    stringstream ss;
+                    ss << tokens[1];
+                    int line = 0;
+                    ss >> line;
+                    consoleDebugger.setBreakpoint({"", line});
                     return 1;
                 };
 
