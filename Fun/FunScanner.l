@@ -112,9 +112,9 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
     return fun::FunParser::token::STRING;
 }
 
-"#"           { BEGIN(comment); }
-<comment>"\n" { BEGIN(INITIAL); }
-<comment>.    {}
+"#"           { column++;           BEGIN(comment); }
+<comment>"\n" { column = 0; line++; BEGIN(INITIAL); }
+<comment>.    { column++;                           }
 
 [ ]  { column++; };
 [\t] { column++; };

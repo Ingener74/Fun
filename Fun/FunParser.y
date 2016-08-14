@@ -246,19 +246,19 @@ cycle_sttmnt
     ;
 
 import
-    : "import" ids { $$ = new Import($2); }
+    : "import" ids { $$ = new Import(@1 + @2, $2); }
     ;
 
 print
-    : "print" exprs { $$ = new Print($2); }
+    : "print" exprs { $$ = new Print(@1 + @2, $2); }
     ;
 
 func
-    : "fun" id "(" ids ")" sttmnts "end" { $$ = new Function($2, $4, $6); }
+    : "fun" id "(" ids ")" sttmnts "end" { $$ = new Function(@1 + @7, $2, $4, $6); }
     ;
 
 class
-    : "class" id "(" ids ")" class_stmts "end" { $$ = new Class($2, $4, $6); }
+    : "class" id "(" ids ")" class_stmts "end" { $$ = new Class(@1 + @7, $2, $4, $6); }
     ;
 
 class_stmts
@@ -268,14 +268,14 @@ class_stmts
     ;
 
 ifelifselse
-    : if "end"            { $$ = new IfElseIfsElse($1); }
-    | if elifs "end"      { $$ = new IfElseIfsElse($1, $2); }
-    | if else "end"       { $$ = new IfElseIfsElse($1, nullptr, $2); }
-    | if elifs else "end" { $$ = new IfElseIfsElse($1, $2, $3); }
+    : if "end"            { $$ = new IfElseIfsElse(@1 + @2, $1); }
+    | if elifs "end"      { $$ = new IfElseIfsElse(@1 + @3, $1, $2); }
+    | if else "end"       { $$ = new IfElseIfsElse(@1 + @3, $1, nullptr, $2); }
+    | if elifs else "end" { $$ = new IfElseIfsElse(@1 + @4, $1, $2, $3); }
     ;
 
 if
-    : "if" expr ":" cycle_sttmnts { $$ = new If($2, $4); }
+    : "if" expr ":" cycle_sttmnts { $$ = new If(@1 + @4, $2, $4); }
     ;
 
 elifs
@@ -284,43 +284,43 @@ elifs
     ;
 
 elif
-    : "elif" expr ":" cycle_sttmnts { $$ = new ElseIf($2, $4); }
+    : "elif" expr ":" cycle_sttmnts { $$ = new ElseIf(@1 + @4, $2, $4); }
     ;
 
 else
-    : "else" cycle_sttmnts { $$ = new Else($2); }
+    : "else" cycle_sttmnts { $$ = new Else(@1 + @2, $2); }
     ;
 
 while
-    : "while" expr ":" cycle_sttmnts "end" { $$ = new While($2, $4); }
+    : "while" expr ":" cycle_sttmnts "end" { $$ = new While(@1 + @5, $2, $4); }
     ;
 
 for
-    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end" { $$ = new For($2, $4, $6, $8); }
+    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end" { $$ = new For(@1 + @9, $2, $4, $6, $8); }
     ;
 
 break
-    : "break" { $$ = new Break(); }
+    : "break" { $$ = new Break(@1); }
     ;
 
 continue
-    : "continue" { $$ = new Continue(); }
+    : "continue" { $$ = new Continue(@1); }
     ;
 
 ret
-    : "ret" exprs  { $$ = new Return($2); }
+    : "ret" exprs  { $$ = new Return(@1 + @2, $2); }
     ;
 
 exception
-    : "try" sttmnts "catch" ids "as" id ":" sttmnts "end" { $$ = new Exception($2, $4, $6, $8); }
+    : "try" sttmnts "catch" ids "as" id ":" sttmnts "end" { $$ = new Exception(@1 + @9, $2, $4, $6, $8); }
     ;
 
 throw
-    : "throw" expr { $$ = new Throw($2); }
+    : "throw" expr { $$ = new Throw(@1 + @2, $2); }
     ;
 
 id
-    : ID { $$ = new Id(*$1); }
+    : ID { $$ = new Id(@1, *$1); }
     ;
 
 ids
@@ -332,27 +332,27 @@ ids
 // %empty             { $$ = new Nil(); }
 expr
     : assign_expr        { $$ = $1; }
-    | expr "+" expr      { $$ = new BinaryOp(BinaryOp::ADD,        $1, $3); }
-    | expr "-" expr      { $$ = new BinaryOp(BinaryOp::SUB,        $1, $3); }
-    | expr "*" expr      { $$ = new BinaryOp(BinaryOp::MUL,        $1, $3); }
-    | expr "/" expr      { $$ = new BinaryOp(BinaryOp::DIV,        $1, $3); }
-    | expr "%" expr      { $$ = new BinaryOp(BinaryOp::MOD,        $1, $3); }
-    | expr ">" expr      { $$ = new BinaryOp(BinaryOp::MORE,       $1, $3); }
-    | expr ">=" expr     { $$ = new BinaryOp(BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr      { $$ = new BinaryOp(BinaryOp::LESS,       $1, $3); }
-    | expr "<=" expr     { $$ = new BinaryOp(BinaryOp::LESS_EQUAL, $1, $3); }
-    | expr "==" expr     { $$ = new BinaryOp(BinaryOp::EQUAL,      $1, $3); }
-    | expr "!=" expr     { $$ = new BinaryOp(BinaryOp::NOT_EQUAL,  $1, $3); }
-    | INTEGER            { $$ = new Integer($1);                            }
-    | REAL               { $$ = new Real($1);                               }
-    | TRUE               { $$ = new Boolean(true);                          }
-    | FALSE              { $$ = new Boolean(false);                         }
-    | STRING             { $$ = new String(*$1);                            }
-    | NIL                { $$ = new Nil();                                  }
+    | expr "+" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::ADD,        $1, $3); }
+    | expr "-" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::SUB,        $1, $3); }
+    | expr "*" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MUL,        $1, $3); }
+    | expr "/" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::DIV,        $1, $3); }
+    | expr "%" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MOD,        $1, $3); }
+    | expr ">" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MORE,       $1, $3); }
+    | expr ">=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::LESS,       $1, $3); }
+    | expr "<=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::LESS_EQUAL, $1, $3); }
+    | expr "==" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::EQUAL,      $1, $3); }
+    | expr "!=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::NOT_EQUAL,  $1, $3); }
+    | INTEGER            { $$ = new Integer(@1, $1);                            }
+    | REAL               { $$ = new Real(@1, $1);                               }
+    | TRUE               { $$ = new Boolean(@1, true);                          }
+    | FALSE              { $$ = new Boolean(@1, false);                         }
+    | STRING             { $$ = new String(@1, *$1);                            }
+    | NIL                { $$ = new Nil(@1);                                  }
     | id                 { $$ = $1;                                                      }
-    | expr "("  ")"      { $$ = new Call($1);                               } // check useless
-    | expr "(" exprs ")" { $$ = new Call($1, $3);                           }
-    | "(" expr ")"       { $$ = new RoundBrackets($2);                      }
+    | expr "("  ")"      { $$ = new Call(@1 + @3, $1);                               } // check useless
+    | expr "(" exprs ")" { $$ = new Call(@1 + @4, $1, $3);                           }
+    | "(" expr ")"       { $$ = new RoundBrackets(@1 + @3, $2);                      }
     // | dots               { $$ = $1; }
     | fun_expr           { $$ = $1; }
     | dictionary         { $$ = $1; }
@@ -360,24 +360,24 @@ expr
     ;
 
 fun_expr
-    : "fun" "(" ids ")" sttmnts "end" { $$ = new Function(nullptr, $3, $5); }
+    : "fun" "(" ids ")" sttmnts "end" { $$ = new Function(@1 + @6, nullptr, $3, $5); }
     ;
 
 index
-    : expr "[" expr "]"  { $$ = new Index($1, $3); }
+    : expr "[" expr "]"  { $$ = new Index(@1 + @4, $1, $3); }
     ;
 
 assign_expr
     : assign           { $$ = $1; }
-    | exprs "+=" exprs { $$ = new Assign($1, $3, Assign::ADD); }
-    | exprs "-=" exprs { $$ = new Assign($1, $3, Assign::SUB); }
-    | exprs "*=" exprs { $$ = new Assign($1, $3, Assign::MUL); }
-    | exprs "/=" exprs { $$ = new Assign($1, $3, Assign::DIV); }
-    | exprs "%=" exprs { $$ = new Assign($1, $3, Assign::MOD); }
+    | exprs "+=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::ADD); }
+    | exprs "-=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::SUB); }
+    | exprs "*=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::MUL); }
+    | exprs "/=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::DIV); }
+    | exprs "%=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::MOD); }
     ;
 
 assign
-    : exprs "=" exprs { $$ = new Assign($1, $3); }
+    : exprs "=" exprs { $$ = new Assign(@1 + @3, $1, $3); }
     ;
 
 assigns
@@ -386,7 +386,7 @@ assigns
     ;
 
 dictionary
-    : "{" assigns "}" { $$ = new Dictionary($2); }
+    : "{" assigns "}" { $$ = new Dictionary(@1 + @3, $2); }
     ;
 
 /*

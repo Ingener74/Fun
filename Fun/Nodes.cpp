@@ -22,7 +22,8 @@ using namespace std;
 Statement* Statement::entryPoint = nullptr;
 int Statement::stmtCounter = 0;
 
-Statement::Statement() {
+Statement::Statement(const location& loc) :
+        loc(loc) {
     stmtCounter++;
 }
 
