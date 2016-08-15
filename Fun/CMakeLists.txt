@@ -54,6 +54,10 @@ add_library(
         ${FLEX_FunScanner_OUTPUTS}
 )
 
+if(NOT EXISTS ${SYSROOT})
+    add_dependencies(Fun ext_POCO ext_gtest)
+endif()
+
 if(ENABLE_LIQUID_METAPHOR)
     add_custom_command(OUTPUT Test0  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-0.fun)
     add_custom_command(OUTPUT Test1  COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-1.fun)

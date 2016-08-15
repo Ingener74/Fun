@@ -49,11 +49,12 @@ if(MINGW OR MSYS)
 elseif(APPLE)
     ExternalProject_Add(
         ${EXT_POCO}
-        URL                 http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1-all.tar.gz
+        URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                             -DENABLE_DATA_ODBC=OFF
                             -DENABLE_DATA_MYSQL=OFF
+                            -DENABLE_DATA_SQLITE=OFF
                             -DENABLE_APACHECONNECTOR=OFF
                             -DENABLE_POCODOC=OFF
                             -DENABLE_PDF=OFF
@@ -61,9 +62,11 @@ elseif(APPLE)
                             -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
                             -DENABLE_ZIP=OFF
                             -DENABLE_XML=OFF
+                            -DENABLE_JSON=OFF
                             -DENABLE_MONGODB=OFF
                             -DENABLE_TESTS=OFF
-                            -DPOCO_STATIC=ON
+                            -DPOCO_STATIC=OFF
+                            -DFORCE_OPENSSL=OFF
                             # -DOPENSSL_INCLUDE_DIR=${3RDPARTY_INSTALL}/include
                             # -DOPENSSL_CRYPTO_LIBRARY=${3RDPARTY_INSTALL}/lib/libcrypto.a
                             # -DOPENSSL_SSL_LIBRARY=${3RDPARTY_INSTALL}/lib/libssl.a
@@ -72,7 +75,7 @@ elseif(APPLE)
 elseif(EMSCRIPTEN)
     ExternalProject_Add(
         ${EXT_POCO}
-        URL                 http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1-all.tar.gz
+        URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
                             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -147,15 +150,23 @@ elseif(ANDROID)
 else()
     ExternalProject_Add(
         ${EXT_POCO}
-        URL                 http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1-all.tar.gz
+        URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                             -DENABLE_DATA_ODBC=OFF
+                            -DENABLE_DATA_MYSQL=OFF
+                            -DENABLE_DATA_SQLITE=OFF
                             -DENABLE_APACHECONNECTOR=OFF
                             -DENABLE_POCODOC=OFF
                             -DENABLE_PDF=OFF
                             -DENABLE_PAGECOMPILER=OFF
                             -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
+                            -DENABLE_ZIP=OFF
+                            -DENABLE_XML=OFF
+                            -DENABLE_JSON=OFF
+                            -DENABLE_MONGODB=OFF
                             -DENABLE_TESTS=OFF
+                            -DPOCO_STATIC=OFF
+                            -DFORCE_OPENSSL=OFF
     )
 endif()
