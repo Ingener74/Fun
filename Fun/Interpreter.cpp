@@ -252,6 +252,9 @@ void Interpreter::visit(BinaryOp* bin_op) {
     fassertl(operands.size() == (ops + 1), bin_op->loc, "operands balance broken after statement")
 }
 
+void Interpreter::visit(Dot *dot) {
+}
+
 void Interpreter::visit(Call* call) {
     load = true;
     debug(call->callable)->accept(this);

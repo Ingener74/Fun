@@ -239,6 +239,17 @@ public:
     Expression* lhs = nullptr, *rhs = nullptr;
 };
 
+class Dot : public Expression {
+public:
+    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc), lhs(lhs), rhs(rhs) {}
+
+    virtual ~Dot();
+
+    virtual Dot *accept(Visitor *);
+
+    Expression *lhs = nullptr, *rhs = nullptr;
+};
+
 class Call: public Expression {
 public:
     Call(const location& loc, Expression* callable, Expression* arg = nullptr) :

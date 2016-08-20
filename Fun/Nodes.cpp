@@ -157,6 +157,13 @@ BinaryOp::~BinaryOp(){
     SAFE_RELEASE(rhs)
 }
 
+ACCEPT_E(Dot)
+
+Dot::~Dot() {
+    SAFE_RELEASE(lhs)
+    SAFE_RELEASE(rhs)
+}
+
 ACCEPT(Call, {
     fassert(callable, "Call expression must have name")
 })

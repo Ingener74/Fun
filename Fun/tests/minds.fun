@@ -179,7 +179,7 @@ class Animal
         print "Animal: " + self._animal_type
     end
 
-    fun __str__()
+    fun __str__(self)
         throw NotImplementedError()
     end
 end
@@ -226,3 +226,55 @@ fun testExc(t)
         print e
     end
 end
+
+l1 = "test string".len()
+assert(l1 == 11)
+
+l2 = "test string".sub(2, 5)
+assert(l2 == "st st")
+
+l3 = "test".toUpper()
+assert(l3 == "TEST")
+
+l4 = "3.1415".float()
+assert(l4 == 3.1415)
+
+
+
+a1 = {
+	x = 10
+	y = 10
+}.len()
+assert(a1 == 2)
+
+a2 = a1.x.float()
+assert(a2 == 10.0)
+
+a3 = a1.y.str()
+assert(a3 == "10")
+
+a4 = (a1.x + a2.y).str()
+assert(a4 == "20")
+
+class Floor()
+	fun __init__()
+		self.b = 42
+	end
+end
+
+# add method to class
+Floor.down = fun(self)
+	ret self.b - 100
+end
+
+# create object of class Floor
+f1 = Floor()
+print "floor down: " + f1.down()
+
+# add method to object
+f1.up = fun(self)
+	ret self.b + 100
+end
+
+print "floor up: " + f1.up()
+

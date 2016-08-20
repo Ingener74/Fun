@@ -261,6 +261,9 @@ void Printer::visit(BinaryOp* bin_op) {
     bin_op->rhs->accept(this);
 }
 
+void Printer::visit(Dot* dot) {
+}
+
 void Printer::visit(Call* call) {
     call->callable->accept(this);
     cout << "(";

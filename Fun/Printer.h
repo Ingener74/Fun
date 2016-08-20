@@ -36,6 +36,7 @@ public:
 //    virtual void visit(Expression*);
     virtual void visit(Assign*);
     virtual void visit(BinaryOp*);
+    virtual void visit(Dot*);
     virtual void visit(Call*);
     virtual void visit(Dictionary*);
     virtual void visit(Id*);

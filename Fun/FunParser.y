@@ -205,6 +205,7 @@ throw           Throw оператор (выброс исключений)
 %left "<" ">" "!=" "<=" ">="
 %left "+" "-"
 %left "*" "/"
+%left "."
 
 %%
 
@@ -351,10 +352,10 @@ expr
     | expr "("  ")"      { $$ = new Call(@1 + @3, $1);                               }
     | expr "(" exprs ")" { $$ = new Call(@1 + @4, $1, $3);                           }
     | "(" expr ")"       { $$ = new RoundBrackets(@1 + @3, $2);                      }
-    // | dots               { $$ = $1; }
-    | fun_expr           { $$ = $1; }
-    | dictionary         { $$ = $1; }
-    | index              { $$ = $1; }
+    | expr "." expr      { $$ = new Dot(@1 + @3, $1, $3);                            }
+    | fun_expr           { $$ = $1;                                                  }
+    | dictionary         { $$ = $1;                                                  }
+    | index              { $$ = $1;                                                  }
     ;
 
 fun_expr
@@ -386,12 +387,6 @@ assigns
 dictionary
     : "{" assigns "}" { $$ = new Dictionary(@1 + @3, $2); }
     ;
-
-/*
-dots
-    : expr "." dots { $$ = $1; NEXT_EXPRESSION($1, $3); }
-    ;
-*/
 
 exprs
     : expr             { $$ = $1; }
