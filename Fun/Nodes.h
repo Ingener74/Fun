@@ -110,50 +110,10 @@ public:
 
     virtual If* accept(Visitor*);
 
-    Expression* cond;
-    Statement* stmts;
-};
+    Expression* cond = nullptr;
+    Statement* stmts = nullptr;
 
-class ElseIf: public Statement {
-public:
-    ElseIf(const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
-        Statement(loc), cond(cond), stmts(stmts) {
-    }
-    virtual ~ElseIf();
-
-    virtual ElseIf* accept(Visitor*);
-
-    Expression* cond;
-    Statement* stmts;
-
-    static void apply(ElseIf*, Visitor*);
-    ElseIf* nextElseIf = nullptr;
-};
-
-class Else: public Statement {
-public:
-    Else(const location& loc, Statement* stmts = nullptr) :
-        Statement(loc), stmts(stmts) {
-    }
-    virtual ~Else();
-
-    virtual Else* accept(Visitor*);
-
-    Statement* stmts;
-};
-
-class IfElseIfsElse : public Statement {
-public:
-    IfElseIfsElse(const location& loc, If* ifStmts = nullptr, ElseIf* elseIfsStmts = nullptr, Else* elseStmts = nullptr) :
-        Statement(loc), ifStmts(ifStmts), elseIfsStmts(elseIfsStmts), elseStmts(elseStmts) {
-    }
-    virtual ~IfElseIfsElse();
-
-    virtual IfElseIfsElse* accept(Visitor*);
-
-    If* ifStmts;
-    ElseIf* elseIfsStmts;
-    Else* elseStmts;
+    If* nextIf = nullptr;
 };
 
 class Import: public Statement {

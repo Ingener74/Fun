@@ -77,44 +77,12 @@ Function::~Function(){
     SAFE_RELEASE(nextFunction)
 }
 
-ACCEPT(If, {
-    fassert(cond, "If must have the condition expression");
-})
+ACCEPT_E(If)
 
 If::~If(){
     SAFE_RELEASE(cond)
     SAFE_RELEASE(stmts)
-}
-
-ACCEPT(ElseIf, {
-    fassert(cond, "Else If must have the condition expression");
-})
-
-ElseIf::~ElseIf(){
-    SAFE_RELEASE(cond)
-    SAFE_RELEASE(stmts)
-    SAFE_RELEASE(nextElseIf)
-}
-
-ACCEPT_E(Else)
-
-Else::~Else(){
-    SAFE_RELEASE(stmts)
-}
-
-ACCEPT(IfElseIfsElse, {
-    fassert(ifStmts, "If Elif Else must have the if statement");
-})
-
-IfElseIfsElse::~IfElseIfsElse(){
-    SAFE_RELEASE(ifStmts)
-    SAFE_RELEASE(elseIfsStmts)
-    SAFE_RELEASE(elseStmts)
-}
-
-void ElseIf::apply(ElseIf* elseIf, Visitor* v) {
-    while (elseIf)
-        elseIf = elseIf->accept(v)->nextElseIf;
+    SAFE_RELEASE(nextIf)
 }
 
 ACCEPT(Import, {

@@ -1,0 +1,18 @@
+{
+    parserClass="com.funplugin.parser.FunParser"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Fun"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.funplugin.psi"
+    psiImplPackage="com.funplugin.psi.impl"
+
+    elementTypeHolderClass="com.funplugin.psi.FunTypes"
+    elementTypeClass="com.funplugin.psi.FunElementType"
+    tokenTypeClass="com.funplugin.psi.FunTokenType"
+}
+
+FunFile ::= item_*
+
+private item_ ::= ()

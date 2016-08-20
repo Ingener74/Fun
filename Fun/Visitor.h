@@ -16,9 +16,6 @@ public:
     virtual void visit(class For*){}
     virtual void visit(class Function*){}
     virtual void visit(class If*){}
-    virtual void visit(class ElseIf*){}
-    virtual void visit(class Else*){}
-    virtual void visit(class IfElseIfsElse*){}
     virtual void visit(class Import*){}
     virtual void visit(class Print*){}
     virtual void visit(class Return*){}

@@ -29,7 +29,7 @@ void yyerror(const char* );
 #define NEXT_STATEMENT(a, b)  if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b;
 #define NEXT_EXPRESSION(a, b) if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b;
 #define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b;
-#define NEXT_ELSE_IF(a, b)    if(!a) throw std::runtime_error("next else if error");    a->nextElseIf = b;
+#define NEXT_IF(a, b)         if(!a) throw std::runtime_error("next if error");         a->nextIf = b;
 #define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b;
 #define NEXT_FUNCTION(a, b)   if(!a) throw std::runtime_error("next function error");   a->nextFunction = b;
 
@@ -53,10 +53,7 @@ void yyerror(const char* );
     Continue*                continue_type;
     Exception*               exception_type;
     Throw*                   throw_type;
-    IfElseIfsElse*           ifelseifselse_type;
     If*                      if_type;
-    ElseIf*                  elif_type;
-    Else*                    else_type;
     Dictionary*              dictionary_type;
     Assign*                  assign_type;
     Class*                   class_type;
@@ -176,11 +173,13 @@ throw           Throw оператор (выброс исключений)
 %type <func_type>            fun_expr
 %type <import_type>          import
 %type <print_type>           print
-%type <ifelseifselse_type>   ifelifselse
+
+%type <if_type>              ifs
+%type <if_type>              ifss
 %type <if_type>              if
-%type <elif_type>            elif
-%type <elif_type>            elifs
-%type <else_type>            else
+%type <if_type>              elif
+%type <if_type>              else
+
 %type <while_type>           while
 %type <for_type>             for
 %type <return_type>          ret
@@ -224,7 +223,7 @@ sttmnt
     : import       { $$ = $1; }
     | print        { $$ = $1; }
     | func         { $$ = $1; }
-    | ifelifselse  { $$ = $1; }
+    | ifs          { $$ = $1; }
     | while        { $$ = $1; }
     | for          { $$ = $1; }
     | ret          { $$ = $1; }
@@ -267,28 +266,27 @@ class_stmts
     | assign class_stmts { $$ = $1; NEXT_STATEMENT($1, $2); }
     ;
 
-ifelifselse
-    : if "end"            { $$ = new IfElseIfsElse(@1 + @2, $1); }
-    | if elifs "end"      { $$ = new IfElseIfsElse(@1 + @3, $1, $2); }
-    | if else "end"       { $$ = new IfElseIfsElse(@1 + @3, $1, nullptr, $2); }
-    | if elifs else "end" { $$ = new IfElseIfsElse(@1 + @4, $1, $2, $3); }
+ifs
+    : if      "end" { $$ = $1; }
+    | if ifss "end" { $$ = $1; NEXT_IF($1, $2); }
+    ;
+
+ifss
+    : elif      { $$ = $1; }
+    | elif ifss { $$ = $1; NEXT_IF($1, $2); }
+    | else      { $$ = $1; }
     ;
 
 if
     : "if" expr ":" cycle_sttmnts { $$ = new If(@1 + @4, $2, $4); }
     ;
 
-elifs
-    : %empty      { $$ = nullptr; }
-    | elif elifs  { $$ = $1; NEXT_ELSE_IF($1, $2); }
-    ;
-
 elif
-    : "elif" expr ":" cycle_sttmnts { $$ = new ElseIf(@1 + @4, $2, $4); }
+    : "elif" expr ":" cycle_sttmnts { $$ = new If(@1 + @4, $2, $4); }
     ;
 
 else
-    : "else" cycle_sttmnts { $$ = new Else(@1 + @2, $2); }
+    : "else" cycle_sttmnts { $$ = new If(@1 + @2, nullptr, $2); }
     ;
 
 while
@@ -343,14 +341,14 @@ expr
     | expr "<=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::LESS_EQUAL, $1, $3); }
     | expr "==" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::EQUAL,      $1, $3); }
     | expr "!=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::NOT_EQUAL,  $1, $3); }
-    | INTEGER            { $$ = new Integer(@1, $1);                            }
-    | REAL               { $$ = new Real(@1, $1);                               }
-    | TRUE               { $$ = new Boolean(@1, true);                          }
-    | FALSE              { $$ = new Boolean(@1, false);                         }
-    | STRING             { $$ = new String(@1, *$1);                            }
-    | NIL                { $$ = new Nil(@1);                                  }
-    | id                 { $$ = $1;                                                      }
-    | expr "("  ")"      { $$ = new Call(@1 + @3, $1);                               } // check useless
+    | INTEGER            { $$ = new Integer(@1, $1);                                 }
+    | REAL               { $$ = new Real(@1, $1);                                    }
+    | TRUE               { $$ = new Boolean(@1, true);                               }
+    | FALSE              { $$ = new Boolean(@1, false);                              }
+    | STRING             { $$ = new String(@1, *$1);                                 }
+    | NIL                { $$ = new Nil(@1);                                         }
+    | id                 { $$ = $1;                                                  }
+    | expr "("  ")"      { $$ = new Call(@1 + @3, $1);                               }
     | expr "(" exprs ")" { $$ = new Call(@1 + @4, $1, $3);                           }
     | "(" expr ")"       { $$ = new RoundBrackets(@1 + @3, $2);                      }
     // | dots               { $$ = $1; }

@@ -53,6 +53,10 @@ void Printer::iterateAssigns(Assign* assign) {
     }
 }
 
+void Printer::iterateIfs(If *if_stmt) {
+    while(if_stmt)
+        if_stmt = if_stmt->accept(this)->nextIf;
+}
 // Statements
 
 void Printer::visit(Break* break_stmt) {
@@ -117,46 +121,24 @@ void Printer::visit(Function* function) {
 }
 
 void Printer::visit(If* if_stmt) {
-    cout << "if ";
-    Expression::apply(if_stmt->cond, this);
-    cout << ":" << endl;
+    if(if_stmt->cond){
+        cout << "if ";
+        Expression::apply(if_stmt->cond, this);
+        cout << ":" << endl;
+    }else{
+        cout << "else" << endl;
+    }
     if (if_stmt->stmts) {
         _scopeLevel++;
         iterateStatements(if_stmt->stmts);
         _scopeLevel--;
     }
-}
 
-void Printer::visit(ElseIf* elseif_stmt) {
-    cout << indents() << "elif ";
-    Expression::apply(elseif_stmt->cond, this);
-    cout << ":" << endl;
-    if (elseif_stmt->stmts) {
-        _scopeLevel++;
-        iterateStatements(elseif_stmt->stmts);
-        _scopeLevel--;
+    if (if_stmt->nextIf && if_stmt->cond) {
+        iterateIfs(if_stmt->nextIf);
+    } else {
+        cout << indents() << "end";
     }
-}
-
-void Printer::visit(Else* else_stmt) {
-    cout << indents() << "else" << endl;
-    if (else_stmt->stmts) {
-        _scopeLevel++;
-        iterateStatements(else_stmt->stmts);
-        _scopeLevel--;
-    }
-}
-
-void Printer::visit(IfElseIfsElse* if_elseifs_else) {
-    if_elseifs_else->ifStmts->accept(this);
-
-    if (if_elseifs_else->elseIfsStmts)
-        ElseIf::apply(if_elseifs_else->elseIfsStmts, this);
-
-    if (if_elseifs_else->elseStmts)
-        if_elseifs_else->elseStmts->accept(this);
-
-    cout << indents() << "end";
 }
 
 void Printer::visit(Import* import) {

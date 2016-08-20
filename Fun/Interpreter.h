@@ -32,9 +32,6 @@ public:
     virtual void visit(For*);
     virtual void visit(Function*);
     virtual void visit(If*);
-    virtual void visit(ElseIf*);
-    virtual void visit(Else*);
-    virtual void visit(IfElseIfsElse*);
     virtual void visit(Import*);
     virtual void visit(Print*);
     virtual void visit(Return*);

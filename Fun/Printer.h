@@ -17,6 +17,7 @@ public:
     virtual void iterateIds(Id*);
     virtual void iterateFunctions(Function*);
     virtual void iterateAssigns(Assign*);
+    virtual void iterateIfs(If*);
 
 //    virtual void visit(Statement*);
     virtual void visit(Break*);
@@ -25,9 +26,6 @@ public:
     virtual void visit(For*);
     virtual void visit(Function*);
     virtual void visit(If*);
-    virtual void visit(ElseIf*);
-    virtual void visit(Else*);
-    virtual void visit(IfElseIfsElse*);
     virtual void visit(Import*);
     virtual void visit(Print*);
     virtual void visit(Return*);
