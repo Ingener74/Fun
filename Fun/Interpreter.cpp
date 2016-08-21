@@ -104,13 +104,35 @@ void Interpreter::visit(Ifs *ifs_stmt) {
 
 void Interpreter::visit(If* if_stmt) {
     auto ops = operands.size();
-    load = true;
-    debug(if_stmt->cond)->accept(this);
-    load = false;
 
-    if (operands.back()->toBoolean()) {
-        RELEASE_TOP
+    if (if_stmt->cond){
+        load = true;
+        debug(if_stmt->cond)->accept(this);
+        load = false;
 
+        if (operands.back()->toBoolean()) {
+            RELEASE_TOP
+
+            auto stmt = if_stmt->stmts;
+
+            while (stmt) {
+                if (break_flag) {
+                    break_flag = false;
+                    break;
+                }
+                if (continue_flag) {
+                    continue_flag = false;
+                    break;
+                }
+
+                stmt = debug(stmt)->accept(this)->nextStatement;
+            }
+
+            break_flag = true;
+        } else {
+            RELEASE_TOP
+        }
+    } else {
         auto stmt = if_stmt->stmts;
 
         while (stmt) {
@@ -127,10 +149,8 @@ void Interpreter::visit(If* if_stmt) {
         }
 
         break_flag = true;
-    } else {
-        RELEASE_TOP
     }
-    fassertl(operands.size() == ops + 1, if_stmt->loc, "operands balance broken after statement");
+    fassertl(operands.size() == ops, if_stmt->loc, "operands balance broken after statement");
 }
 
 void Interpreter::visit(Import* import_stmt) {
