@@ -32,11 +32,12 @@ public:
 };
 
 bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
+    Statement* root = nullptr;
     FunLexer lexer(filename, &inputStream);
-    FunParser parser(lexer);
+    FunParser parser(lexer, &root);
     parser.set_debug_level(debug);
     bool result = parser.parse();
-    visitor->iterateStatements(Statement::entryPoint);
+    visitor->iterateStatements(root);
     return result;
 }
 

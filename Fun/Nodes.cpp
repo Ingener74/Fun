@@ -19,7 +19,6 @@ namespace fun {
 
 using namespace std;
 
-Statement* Statement::entryPoint = nullptr;
 int Statement::stmtCounter = 0;
 
 Statement::Statement(const location& loc) :
@@ -30,11 +29,6 @@ Statement::Statement(const location& loc) :
 Statement::~Statement(){
     stmtCounter--;
     SAFE_RELEASE(nextStatement)
-}
-
-void Statement::clear() {
-    entryPoint = nullptr;
-    entryPoint->release();
 }
 
 ACCEPT_E(Break)

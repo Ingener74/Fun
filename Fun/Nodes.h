@@ -26,9 +26,6 @@ public:
     }
 
 public:
-    static Statement* entryPoint;
-    static void clear();
-
     static int stmtCounter;
 };
 

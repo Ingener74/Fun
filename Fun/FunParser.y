@@ -61,7 +61,7 @@ void yyerror(const char* );
     Index*                   index_type;
 }
 
-// %destructor { delete $$; } <str> <scope_type> <import_type> <expr_type> <print_type> <func_type> <arg_type> <if_type> <expr_list_type> <id_type> <statement_type> <while_type>
+%destructor { delete $$; } <str>
 
 %code{
 int yylex(fun::FunParser::semantic_type*, fun::location*, FunLexer&);
@@ -164,7 +164,6 @@ throw           Throw оператор (выброс исключений)
 %type <sttmnt_type>          cycle_sttmnts
 %type <id_type>              id
 %type <id_type>              ids
-// %type <expr_type>            dots
 %type <expr_type>            expr
 %type <expr_type>            assign_expr
 %type <assign_type>          assigns
@@ -194,7 +193,7 @@ throw           Throw оператор (выброс исключений)
 %type <index_type>           index
 
 %param { FunLexer& myLexer };
-// %parse-param { fun::FunAst* ast };
+%parse-param { Statement** root };
 
 %initial-action
 {
@@ -213,7 +212,7 @@ throw           Throw оператор (выброс исключений)
 %start program;
 
 program
-    : sttmnts { Statement::entryPoint = $1; }
+    : sttmnts { *root = $1; }
     ;
 
 sttmnts

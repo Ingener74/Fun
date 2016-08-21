@@ -148,10 +148,11 @@ void MainWidget::runProgram() {
             ss << codeTextEdit->toPlainText().toStdString();
 
             FunLexer lexer(programFileName.toStdString(), &ss);
-            fun::FunParser parser(lexer);
+            fun::Statement* root = nullptr;
+            fun::FunParser parser(lexer, &root);
             parser.set_debug_level(debugCheckBox->isChecked());
             parser.parse();
-            _visitor->iterateStatements(fun::Statement::entryPoint);
+            _visitor->iterateStatements(root);
         } catch (const exception &e) {
             cerr << e.what() << endl;
         }
