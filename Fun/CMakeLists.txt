@@ -72,13 +72,13 @@ if(ENABLE_LIQUID_METAPHOR)
     add_custom_command(OUTPUT Test10 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-10.fun)
     add_custom_command(OUTPUT Test11 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -f ../../Fun/tests/test-11.fun)
     
-    add_custom_command(OUTPUT Test12 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-0.fun)
-    add_custom_command(OUTPUT Test13 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-1.fun)
-    add_custom_command(OUTPUT Test14 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-2.fun)
-    add_custom_command(OUTPUT Test15 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-3.fun)
+#    add_custom_command(OUTPUT Test12 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-0.fun)
+#    add_custom_command(OUTPUT Test13 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-1.fun)
+#    add_custom_command(OUTPUT Test14 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-2.fun)
+#    add_custom_command(OUTPUT Test15 COMMAND ../Liquid-Metaphor/Liquid-Metaphor -r -f ../../Fun/tests/interpret/test-3.fun)
     
     add_custom_target(TestFun
-        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9 Test10 Test11 Test12 Test13 Test14 Test15
+        DEPENDS Test0 Test1 Test2 Test3 Test4 Test5 Test6 Test7 Test8 Test9 Test10 Test11 # Test12 Test13 Test14 Test15
     )
     
 endif()

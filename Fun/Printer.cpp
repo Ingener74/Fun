@@ -118,8 +118,11 @@ void Printer::visit(Function* function) {
 
 void Printer::visit(Ifs *ifs_stmt) {
     auto if_stmt = ifs_stmt->if_stmts;
-    while (if_stmt)
+    while (if_stmt){
         if_stmt = if_stmt->accept(this)->nextIf;
+        if(if_stmt)
+            cout << indents();
+    }
     cout << indents() << "end";
 }
 
