@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.0)
+
+if(MINGW OR MSYS)
+elseif(EMSCRIPTEN)
+elseif(ANDROID)
+elseif(APPLE)
+    # add_executable(JupiterTests tests/main.cpp)
+    # target_link_libraries(JupiterTests Jupiter gmock gtest pthread gmock_main gtest_main)
+else()
+    add_executable(test1 test1.cpp)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(test1 Fun gmock gtest pthread gmock_main gtest_main pthread PocoFoundationd)
+    else()
+        target_link_libraries(test1 Fun gmock gtest pthread gmock_main gtest_main pthread PocoFoundation)
+    endif()
+    
+    add_test(Tests test1)
+endif()

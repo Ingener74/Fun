@@ -82,3 +82,5 @@ if(ENABLE_LIQUID_METAPHOR)
     )
     
 endif()
+
+add_subdirectory(gtest)

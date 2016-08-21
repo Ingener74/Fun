@@ -33,6 +33,8 @@ if(NOT EXISTS ${SYSROOT})
     add_subdirectory(3rdparty)
 endif()
 
+enable_testing()
+
 include_directories(
     Fun
     ${CMAKE_BINARY_DIR}/Fun
