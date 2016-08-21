@@ -41,8 +41,9 @@ foo = 42
 
     ASSERT_EQ(Statement::statementCounter(), 3);
     result.root->release();
-    ASSERT_EQ(Statement::statementCounter(), 0);
+    ASSERT_EQ(Statement::statementCounter(), 1);
 
+    ASSERT_EQ(result.v->getOperands().size(), 0);
     ASSERT_EQ(result.v->getMemory()[0].size(), 1);
 }
 
