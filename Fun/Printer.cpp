@@ -53,10 +53,6 @@ void Printer::iterateAssigns(Assign* assign) {
     }
 }
 
-void Printer::iterateIfs(If *if_stmt) {
-    while(if_stmt)
-        if_stmt = if_stmt->accept(this)->nextIf;
-}
 // Statements
 
 void Printer::visit(Break* break_stmt) {
@@ -120,24 +116,25 @@ void Printer::visit(Function* function) {
     cout << indents() << "end";
 }
 
-void Printer::visit(If* if_stmt) {
-    if(if_stmt->cond){
+void Printer::visit(Ifs *ifs_stmt) {
+    auto if_stmt = ifs_stmt->if_stmts;
+    while (if_stmt)
+        if_stmt = if_stmt->accept(this)->nextIf;
+    cout << indents() << "end";
+}
+
+void Printer::visit(If *if_stmt) {
+    if (if_stmt->cond) {
         cout << "if ";
         Expression::apply(if_stmt->cond, this);
         cout << ":" << endl;
-    }else{
+    } else {
         cout << "else" << endl;
     }
     if (if_stmt->stmts) {
         _scopeLevel++;
         iterateStatements(if_stmt->stmts);
         _scopeLevel--;
-    }
-
-    if (if_stmt->nextIf && if_stmt->cond) {
-        iterateIfs(if_stmt->nextIf);
-    } else {
-        cout << indents() << "end";
     }
 }
 

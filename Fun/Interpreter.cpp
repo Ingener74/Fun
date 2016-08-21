@@ -91,6 +91,9 @@ void Interpreter::visit(Function *function) {
     }
 }
 
+void Interpreter::visit(Ifs *) {
+}
+
 void Interpreter::visit(If* if_stmt) {
     auto ops = operands.size();
     load = true;

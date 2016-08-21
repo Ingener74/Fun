@@ -77,6 +77,12 @@ Function::~Function(){
     SAFE_RELEASE(nextFunction)
 }
 
+ACCEPT_E(Ifs)
+
+Ifs::~Ifs() {
+    SAFE_RELEASE(if_stmts)
+}
+
 ACCEPT_E(If)
 
 If::~If(){

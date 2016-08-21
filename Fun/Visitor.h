@@ -15,6 +15,7 @@ public:
     virtual void visit(class Class*){}
     virtual void visit(class For*){}
     virtual void visit(class Function*){}
+    virtual void visit(class Ifs*){}
     virtual void visit(class If*){}
     virtual void visit(class Import*){}
     virtual void visit(class Print*){}

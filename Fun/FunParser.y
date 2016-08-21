@@ -53,6 +53,7 @@ void yyerror(const char* );
     Continue*                continue_type;
     Exception*               exception_type;
     Throw*                   throw_type;
+    Ifs*                     ifs_type;
     If*                      if_type;
     Dictionary*              dictionary_type;
     Assign*                  assign_type;
@@ -174,7 +175,7 @@ throw           Throw оператор (выброс исключений)
 %type <import_type>          import
 %type <print_type>           print
 
-%type <if_type>              ifs
+%type <ifs_type>             ifs
 %type <if_type>              ifss
 %type <if_type>              if
 %type <if_type>              elif
@@ -268,8 +269,8 @@ class_stmts
     ;
 
 ifs
-    : if      "end" { $$ = $1; }
-    | if ifss "end" { $$ = $1; NEXT_IF($1, $2); }
+    : if      "end" { $$ = new Ifs(@1 + @2, $1); }
+    | if ifss "end" { $$ = new Ifs(@1 + @3, $1); NEXT_IF($1, $2); }
     ;
 
 ifss

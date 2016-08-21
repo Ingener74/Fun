@@ -116,6 +116,16 @@ public:
     If* nextIf = nullptr;
 };
 
+class Ifs: public Statement {
+public:
+    Ifs(const location& loc, If* if_stmts): Statement(loc), if_stmts(if_stmts){}
+    virtual ~Ifs();
+
+    virtual Ifs* accept(Visitor*);
+
+    If* if_stmts = nullptr;
+};
+
 class Import: public Statement {
 public:
     Import(const location& loc, Id* library) :

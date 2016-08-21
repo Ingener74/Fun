@@ -31,6 +31,7 @@ public:
     virtual void visit(Continue*);
     virtual void visit(For*);
     virtual void visit(Function*);
+    virtual void visit(Ifs*);
     virtual void visit(If*);
     virtual void visit(Import*);
     virtual void visit(Print*);

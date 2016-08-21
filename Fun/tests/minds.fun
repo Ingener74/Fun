@@ -239,6 +239,8 @@ assert(l3 == "TEST")
 l4 = "3.1415".float()
 assert(l4 == 3.1415)
 
+l5 = "format %s - %d - %f".format("test", 42, 3.1415)
+assert(l5 == "format test - 42 - 3.1415")
 
 
 a1 = {
@@ -277,4 +279,31 @@ f1.up = fun(self)
 end
 
 print "floor up: " + f1.up()
+
+# pass unnamed class devided from another as callback
+class CallbackInterface()
+	fun callback(self)
+		throw NotImplementedError()
+	end
+end
+
+data1 = "Data"
+
+fun(callback)
+	if true:
+		callback.callback()
+	end
+end(class(CallbackInterface)
+	fun __init__(self, data)
+		self._data = nil
+	end
+	fun callback(self)
+		print "callback " + self._data
+	end
+end(data1))
+
+
+
+
+
 
