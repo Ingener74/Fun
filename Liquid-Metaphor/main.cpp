@@ -158,9 +158,21 @@ int main(int argc, char* argv[]) {
                     return 1;
                 };
 
-                auto variablesCmd = [&interpret]{
+                auto variablesCmd = [&interpret] {
                     cout << "########### Memory #############" << endl;
-                    for (auto &i: interpret.getMemory()) cout << types[i.second->getType()] << " " << i.first << " == " << i.second->toString() << " (" << i.second->referenceCount() << ")" << endl;
+                    int indents = 0;
+                    for (auto &scope: interpret.getMemory()) {
+                        for (auto &var: scope) {
+                            cout << [&indents] {
+                                stringstream ss;
+                                for (int n = 0; n < indents; ++n)
+                                    ss << "  ";
+                                return ss.str();
+                            }() << types[var.second->getType()] << " " << var.first << " == " <<
+                                 var.second->toString() << " (" << var.second->referenceCount() << ")" << endl;
+                        }
+                        indents++;
+                    }
                     cout << "################################" << endl;
                     return 1;
                 };

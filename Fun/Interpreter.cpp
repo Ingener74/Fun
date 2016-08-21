@@ -17,6 +17,7 @@ void Interpreter::iterateStatements(Statement *stmts) {
 
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
+    variables.push_back(std::unordered_map<std::string, Terminal*>{});
 }
 
 Interpreter::~Interpreter() {
@@ -339,28 +340,34 @@ void Interpreter::visit(Dictionary* dict) {
 
 void Interpreter::visit(Id* id) {
     if (load) {
-        auto var = variables.find(id->value);
-        fassertl(var != variables.end(), id->loc, id->value + " undefined");
-        operands.push_back(var->second);
-        var->second->duplicate();
-
-        fassertl(!operands.empty(), id->loc, "operands empty after expression")
+        for (auto it = variables.rbegin(); it != variables.rend(); ++it) {
+            auto var = it->find(id->value);
+            if (var == it->end()) {
+                continue;
+            } else {
+                operands.push_back(var->second);
+                var->second->duplicate();
+                fassertl(!operands.empty(), id->loc, "operands empty after expression")
+                return;
+            }
+        }
+        fassertl(false, id->loc, id->value + " undefined");
     } else if (store) {
         fassertl(operands.size() > 0, id->loc, "have no operands");
 
-        auto var = variables.find(id->value);
+        auto rit = variables.rbegin();
+
+        auto var = rit->find(id->value);
 
         auto val = operands.back();
         operands.pop_back();
 
-        if (var == variables.end()) {
-            auto it = variables.insert({id->value, val});
+        if (var == rit->end()) {
+            auto it = rit->insert({id->value, val});
             fassertl(it.second, id->loc, "can't store top operands value in " + id->value);
         } else {
             var->second = val;
         }
-
-//        fassert(!operands.empty(), "operands empty after expression")
     }
 }
 
@@ -500,7 +507,7 @@ const std::vector<Terminal*> &Interpreter::getOperands() const {
     return operands;
 }
 
-const std::unordered_map<std::string, Terminal*>& Interpreter::getMemory() const {
+const std::vector<std::unordered_map<std::string, Terminal*>>& Interpreter::getMemory() const {
     return variables;
 }
 

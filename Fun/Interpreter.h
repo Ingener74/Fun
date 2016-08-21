@@ -56,11 +56,11 @@ public:
     virtual void visit(String*);
 
     const std::vector<Terminal*>& getOperands() const;
-    const std::unordered_map<std::string, Terminal*>& getMemory() const;
+    const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const;
 
 private:
     std::vector<Terminal*> operands;
-    std::unordered_map<std::string, Terminal*> variables;
+    std::vector<std::unordered_map<std::string, Terminal*>> variables;
 
     bool load = false;
     bool store = false;
