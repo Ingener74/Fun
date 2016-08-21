@@ -91,7 +91,15 @@ void Interpreter::visit(Function *function) {
     }
 }
 
-void Interpreter::visit(Ifs *) {
+void Interpreter::visit(Ifs *ifs_stmt) {
+    auto if_stmt = ifs_stmt->if_stmts;
+    while(if_stmt){
+        if_stmt = if_stmt->accept(this)->nextIf;
+        if(break_flag){
+            break_flag = false;
+            break;
+        }
+    }
 }
 
 void Interpreter::visit(If* if_stmt) {
@@ -101,8 +109,7 @@ void Interpreter::visit(If* if_stmt) {
     load = false;
 
     if (operands.back()->toBoolean()) {
-//        operands.back()->release();
-//        operands.pop_back();
+        RELEASE_TOP
 
         auto stmt = if_stmt->stmts;
 
@@ -118,6 +125,10 @@ void Interpreter::visit(If* if_stmt) {
 
             stmt = debug(stmt)->accept(this)->nextStatement;
         }
+
+        break_flag = true;
+    } else {
+        RELEASE_TOP
     }
     fassertl(operands.size() == ops + 1, if_stmt->loc, "operands balance broken after statement");
 }
