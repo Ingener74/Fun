@@ -21,10 +21,7 @@ public:
     Statement* nextStatement = nullptr;
     location loc;
 
-    static int statementCounter(){
-        return stmtCounter;
-    }
-
+    static int counter();
 public:
     static int stmtCounter;
 };

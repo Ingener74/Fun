@@ -21,6 +21,8 @@ Interpreter::Interpreter(Debugger* debugger) :
 }
 
 Interpreter::~Interpreter() {
+    while (!variables.empty())
+        clearTop();
 }
 
 void Interpreter::visit(Break* break_stmt) {
@@ -509,6 +511,16 @@ const std::vector<Terminal*> &Interpreter::getOperands() const {
 
 const std::vector<std::unordered_map<std::string, Terminal*>>& Interpreter::getMemory() const {
     return variables;
+}
+
+void Interpreter::clearTop() {
+    auto rit = variables.rbegin();
+    if (rit != variables.rend()) {
+        for (auto &var : *rit) {
+            var.second->release();
+        }
+    }
+    variables.pop_back();
 }
 
 }

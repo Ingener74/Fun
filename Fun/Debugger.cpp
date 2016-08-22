@@ -11,6 +11,22 @@ namespace fun {
 using namespace std;
 using namespace Poco;
 
+
+Breakpoint::Breakpoint(const std::string& module, int line) :
+        module(module), line(line) {
+}
+
+Breakpoint::~Breakpoint() {
+}
+
+bool Breakpoint::operator ==(const Breakpoint& rhs) const {
+    return tie(module, line) == tie(rhs.module, rhs.line);
+}
+
+bool Breakpoint::operator !=(const Breakpoint& rhs) const {
+    return !(rhs == *this);
+}
+
 Debugger::Debugger(Printer *printer) : _printer(printer), _state(new Normal) {
 }
 
@@ -39,7 +55,7 @@ const Breakpoints &Debugger::getBreakpoints() const {
 }
 
 void Debugger::list() {
-    if (_currentStatement)
+    if (_currentStatement && _printer)
         _currentStatement->accept(_printer);
 }
 

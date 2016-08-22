@@ -79,6 +79,8 @@ private:
         if (debugger) debugger->onBeforeStep(stmt);
         return stmt;
     }
+
+    void clearTop();
 };
 
 }

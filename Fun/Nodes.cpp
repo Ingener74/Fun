@@ -6,9 +6,9 @@
 #define SAFE_RELEASE(x) if (x) x->release();
 
 #define ACCEPT(CLASS, BODY)        \
-CLASS* CLASS::accept(Visitor* v) { \
-    fassert(v, "Visitor is null"); \
-    BODY                           \
+CLASS* CLASS::accept(Visitor* v) {  \
+    fassert(v, "Visitor is null");  \
+    BODY                            \
     v->visit(this);                \
     return this;                   \
 }
@@ -29,6 +29,10 @@ Statement::Statement(const location& loc) :
 Statement::~Statement(){
     stmtCounter--;
     SAFE_RELEASE(nextStatement)
+}
+
+int Statement::counter() {
+    return stmtCounter;
 }
 
 ACCEPT_E(Break)

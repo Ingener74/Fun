@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <memory>
+#include <vector>
 #include <unordered_map>
 #include <Poco/Mutex.h>
 #include <Poco/Condition.h>
@@ -10,20 +13,12 @@ class Printer;
 
 class Breakpoint {
 public:
-    Breakpoint(const std::string &module = {}, int line = 0) :
-            module(module), line(line) {
-    }
+    Breakpoint(const std::string& module = { }, int line = 0);
 
-    virtual ~Breakpoint() {
-    }
+    virtual ~Breakpoint();
 
-    bool operator==(const Breakpoint &rhs) const {
-        return module == rhs.module && line == rhs.line;
-    }
-
-    bool operator!=(const Breakpoint &rhs) const {
-        return !(rhs == *this);
-    }
+    bool operator ==(const Breakpoint& rhs) const;
+    bool operator !=(const Breakpoint& rhs) const;
 
     std::string module;
     int line;
@@ -33,38 +28,26 @@ using Breakpoints = std::vector<Breakpoint>;
 
 class Debugger {
 public:
-    Debugger(Printer *printer);
-
+    Debugger(Printer *printer = nullptr);
     virtual ~Debugger() = default;
 
     virtual void setBreakpoint(const Breakpoint &breakpoint);
-
     virtual void enableBreakpoint(const Breakpoint &breakpoint);
-
     virtual void disableBreakpoint(const Breakpoint &breakpoint);
-
     virtual void removeBreakpoint(const Breakpoint &breakpoint);
-
     virtual const Breakpoints &getBreakpoints() const;
 
     virtual void onCatchBreakpoint(const Breakpoint &) = 0;
-
     virtual void onOperandsChanged(const std::vector<Terminal*> &) = 0;
-
     virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) = 0;
 
     virtual void list();
 
     virtual void pause() { _state->pause(this); }
-
     virtual void resume() { _state->resume(this); }
-
     virtual void stepOver() { _state->stepOver(this); }
-
     virtual void stepIn() { _state->stepIn(this); }
-
     virtual void stepOut() { _state->stepOut(this); }
-
     virtual void onBeforeStep(Statement *stmt) { _state->onBeforeStep(this, stmt); }
 
 protected:
