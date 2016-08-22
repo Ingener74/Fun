@@ -243,19 +243,20 @@ l5 = "format %s - %d - %f".format("test", 42, 3.1415)
 assert(l5 == "format test - 42 - 3.1415")
 
 
-a1 = {
+d1 = {
 	x = 10
 	y = 10
-}.len()
+}
+a1 = d1.len()
 assert(a1 == 2)
 
-a2 = a1.x.float()
+a2 = d1.x.float()
 assert(a2 == 10.0)
 
-a3 = a1.y.str()
+a3 = d1.y.str()
 assert(a3 == "10")
 
-a4 = (a1.x + a2.y).str()
+a4 = (d1.x + d1.y).str()
 assert(a4 == "20")
 
 class Floor()
