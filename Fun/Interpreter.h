@@ -11,7 +11,7 @@
 #include <Poco/Condition.h>
 
 #include <Visitor.h>
-#include "Nodes.h"
+#include "AST.h"
 #include "Debugger.h"
 
 namespace fun {

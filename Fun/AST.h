@@ -321,7 +321,7 @@ public:
 class Terminal: public Expression {
 public:
     enum Type {
-        Integer, Real, String, Boolean, Object, Function, Nil, Unknown
+        Unknown, Integer, Real, String, Boolean, Object, Function, Nil, Dictionary, List
     };
 
     Terminal(const location& loc) :

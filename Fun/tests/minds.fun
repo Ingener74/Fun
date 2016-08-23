@@ -303,8 +303,42 @@ end(class(CallbackInterface)
 	end
 end(data1))
 
+# function default parameters
+fun f1(a, b, c = 1000)
+	ret a, b, c
+end
 
+r1, r2, r3 = f1(10, 100)
+assert(r1 == 10)
+assert(r2 == 100)
+assert(r3 == 1000)
 
+# function variadic parameters
+fun f2(a, b, ...)
+	print a
+	print b
+	for i in ...:
+		print i
+	end
+	for i = 0; i < ....len(); ++i: # are you sure about that???
+	end
+end
+
+# threads
+# first thread wait a value and used after
+lock(var1)
+	while !var1:
+		var1.wait()
+	end
+	# use var1
+end
+
+# second thread get value for var1 and signal another
+var2 = getB()
+lock(var1)
+	var1 = var2
+	var1.signal()
+end
 
 
 

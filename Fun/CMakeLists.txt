@@ -31,9 +31,9 @@ add_library(
         
         Utils.cpp
         Utils.h
-        
-        Nodes.cpp
-        Nodes.h
+
+        AST.cpp
+        AST.h
 
         Debugger.cpp
         Debugger.h

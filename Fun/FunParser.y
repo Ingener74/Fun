@@ -11,7 +11,7 @@
 
 class FunLexer;
 
-#include "Nodes.h"
+#include "AST.h"
 
 // POCO compability
 #undef IN
@@ -87,8 +87,8 @@ int yylex(fun::FunParser::semantic_type*, fun::location*, FunLexer&);
 %token DIV                   "/"
 %token MOD                   "%"
 
-%token INC "++"
-%token DEC "--"
+%token INC                   "++"
+%token DEC                   "--"
 
 /*
 ++   --         Суффиксальный/постфиксный инкремент и декремент

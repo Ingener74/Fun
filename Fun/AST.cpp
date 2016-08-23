@@ -1,14 +1,14 @@
 #include <sstream>
 #include "Visitor.h"
 #include "Utils.h"
-#include "Nodes.h"
+#include "AST.h"
 
 #define SAFE_RELEASE(x) if (x) x->release();
 
 #define ACCEPT(CLASS, BODY)        \
-CLASS* CLASS::accept(Visitor* v) {  \
-    fassert(v, "Visitor is null");  \
-    BODY                            \
+CLASS* CLASS::accept(Visitor* v) { \
+    fassert(v, "Visitor is null"); \
+    BODY                           \
     v->visit(this);                \
     return this;                   \
 }
