@@ -11,6 +11,24 @@ namespace fun {
 
 class Visitor;
 
+class Ast{
+public:
+    Ast(){}
+    virtual ~Ast();
+
+    void accept(Visitor*);
+
+    template<typename T, typename ... Args>
+    T* addStatement(Args&& ... args) {
+        auto res = new T(std::forward<Args>(args)...);
+        _statements.push_back(res);
+        return res;
+    }
+
+private:
+    std::vector<Statement*> _statements;
+};
+
 class Statement : public Poco::RefCountedObject {
 public:
     Statement(const location& loc);
@@ -22,7 +40,11 @@ public:
     location loc;
 
     static int counter();
-public:
+protected:
+//    template<typename T>
+//    static T* duplicate(T*){
+//
+//    }
     static int stmtCounter;
 };
 

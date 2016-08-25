@@ -19,6 +19,12 @@ namespace fun {
 
 using namespace std;
 
+Ast::~Ast() {
+}
+
+void Ast::accept(Visitor*) {
+}
+
 int Statement::stmtCounter = 0;
 
 Statement::Statement(const location& loc) :
