@@ -340,5 +340,56 @@ lock(var1)
 	var1.signal()
 end
 
+# math
+math.sin(10)
+math.cos()
+math.atan2()
+math.atan()
 
+# fs
+f1 = fs.open("file.txt", fun(content) 
+	print "content: " + content 
+end)
+
+data2 = f1.read()
+
+f1.close()
+
+b1 = fs.fileExist("file.txt")
+
+b2 = fs.isDir("/dir")
+
+# sys
+sys.argv
+sys.os()
+
+# thread
+thread.create(fun() end)
+
+# json
+json.encode({
+	test = 42
+	f1 = 3.1415
+})
+json.decode("{\"test\": 42}")
+
+# net
+req1 = net.request("www.api-server.com")
+ws1 = net.websocket("ws://api-server.com", fun(text) end, fun(binary) end, fun(error) end)
+
+# native
+lib1 = native.loadLibrary("./libApi.{so, dll, dylib}")
+fi1 = native.create(lib1.getFunction("c_function"), native.pointer, {
+	arg1 = native.int32, 
+	arg2, native.float32
+})
+res1 = native.call(fi1, {42, 3.1415})
+
+# * gl
+# * glut
+# * sqlite
+# * xml
+# * gui
+# debug
+debug.backtrace()
 
