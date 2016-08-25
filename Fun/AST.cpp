@@ -20,9 +20,12 @@ namespace fun {
 using namespace std;
 
 Ast::~Ast() {
+    _root->release();
+    for (auto i: _statements) i->release();
 }
 
-void Ast::accept(Visitor*) {
+void Ast::accept(Visitor* v) {
+    v->iterateStatements(_root);
 }
 
 int Statement::stmtCounter = 0;
@@ -46,6 +49,7 @@ ACCEPT_E(Break)
 ACCEPT(Class, {
     fassert(name, "Class must have the name");
 })
+
 Class::~Class() {
     SAFE_RELEASE(name)
     SAFE_RELEASE(derived)

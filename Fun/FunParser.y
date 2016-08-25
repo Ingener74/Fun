@@ -26,12 +26,12 @@ class FunLexer;
 using namespace std;
 void yyerror(const char* );
 
-#define NEXT_STATEMENT(a, b)  if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b;
-#define NEXT_EXPRESSION(a, b) if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b;
-#define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b;
-#define NEXT_IF(a, b)         if(!a) throw std::runtime_error("next if error");         a->nextIf = b;
-#define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b;
-#define NEXT_FUNCTION(a, b)   if(!a) throw std::runtime_error("next function error");   a->nextFunction = b;
+#define NEXT_STATEMENT(a, b)  if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b; b->duplicate();
+#define NEXT_EXPRESSION(a, b) if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b; b->duplicate();
+#define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b; b->duplicate();
+#define NEXT_IF(a, b)         if(!a) throw std::runtime_error("next if error");         a->nextIf = b; b->duplicate();
+#define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b; b->duplicate();
+#define NEXT_FUNCTION(a, b)   if(!a) throw std::runtime_error("next function error");   a->nextFunction = b; b->duplicate();
 
 %}
 
@@ -193,7 +193,7 @@ throw           Throw оператор (выброс исключений)
 %type <index_type>           index
 
 %param { FunLexer& myLexer };
-%parse-param { Statement** root };
+%parse-param { Ast* ast };
 
 %initial-action
 {
@@ -212,7 +212,7 @@ throw           Throw оператор (выброс исключений)
 %start program;
 
 program
-    : sttmnts { *root = $1; }
+    : sttmnts { ast->setRoot($1); }
     ;
 
 sttmnts
@@ -246,19 +246,19 @@ cycle_sttmnt
     ;
 
 import
-    : "import" ids { $$ = new Import(@1 + @2, $2); }
+    : "import" ids { $$ = ast->add<Import>(@1 + @2, $2); }
     ;
 
 print
-    : "print" exprs { $$ = new Print(@1 + @2, $2); }
+    : "print" exprs { $$ = ast->add<Print>(@1 + @2, $2); }
     ;
 
 func
-    : "fun" id "(" ids ")" sttmnts "end" { $$ = new Function(@1 + @7, $2, $4, $6); }
+    : "fun" id "(" ids ")" sttmnts "end" { $$ = ast->add<Function>(@1 + @7, $2, $4, $6); }
     ;
 
 class
-    : "class" id "(" ids ")" class_stmts "end" { $$ = new Class(@1 + @7, $2, $4, $6); }
+    : "class" id "(" ids ")" class_stmts "end" { $$ = ast->add<Class>(@1 + @7, $2, $4, $6); }
     ;
 
 class_stmts
@@ -268,8 +268,8 @@ class_stmts
     ;
 
 ifs
-    : if      "end" { $$ = new Ifs(@1 + @2, $1); }
-    | if ifss "end" { $$ = new Ifs(@1 + @3, $1); NEXT_IF($1, $2); }
+    : if      "end" { $$ = ast->add<Ifs>(@1 + @2, $1); }
+    | if ifss "end" { $$ = ast->add<Ifs>(@1 + @3, $1); NEXT_IF($1, $2); }
     ;
 
 ifss
@@ -279,47 +279,47 @@ ifss
     ;
 
 if
-    : "if" expr ":" cycle_sttmnts { $$ = new If(@1 + @4, $2, $4); }
+    : "if" expr ":" cycle_sttmnts { $$ = ast->add<If>(@1 + @4, $2, $4); }
     ;
 
 elif
-    : "elif" expr ":" cycle_sttmnts { $$ = new If(@1 + @4, $2, $4); }
+    : "elif" expr ":" cycle_sttmnts { $$ = ast->add<If>(@1 + @4, $2, $4); }
     ;
 
 else
-    : "else" cycle_sttmnts { $$ = new If(@1 + @2, nullptr, $2); }
+    : "else" cycle_sttmnts { $$ = ast->add<If>(@1 + @2, nullptr, $2); }
     ;
 
 while
-    : "while" expr ":" cycle_sttmnts "end" { $$ = new While(@1 + @5, $2, $4); }
+    : "while" expr ":" cycle_sttmnts "end" { $$ = ast->add<While>(@1 + @5, $2, $4); }
     ;
 
 for
-    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end" { $$ = new For(@1 + @9, $2, $4, $6, $8); }
+    : "for" expr ";" expr ";" expr ":" cycle_sttmnts "end" { $$ = ast->add<For>(@1 + @9, $2, $4, $6, $8); }
     ;
 
 break
-    : "break" { $$ = new Break(@1); }
+    : "break" { $$ = ast->add<Break>(@1); }
     ;
 
 continue
-    : "continue" { $$ = new Continue(@1); }
+    : "continue" { $$ = ast->add<Continue>(@1); }
     ;
 
 ret
-    : "ret" exprs  { $$ = new Return(@1 + @2, $2); }
+    : "ret" exprs  { $$ = ast->add<Return>(@1 + @2, $2); }
     ;
 
 exception
-    : "try" sttmnts "catch" ids "as" id ":" sttmnts "end" { $$ = new Exception(@1 + @9, $2, $4, $6, $8); }
+    : "try" sttmnts "catch" ids "as" id ":" sttmnts "end" { $$ = ast->add<Exception>(@1 + @9, $2, $4, $6, $8); }
     ;
 
 throw
-    : "throw" expr { $$ = new Throw(@1 + @2, $2); }
+    : "throw" expr { $$ = ast->add<Throw>(@1 + @2, $2); }
     ;
 
 id
-    : ID { $$ = new Id(@1, *$1); }
+    : ID { $$ = ast->add<Id>(@1, *$1); }
     ;
 
 ids
@@ -331,52 +331,52 @@ ids
 // %empty             { $$ = new Nil(); }
 expr
     : assign_expr        { $$ = $1; }
-    | expr "+" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::ADD,        $1, $3); }
-    | expr "-" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::SUB,        $1, $3); }
-    | expr "*" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MUL,        $1, $3); }
-    | expr "/" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::DIV,        $1, $3); }
-    | expr "%" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MOD,        $1, $3); }
-    | expr ">" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::MORE,       $1, $3); }
-    | expr ">=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr      { $$ = new BinaryOp(@1 + @3, BinaryOp::LESS,       $1, $3); }
-    | expr "<=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::LESS_EQUAL, $1, $3); }
-    | expr "==" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::EQUAL,      $1, $3); }
-    | expr "!=" expr     { $$ = new BinaryOp(@1 + @3, BinaryOp::NOT_EQUAL,  $1, $3); }
-    | INTEGER            { $$ = new Integer(@1, $1);                                 }
-    | REAL               { $$ = new Real(@1, $1);                                    }
-    | TRUE               { $$ = new Boolean(@1, true);                               }
-    | FALSE              { $$ = new Boolean(@1, false);                              }
-    | STRING             { $$ = new String(@1, *$1);                                 }
-    | NIL                { $$ = new Nil(@1);                                         }
+    | expr "+" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::ADD,        $1, $3); }
+    | expr "-" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::SUB,        $1, $3); }
+    | expr "*" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MUL,        $1, $3); }
+    | expr "/" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::DIV,        $1, $3); }
+    | expr "%" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MOD,        $1, $3); }
+    | expr ">" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MORE,       $1, $3); }
+    | expr ">=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MORE_EQUAL, $1, $3); }
+    | expr "<" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LESS,       $1, $3); }
+    | expr "<=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LESS_EQUAL, $1, $3); }
+    | expr "==" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::EQUAL,      $1, $3); }
+    | expr "!=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::NOT_EQUAL,  $1, $3); }
+    | INTEGER            { $$ = ast->add<Integer>(@1, $1);                                 }
+    | REAL               { $$ = ast->add<Real>(@1, $1);                                    }
+    | TRUE               { $$ = ast->add<Boolean>(@1, true);                               }
+    | FALSE              { $$ = ast->add<Boolean>(@1, false);                              }
+    | STRING             { $$ = ast->add<String>(@1, *$1);                                 }
+    | NIL                { $$ = ast->add<Nil>(@1);                                         }
     | id                 { $$ = $1;                                                  }
-    | expr "("  ")"      { $$ = new Call(@1 + @3, $1);                               }
-    | expr "(" exprs ")" { $$ = new Call(@1 + @4, $1, $3);                           }
-    | "(" expr ")"       { $$ = new RoundBrackets(@1 + @3, $2);                      }
-    | expr "." expr      { $$ = new Dot(@1 + @3, $1, $3);                            }
+    | expr "("  ")"      { $$ = ast->add<Call>(@1 + @3, $1);                               }
+    | expr "(" exprs ")" { $$ = ast->add<Call>(@1 + @4, $1, $3);                           }
+    | "(" expr ")"       { $$ = ast->add<RoundBrackets>(@1 + @3, $2);                      }
+    | expr "." expr      { $$ = ast->add<Dot>(@1 + @3, $1, $3);                            }
     | fun_expr           { $$ = $1;                                                  }
     | dictionary         { $$ = $1;                                                  }
     | index              { $$ = $1;                                                  }
     ;
 
 fun_expr
-    : "fun" "(" ids ")" sttmnts "end" { $$ = new Function(@1 + @6, nullptr, $3, $5); }
+    : "fun" "(" ids ")" sttmnts "end" { $$ = ast->add<Function>(@1 + @6, nullptr, $3, $5); }
     ;
 
 index
-    : expr "[" expr "]"  { $$ = new Index(@1 + @4, $1, $3); }
+    : expr "[" expr "]"  { $$ = ast->add<Index>(@1 + @4, $1, $3); }
     ;
 
 assign_expr
     : assign           { $$ = $1; }
-    | exprs "+=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::ADD); }
-    | exprs "-=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::SUB); }
-    | exprs "*=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::MUL); }
-    | exprs "/=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::DIV); }
-    | exprs "%=" exprs { $$ = new Assign(@1 + @3, $1, $3, Assign::MOD); }
+    | exprs "+=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::ADD); }
+    | exprs "-=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::SUB); }
+    | exprs "*=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MUL); }
+    | exprs "/=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::DIV); }
+    | exprs "%=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MOD); }
     ;
 
 assign
-    : exprs "=" exprs { $$ = new Assign(@1 + @3, $1, $3); }
+    : exprs "=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3); }
     ;
 
 assigns
@@ -385,7 +385,7 @@ assigns
     ;
 
 dictionary
-    : "{" assigns "}" { $$ = new Dictionary(@1 + @3, $2); }
+    : "{" assigns "}" { $$ = ast->add<Dictionary>(@1 + @3, $2); }
     ;
 
 exprs

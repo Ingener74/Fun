@@ -10,22 +10,26 @@
 namespace fun {
 
 class Visitor;
+class Statement;
 
 class Ast{
 public:
     Ast(){}
     virtual ~Ast();
 
-    void accept(Visitor*);
+    void setRoot(Statement* root){ _root = root; }
 
     template<typename T, typename ... Args>
-    T* addStatement(Args&& ... args) {
+    T *add(Args &&... args) {
         auto res = new T(std::forward<Args>(args)...);
         _statements.push_back(res);
         return res;
     }
 
+    void accept(Visitor*);
+
 private:
+    Statement* _root = nullptr;
     std::vector<Statement*> _statements;
 };
 
@@ -41,10 +45,11 @@ public:
 
     static int counter();
 protected:
-//    template<typename T>
-//    static T* duplicate(T*){
-//
-//    }
+    template<typename T>
+    static T *addRef(T *arg) {
+        arg->duplicate();
+        return arg;
+    }
     static int stmtCounter;
 };
 
@@ -64,7 +69,7 @@ class Function;
 class Class: public Statement {
 public:
     Class(const location& loc, Id* name, Id* derived, Statement* stmts) :
-            Statement(loc), name(name), derived(derived), stmts(stmts) {
+            Statement(loc), name(addRef(name)), derived(addRef(derived)), stmts(addRef(stmts)) {
     }
     virtual ~Class();
 
@@ -89,7 +94,8 @@ class Exception: public Statement {
 public:
     Exception(const location& loc, Statement* tryStmts = nullptr, Id* errorClasses = nullptr, Id* errorObject = nullptr,
             Statement* catchStmts = nullptr) :
-            Statement(loc), tryStmts(tryStmts), errorClasses(errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
+            Statement(loc), tryStmts(addRef(tryStmts)), errorClasses(addRef(errorClasses)),
+            errorObject(addRef(errorObject)), catchStmts(addRef(catchStmts)) {
     }
     virtual ~Exception();
 
@@ -107,7 +113,8 @@ class For: public Statement {
 public:
     For(const location& loc, Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment = nullptr,
             Statement* stmts = nullptr) :
-                Statement(loc), initial(initial), condition(condition), increment(increment), stmts(stmts) {
+                Statement(loc), initial(addRef(initial)), condition(addRef(condition)),
+                increment(addRef(increment)), stmts(addRef(stmts)) {
     }
     virtual ~For();
 
@@ -120,7 +127,7 @@ public:
 class If: public Statement {
 public:
     If(const location& loc, Expression* cond, Statement* stmts = nullptr) :
-        Statement(loc), cond(cond), stmts(stmts){
+            Statement(loc), cond(addRef(cond)), stmts(addRef(stmts)) {
     }
     virtual ~If();
 
@@ -134,7 +141,7 @@ public:
 
 class Ifs: public Statement {
 public:
-    Ifs(const location& loc, If* if_stmts): Statement(loc), if_stmts(if_stmts){}
+    Ifs(const location& loc, If* if_stmts): Statement(loc), if_stmts(addRef(if_stmts)){}
     virtual ~Ifs();
 
     virtual Ifs* accept(Visitor*);
@@ -145,7 +152,7 @@ public:
 class Import: public Statement {
 public:
     Import(const location& loc, Id* library) :
-            Statement(loc), id(library) {
+            Statement(loc), id(addRef(library)) {
     }
     virtual ~Import();
 
@@ -157,7 +164,7 @@ public:
 class Print: public Statement {
 public:
     Print(const location& loc, Expression* expr) :
-            Statement(loc), expression(expr) {
+            Statement(loc), expression(addRef(expr)) {
     }
     virtual ~Print();
 
@@ -169,7 +176,7 @@ public:
 class Return: public Statement {
 public:
     Return(const location& loc, Expression* expr = nullptr) :
-            Statement(loc), expression(expr) {
+            Statement(loc), expression(addRef(expr)) {
     }
     virtual ~Return();
 
@@ -181,7 +188,7 @@ public:
 class Throw: public Statement {
 public:
     Throw(const location& loc, Expression* exression = nullptr) :
-            Statement(loc), expression(exression) {
+            Statement(loc), expression(addRef(exression)) {
     }
     virtual ~Throw();
 
@@ -193,14 +200,14 @@ public:
 class While: public Statement {
 public:
     While(const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
-            Statement(loc), cond(cond), stmts(stmts) {
+            Statement(loc), cond(addRef(cond)), stmts(addRef(stmts)) {
     }
     virtual ~While();
 
     virtual While* accept(Visitor*);
 
-    Expression* cond;
-    Statement* stmts;
+    Expression* cond = nullptr;
+    Statement* stmts = nullptr;
 };
 
 class Expression: public Statement {
@@ -223,15 +230,15 @@ public:
     };
 
     Assign(const location& loc, Expression* ids, Expression* exprs, Type type = ASSIGN) :
-            Expression(loc), ids(ids), exprs(exprs), type(type) {
+            Expression(loc), ids(addRef(ids)), exprs(addRef(exprs)), type(type) {
     }
     virtual ~Assign();
 
     virtual Assign* accept(Visitor*);
 
     Type type;
-    Expression* ids;
-    Expression* exprs;
+    Expression* ids = nullptr;
+    Expression* exprs = nullptr;
 
     static void apply(Assign*, Visitor*);
     Assign* nextAssign = nullptr;
@@ -255,7 +262,7 @@ public:
     };
 
     BinaryOp(const location& loc, Op op, Expression* lhs, Expression* rhs) :
-        Expression(loc), m_operation(op), lhs(lhs), rhs(rhs) {
+        Expression(loc), m_operation(op), lhs(addRef(lhs)), rhs(addRef(rhs)) {
     }
     virtual ~BinaryOp();
 
@@ -267,7 +274,7 @@ public:
 
 class Dot : public Expression {
 public:
-    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc), lhs(lhs), rhs(rhs) {}
+    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc), lhs(addRef(lhs)), rhs(addRef(rhs)) {}
 
     virtual ~Dot();
 
@@ -279,7 +286,7 @@ public:
 class Call: public Expression {
 public:
     Call(const location& loc, Expression* callable, Expression* arg = nullptr) :
-        Expression(loc), callable(callable), arguments(arg) {
+        Expression(loc), callable(addRef(callable)), arguments(addRef(arg)) {
     }
     virtual ~Call();
 
@@ -292,7 +299,7 @@ public:
 class Dictionary: public Expression {
 public:
     Dictionary(const location& loc, Assign* assign) :
-        Expression(loc), assign(assign) {
+        Expression(loc), assign(addRef(assign)) {
     }
     virtual ~Dictionary();
 
@@ -318,7 +325,7 @@ public:
 class Index: public Expression {
 public:
     Index(const location& loc, Expression* indexable, Expression* arg) :
-        Expression(loc), indexable(indexable), arg(arg) {
+        Expression(loc), indexable(addRef(indexable)), arg(addRef(arg)) {
     }
     virtual ~Index();
 
@@ -331,13 +338,13 @@ public:
 class RoundBrackets: public Expression {
 public:
     RoundBrackets(const location& loc, Expression* expr) :
-        Expression(loc), expr(expr) {
+        Expression(loc), expr(addRef(expr)) {
     }
     virtual ~RoundBrackets();
 
     virtual RoundBrackets* accept(Visitor*);
 
-    Expression* expr;
+    Expression* expr = nullptr;
 };
 
 class Terminal: public Expression {
@@ -366,7 +373,7 @@ public:
 class Function: public Terminal {
 public:
     Function(const location& loc, Id* id, Id* args = nullptr, Statement* scope = nullptr) :
-            Terminal(loc), name(id), args(args), stmts(scope) {
+            Terminal(loc), name(addRef(id)), args(addRef(args)), stmts(addRef(scope)) {
     }
     virtual ~Function();
 
