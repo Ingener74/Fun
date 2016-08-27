@@ -14,78 +14,59 @@
 using namespace std;
 using namespace fun;
 
-struct ParseResult{
-    Statement* root;
-    bool result;
-};
-
-ParseResult parse(const std::string& source) {
-    Statement* root = nullptr;
+bool parse(const std::string& source) {
     stringstream ss;
     ss << source;
     FunLexer lexer("", &ss);
-    FunParser parser(lexer, &root);
+    Ast ast;
+    FunParser parser(lexer, &ast);
     parser.set_debug_level(0);
     int result = parser.parse();
-    Statement::clear();
-    return {root, result == 0};
+    return result == 0;
 }
 
 TEST(Parse, Test1) {
     {
-        auto result = parse(R"()");
-        ASSERT_EQ(result.root, nullptr);
-        ASSERT_EQ(result.result, true);
+        ASSERT_EQ(parse(R"()"), true);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Test2) {
     {
-        auto result = parse(R"(
+        ASSERT_EQ(parse(R"(
 print 42
 print 3.14
 print "foo"
 print nil
 print false
 print true
-)");
-        ASSERT_NE(result.root, nullptr);
-        ASSERT_EQ(result.result, true);
-        result.root->release();
+)"), true);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Test3) {
     {
-        auto result = parse(R"(
+        ASSERT_EQ(parse(R"(
 foo = 
-)");
-        ASSERT_EQ(result.root, nullptr);
-        ASSERT_EQ(result.result, false);
+)"), false);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Test4) {
     {
-        auto result = parse(R"(
-foo = 42)");
-        ASSERT_NE(result.root, nullptr);
-        ASSERT_EQ(result.result, true);
-        result.root->release();
+        ASSERT_EQ(parse(R"(
+foo = 42)"), true);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Test5) {
     {
-        auto result = parse(R"(
-foo = 42)");
-        ASSERT_NE(result.root, nullptr);
-        ASSERT_EQ(result.result, true);
-        result.root->release();
+        ASSERT_EQ(parse(R"(
+foo = 42)"), true);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
@@ -93,7 +74,7 @@ foo = 42)");
 struct Result {
     std::unique_ptr<Interpreter> v;
     std::unique_ptr<Debugger> d;
-    Statement* root;
+    std::unique_ptr<Ast> ast;
 };
 
 class DebuggerMock: public Debugger {
@@ -106,16 +87,15 @@ public:
 Result interpret(const std::string& source) {
     std::unique_ptr<Debugger> debugger(new DebuggerMock);
     std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
-    Statement* root = nullptr;
+    std::unique_ptr<Ast> ast(new Ast);
     stringstream ss;
     ss << source;
     FunLexer lexer("", &ss);
-    FunParser parser(lexer, &root);
+    FunParser parser(lexer, ast.get());
     parser.set_debug_level(0);
     bool result = parser.parse();
-    Statement::clear();
-    interpreter->iterateStatements(root);
-    return {move(interpreter), move(debugger), root};
+    ast->accept(interpreter.get());
+    return {move(interpreter), move(debugger), move(ast)};
 }
 
 TEST(Fun, leakTest1) {
@@ -123,8 +103,6 @@ TEST(Fun, leakTest1) {
         auto result = interpret(R"(foo = 42)");
 
         ASSERT_EQ(Statement::counter(), 3);
-        result.root->release();
-        ASSERT_EQ(Statement::counter(), 1);
 
         ASSERT_EQ(result.v->getOperands().size(), 0);
         ASSERT_EQ(result.v->getMemory()[0].size(), 1);
@@ -139,8 +117,6 @@ foo = 42
 print foo
 )");
         ASSERT_EQ(Statement::counter(), 5);
-        result.root->release();
-        ASSERT_EQ(Statement::counter(), 4);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }

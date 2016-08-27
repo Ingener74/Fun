@@ -47,7 +47,8 @@ public:
 protected:
     template<typename T>
     static T *addRef(T *arg) {
-        arg->duplicate();
+        if (arg)
+            arg->duplicate();
         return arg;
     }
     static int stmtCounter;

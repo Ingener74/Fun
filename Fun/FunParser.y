@@ -26,12 +26,12 @@ class FunLexer;
 using namespace std;
 void yyerror(const char* );
 
-#define NEXT_STATEMENT(a, b)  if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b; b->duplicate();
-#define NEXT_EXPRESSION(a, b) if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b; b->duplicate();
-#define NEXT_ID(a, b)         if(!a) throw std::runtime_error("next id error");         a->nextId = b; b->duplicate();
-#define NEXT_IF(a, b)         if(!a) throw std::runtime_error("next if error");         a->nextIf = b; b->duplicate();
-#define NEXT_ASSIGN(a, b)     if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b; b->duplicate();
-#define NEXT_FUNCTION(a, b)   if(!a) throw std::runtime_error("next function error");   a->nextFunction = b; b->duplicate();
+#define NEXT_STATEMENT(a, b)  { if(!a) throw std::runtime_error("next statement error");  a->nextStatement = b;              if(b) b->duplicate(); }
+#define NEXT_EXPRESSION(a, b) { if(!a) throw std::runtime_error("next expression error"); a->nextExpression =  b;              if(b) b->duplicate(); }
+#define NEXT_ID(a, b)         { if(!a) throw std::runtime_error("next id error");         a->nextId = b;              if(b) b->duplicate(); }
+#define NEXT_IF(a, b)         { if(!a) throw std::runtime_error("next if error");         a->nextIf = b;              if(b) b->duplicate(); }
+#define NEXT_ASSIGN(a, b)     { if(!a) throw std::runtime_error("next assign error");     a->nextAssign = b;              if(b) b->duplicate(); }
+#define NEXT_FUNCTION(a, b)   { if(!a) throw std::runtime_error("next function error");   a->nextFunction = b;              if(b) b->duplicate(); }
 
 %}
 

@@ -20,7 +20,8 @@ namespace fun {
 using namespace std;
 
 Ast::~Ast() {
-    _root->release();
+    if(_root)
+        _root->release();
     for (auto i: _statements) i->release();
 }
 
