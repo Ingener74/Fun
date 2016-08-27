@@ -29,9 +29,7 @@ set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
 
 set(3RDPARTY_INSTALL ${SYSROOT})
 
-if(NOT EXISTS ${SYSROOT})
-    add_subdirectory(3rdparty)
-endif()
+add_subdirectory(3rdparty)
 
 enable_testing()
 
@@ -67,12 +65,3 @@ option(ENABLE_DANCING_COMIC "Enable Dancing-Comic" OFF)
 if(ENABLE_DANCING_COMIC)
     add_subdirectory(Dancing-Comic)
 endif()
-
-
-option(ENABLE_LIQUID_METAPHOR "Enable Liquid-Metaphor" ON)
-if(ENABLE_LIQUID_METAPHOR)
-    add_subdirectory(Liquid-Metaphor)
-endif()
-
-
-

@@ -25,135 +25,204 @@ bool parse(const std::string& source) {
     return result == 0;
 }
 
+struct ParseResult {
+    bool successful;
+    std::unique_ptr<Ast> ast;
+};
+
+ParseResult parseAst(const std::string& source) {
+    stringstream ss;
+    ss << source;
+    FunLexer lexer("", &ss);
+    std::unique_ptr<Ast> ast(new Ast);
+    FunParser parser(lexer, ast.get());
+    parser.set_debug_level(0);
+    int result = parser.parse();
+    return {result == 0, move(ast)};
+}
+
 TEST(Parse, Empty_0) {
     {
-        ASSERT_EQ(parse(R"()"), true);
+        ASSERT_TRUE(parse(R"()"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Integer_0) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 42
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Integer_1) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 1000000000
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Integer_2) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 0
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Integer_3) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 100
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Bool_0) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 true
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Bool_1) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 false
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_0) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 0.0
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_1) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 1.0
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_2) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 .0
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_3) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 10.
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_4) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 1.0e1
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_5) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 1.0E1
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_6) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 .1e-3
-)"), true);
+)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
 
 TEST(Parse, Float_7) {
     {
-        ASSERT_EQ(parse(R"(
+        ASSERT_TRUE(parse(R"(
 .13145E-12
-)"), true);
+)"));
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_8) {
+    {
+        auto r = parseAst(R"(
+1.0
+)");
+        ASSERT_TRUE(r.successful);
+
+        Real* real = dynamic_cast<Real*>(r.ast->root());
+
+        ASSERT_NE(real, nullptr);
+
+        ASSERT_FLOAT_EQ(real->value, 1.0);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_9) {
+    {
+        auto r = parseAst(R"(
+1.0
+)");
+        ASSERT_TRUE(r.successful);
+
+        Real* real = dynamic_cast<Real*>(r.ast->root());
+
+        ASSERT_NE(real, nullptr);
+
+        ASSERT_FLOAT_EQ(real->value, 1.0);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, String_0) {
+    {
+        ASSERT_TRUE(parse(R"(
+"Test string"
+)"));
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, String_1) {
+    {
+        auto result = parseAst(R"(
+"Test
+string"
+)");
+        ASSERT_TRUE(result.successful);
+        ASSERT_EQ(result.ast->root()->loc, location(position(nullptr, 2, 1), position(nullptr, 3, 6)));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }

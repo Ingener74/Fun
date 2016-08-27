@@ -17,16 +17,10 @@ using namespace std;
 	yylloc->begin.column = startColumn; \
 	yylloc->end.line     = endLine;     \
 	yylloc->end.column   = endColumn;   \
-	// cout << *yylloc << endl;
 
 #define LOCATION(size) \
 	LOCATION_FULL(line, column, line, column + size); \
 	column += size;
-
-// ["][^"]*["] {
-//    yylval->str = new string(yytext + 1, yyleng - 2);
-//    return fun::FunParser::token::STRING;
-// }
 
 stringstream ss;
 int str_start_line = 0, str_start_column = 0;
@@ -37,8 +31,8 @@ int str_start_line = 0, str_start_column = 0;
 %option c++
 %option yyclass="FunLexer"
 
-DIGIT    [0-9]
-ID       [a-zA-Z_][a-zA-Z_0-9]*
+digit    [0-9]
+ID       [a-zA-Z_][a-zA-Z_0-9_]*
 
 %x comment
 %x strng
@@ -100,13 +94,13 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 "=="        { LOCATION(2); return fun::FunParser::token::EQUAL;      }
 "!="        { LOCATION(2); return fun::FunParser::token::NOT_EQUAL;  }
 
-{DIGIT}+ {
+{digit}+ {
     yylval->integer = atoi(yytext); 
     LOCATION(strlen(yytext));
     return fun::FunParser::token::INTEGER;
 }
 
-{DIGIT}+"."{DIGIT}* {
+{digit}+"."{digit}* {
     yylval->real = atof(yytext); 
     LOCATION(strlen(yytext));
     return fun::FunParser::token::REAL;
@@ -130,7 +124,10 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
     return fun::FunParser::token::STRING;
 }
 <strng>\n {
-	throw std::runtime_error("error - unterminated string constant");
+	// throw std::runtime_error("error - unterminated string constant");
+	ss << '\n';
+	column = 0;
+	line++;
 }
 <strng>\\[0-7]{1,3} {
 	/* octal escape sequence */

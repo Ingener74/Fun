@@ -17,7 +17,17 @@ public:
     Ast(){}
     virtual ~Ast();
 
-    void setRoot(Statement* root){ _root = root; }
+    void setRoot(Statement* root) {
+        _root = root;
+    }
+
+    Statement* root() {
+        return _root;
+    }
+
+    const Statement* root() const {
+        return _root;
+    }
 
     template<typename T, typename ... Args>
     T *add(Args &&... args) {
