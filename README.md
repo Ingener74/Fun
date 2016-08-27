@@ -120,4 +120,4 @@ end()()
 
 ### Скриншотики :)
 
-![Github Logo](/Fun/doc/1.png)
+![Github Logo](/fun/doc/1.png)
