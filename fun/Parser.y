@@ -4,12 +4,12 @@
 %debug
 
 %define api.namespace {fun}
-%define parser_class_name{FunParser}
+%define parser_class_name{Parser}
 %locations
 
 %code requires{
 
-class FunLexer;
+class Lexer;
 
 #include "AST.h"
 
@@ -66,7 +66,7 @@ void yyerror(const char* );
 %destructor { delete $$; } <str>
 
 %code{
-int yylex(fun::FunParser::semantic_type*, fun::location*, FunLexer&);
+int yylex(fun::Parser::semantic_type*, fun::location*, Lexer&);
 }
 
 %token <integer>             INTEGER
@@ -194,7 +194,7 @@ throw           Throw оператор (выброс исключений)
 %type <sttmnt_type>          class_stmts
 %type <index_type>           index
 
-%param { FunLexer& myLexer };
+%param { Lexer& myLexer };
 %parse-param { Ast* ast };
 
 %initial-action
@@ -397,13 +397,13 @@ exprs
 
 %%
 
-#include <FunLexer.h>
+#include <Lexer.h>
 
-int yylex(fun::FunParser::semantic_type* yylval, fun::location* yylloc, FunLexer& myLexer) {
+int yylex(fun::Parser::semantic_type* yylval, fun::location* yylloc, Lexer& myLexer) {
     return myLexer.yylex(yylval, yylloc);
 }
 
-void fun::FunParser::error(const location& loc, const std::string& message) {
+void fun::Parser::error(const location& loc, const std::string& message) {
     cerr << "error: " << loc << ": " << message << endl;
 }
 

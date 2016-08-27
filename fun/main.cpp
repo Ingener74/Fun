@@ -32,9 +32,9 @@ public:
 };
 
 bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
-    FunLexer lexer(filename, &inputStream);
+    Lexer lexer(filename, &inputStream);
     Ast ast;
-    FunParser parser(lexer, &ast);
+    Parser parser(lexer, &ast);
     parser.set_debug_level(debug);
     bool result = parser.parse();
     ast.accept(visitor);

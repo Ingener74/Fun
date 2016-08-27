@@ -147,9 +147,9 @@ void MainWidget::runProgram() {
 
             ss << codeTextEdit->toPlainText().toStdString();
 
-            FunLexer lexer(programFileName.toStdString(), &ss);
+            Lexer lexer(programFileName.toStdString(), &ss);
             fun::Ast ast;
-            fun::FunParser parser(lexer, &ast);
+            fun::Parser parser(lexer, &ast);
             parser.set_debug_level(debugCheckBox->isChecked());
             parser.parse();
             ast.accept(_visitor);

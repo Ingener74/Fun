@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FunLexer.h>
+#include <Lexer.h>
 #include <AST.h>
 #include <Printer.h>
 #include <Interpreter.h>

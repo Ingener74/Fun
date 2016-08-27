@@ -11,23 +11,23 @@ include_directories(
 )
 
 BISON_TARGET(
-        FunParser
-        FunParser.y
-        ${CMAKE_CURRENT_BINARY_DIR}/FunParser.cpp
+        Parser
+        Parser.y
+        ${CMAKE_CURRENT_BINARY_DIR}/Parser.cpp
 )
 
 FLEX_TARGET(
-        FunScanner
-        FunScanner.l
-        ${CMAKE_CURRENT_BINARY_DIR}/FunScanner.cpp)
+        Scanner
+        Scanner.l
+        ${CMAKE_CURRENT_BINARY_DIR}/Scanner.cpp)
 
-ADD_FLEX_BISON_DEPENDENCY(FunScanner FunParser)
+ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
 add_library(
         fun_backend
         
-        FunLexer.cpp
-        FunLexer.h
+        Lexer.cpp
+        Lexer.h
         
         Utils.cpp
         Utils.h
@@ -50,8 +50,8 @@ add_library(
         Printer.cpp
         Printer.h
         
-        ${BISON_FunParser_OUTPUTS}
-        ${FLEX_FunScanner_OUTPUTS}
+        ${BISON_Parser_OUTPUTS}
+        ${FLEX_Scanner_OUTPUTS}
 )
 set_target_properties(fun_backend PROPERTIES OUTPUT_NAME fun)
 

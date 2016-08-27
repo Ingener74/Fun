@@ -17,9 +17,9 @@ using namespace fun;
 bool parse(const std::string& source) {
     stringstream ss;
     ss << source;
-    FunLexer lexer("", &ss);
+    Lexer lexer("", &ss);
     Ast ast;
-    FunParser parser(lexer, &ast);
+    Parser parser(lexer, &ast);
     parser.set_debug_level(0);
     int result = parser.parse();
     return result == 0;
@@ -33,9 +33,9 @@ struct ParseResult {
 ParseResult parseAst(const std::string& source) {
     stringstream ss;
     ss << source;
-    FunLexer lexer("", &ss);
+    Lexer lexer("", &ss);
     std::unique_ptr<Ast> ast(new Ast);
-    FunParser parser(lexer, ast.get());
+    Parser parser(lexer, ast.get());
     parser.set_debug_level(0);
     int result = parser.parse();
     return {result == 0, move(ast)};
@@ -385,8 +385,8 @@ Result interpret(const std::string& source) {
     std::unique_ptr<Ast> ast(new Ast);
     stringstream ss;
     ss << source;
-    FunLexer lexer("", &ss);
-    FunParser parser(lexer, ast.get());
+    Lexer lexer("", &ss);
+    Parser parser(lexer, ast.get());
     parser.set_debug_level(0);
     bool result = parser.parse();
     ast->accept(interpreter.get());
