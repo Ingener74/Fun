@@ -34,8 +34,8 @@ add_subdirectory(3rdparty)
 enable_testing()
 
 include_directories(
-    Fun
-    ${CMAKE_BINARY_DIR}/Fun
+    fun
+    ${CMAKE_BINARY_DIR}/fun
     cxxopts/src
     ${SYSROOT}/include
 )
@@ -57,7 +57,7 @@ endif()
 
 option(ENABLE_FUN "Enable Fun" ON)
 if(ENABLE_FUN)
-    add_subdirectory(Fun)
+    add_subdirectory(fun)
 endif()
 
 
