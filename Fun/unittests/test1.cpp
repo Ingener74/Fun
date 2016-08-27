@@ -25,9 +25,135 @@ bool parse(const std::string& source) {
     return result == 0;
 }
 
-TEST(Parse, Test1) {
+TEST(Parse, Empty_0) {
     {
         ASSERT_EQ(parse(R"()"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Integer_0) {
+    {
+        ASSERT_EQ(parse(R"(
+42
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Integer_1) {
+    {
+        ASSERT_EQ(parse(R"(
+1000000000
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Integer_2) {
+    {
+        ASSERT_EQ(parse(R"(
+0
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Integer_3) {
+    {
+        ASSERT_EQ(parse(R"(
+100
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_0) {
+    {
+        ASSERT_EQ(parse(R"(
+true
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_1) {
+    {
+        ASSERT_EQ(parse(R"(
+false
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_0) {
+    {
+        ASSERT_EQ(parse(R"(
+0.0
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_1) {
+    {
+        ASSERT_EQ(parse(R"(
+1.0
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_2) {
+    {
+        ASSERT_EQ(parse(R"(
+.0
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_3) {
+    {
+        ASSERT_EQ(parse(R"(
+10.
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_4) {
+    {
+        ASSERT_EQ(parse(R"(
+1.0e1
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_5) {
+    {
+        ASSERT_EQ(parse(R"(
+1.0E1
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_6) {
+    {
+        ASSERT_EQ(parse(R"(
+.1e-3
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Float_7) {
+    {
+        ASSERT_EQ(parse(R"(
+.13145E-12
+)"), true);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
@@ -67,6 +193,106 @@ TEST(Parse, Test5) {
     {
         ASSERT_EQ(parse(R"(
 foo = 42)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_1) {
+    {
+        ASSERT_EQ(parse(R"(
+if
+)"), false);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_2) {
+    {
+        ASSERT_EQ(parse(R"(
+if
+end
+)"), false);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_3) {
+    {
+        ASSERT_EQ(parse(R"(
+if nil
+end
+)"), false);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_4) {
+    {
+        ASSERT_EQ(parse(R"(
+if:
+end
+)"), false);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_5) {
+    {
+        ASSERT_EQ(parse(R"(
+if nil:
+end
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_6) {
+    {
+        ASSERT_EQ(parse(R"(
+if 0:
+if 1:
+end
+)"), false);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_7) {
+    {
+        ASSERT_EQ(parse(R"(
+if 0:
+elif 1:
+end
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_8) {
+    {
+        ASSERT_EQ(parse(R"(
+if 0:
+elif 1:
+else
+end
+)"), true);
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, If_9) {
+    {
+        ASSERT_EQ(parse(R"(
+if 0:
+    ""
+elif 1:
+    5
+else
+    4
+else
+    2
+end
+)"), false);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
