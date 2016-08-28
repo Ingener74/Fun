@@ -26,6 +26,9 @@ ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 add_library(
         fun_backend
         
+        Errors.cpp
+        Errors.h
+        
         Lexer.cpp
         Lexer.h
         
@@ -61,12 +64,6 @@ endif()
 
 # fun executable
 add_executable(fun_command_line_frontend main.cpp)
-
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    target_link_libraries(fun_command_line_frontend fun_backend PocoFoundationd)
-#else()
-#    target_link_libraries(fun_command_line_frontend fun_backend PocoFoundation)
-#endif()
 
 target_link_libraries(fun_command_line_frontend fun_backend ${POCO_LIBRARIES})
 set_target_properties(fun_command_line_frontend PROPERTIES OUTPUT_NAME fun)

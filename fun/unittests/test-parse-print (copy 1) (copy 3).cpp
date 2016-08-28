@@ -1,85 +1,11 @@
-/*
- * test1.cpp
- *
- *  Created on: Aug 21, 2016
- *      Author: pavel
- */
-
-#include <memory>
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-
-#include <fun.h>
+#include "test.h"
 
 using namespace std;
 using namespace fun;
 
-bool parse(const std::string& source) {
-    stringstream ss;
-    ss << source;
-    Lexer lexer("", &ss);
-    Ast ast;
-    Parser parser(lexer, &ast);
-    parser.set_debug_level(0);
-    int result = parser.parse();
-    return result == 0;
-}
-
-struct ParseResult {
-    bool successful;
-    std::unique_ptr<Ast> ast;
-};
-
-ParseResult parseAst(const std::string& source) {
-    stringstream ss;
-    ss << source;
-    Lexer lexer("", &ss);
-    std::unique_ptr<Ast> ast(new Ast);
-    Parser parser(lexer, ast.get());
-    parser.set_debug_level(0);
-    int result = parser.parse();
-    return {result == 0, move(ast)};
-}
-
 TEST(Parse, Empty_0) {
     {
         ASSERT_TRUE(parse(R"()"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
-
-TEST(Parse, Integer_0) {
-    {
-        ASSERT_TRUE(parse(R"(
-42
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
-
-TEST(Parse, Integer_1) {
-    {
-        ASSERT_TRUE(parse(R"(
-1000000000
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
-
-TEST(Parse, Integer_2) {
-    {
-        ASSERT_TRUE(parse(R"(
-0
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
-
-TEST(Parse, Integer_3) {
-    {
-        ASSERT_TRUE(parse(R"(
-100
-)"));
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
@@ -97,6 +23,49 @@ TEST(Parse, Bool_1) {
     {
         ASSERT_TRUE(parse(R"(
 false
+)"));
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_2) {
+    {
+        auto r = parseAst(R"(
+True
+)");
+        ASSERT_TRUE(r.successful);
+
+        auto id = dynamic_cast<Id*>(r.ast->root());
+
+        ASSERT_NE(id, nullptr);
+
+        ASSERT_EQ(id->value, "True");
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_3) {
+    {
+        ASSERT_FALSE(parse(R"(
+False
+)"));
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_4) {
+    {
+        ASSERT_FALSE(parse(R"(
+TRUE
+)"));
+    }
+    ASSERT_EQ(Statement::counter(), 0);
+}
+
+TEST(Parse, Bool_5) {
+    {
+        ASSERT_FALSE(parse(R"(
+FALSE
 )"));
     }
     ASSERT_EQ(Statement::counter(), 0);
@@ -364,33 +333,6 @@ end
 )"), false);
     }
     ASSERT_EQ(Statement::counter(), 0);
-}
-
-struct Result {
-    std::unique_ptr<Interpreter> v;
-    std::unique_ptr<Debugger> d;
-    std::unique_ptr<Ast> ast;
-};
-
-class DebuggerMock: public Debugger {
-public:
-    MOCK_METHOD1(onCatchBreakpoint, void(const Breakpoint &));
-    MOCK_METHOD1(onOperandsChanged, void(const std::vector<Terminal*> &));
-    MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, Terminal*>&));
-};
-
-Result interpret(const std::string& source) {
-    std::unique_ptr<Debugger> debugger(new DebuggerMock);
-    std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
-    std::unique_ptr<Ast> ast(new Ast);
-    stringstream ss;
-    ss << source;
-    Lexer lexer("", &ss);
-    Parser parser(lexer, ast.get());
-    parser.set_debug_level(0);
-    bool result = parser.parse();
-    ast->accept(interpreter.get());
-    return {move(interpreter), move(debugger), move(ast)};
 }
 
 TEST(Fun, leakTest1) {

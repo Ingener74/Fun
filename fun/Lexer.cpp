@@ -1,7 +1,7 @@
 #include "Lexer.h"
 
-Lexer::Lexer(const std::string& filename, std::istream *in)
-        : yyFlexLexer(in), _filename(filename), line(0), column(0) {
+Lexer::Lexer(const std::string& filename, std::istream *in, bool debug)
+        : yyFlexLexer(in), _filename(filename), line(1), column(0), _debug(debug) {
 }
 
 Lexer::~Lexer() {
