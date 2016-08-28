@@ -53,6 +53,9 @@ add_library(
         Printer.cpp
         Printer.h
         
+        VirtualMachine.cpp
+        VirtualMachine.h
+        
         ${BISON_Parser_OUTPUTS}
         ${FLEX_Scanner_OUTPUTS}
 )
