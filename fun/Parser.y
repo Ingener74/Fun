@@ -331,7 +331,6 @@ ids
     | id "," ids   { $$ = $1; NEXT_ID($1, $3); }
     ;
 
-// %empty             { $$ = new Nil(); }
 expr
     : assign_expr        { $$ = $1; }
     | expr "+" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::ADD,        $1, $3); }
