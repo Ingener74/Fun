@@ -30,12 +30,19 @@ foo = 42)"), true);
 
 TEST(Interpret, Assign_3) {
     {
-        auto result = interpret(R"(foo = 42)");
+        auto r = interpret(R"(foo = 42)");
 
         ASSERT_EQ(Statement::counter(), 3);
 
-        ASSERT_EQ(result.v->getOperands().size(), 0);
-        ASSERT_EQ(result.v->getMemory()[0].size(), 1);
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        auto var = r.v->getMemory()[0]["foo"];
+
+        auto integer = dynamic_cast<Integer*>(var);
+
+        ASSERT_NE(integer, nullptr);
+        ASSERT_EQ(integer->value, 42);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }

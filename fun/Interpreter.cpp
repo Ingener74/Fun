@@ -17,7 +17,7 @@ void Interpreter::iterateStatements(Statement *stmts) {
 
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
-    variables.push_back(std::unordered_map<std::string, Terminal*>{});
+    variables.push_back(unordered_map<string, Terminal*>{});
 }
 
 Interpreter::~Interpreter() {
@@ -505,11 +505,15 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
     }
 }
 
-const std::vector<Terminal*> &Interpreter::getOperands() const {
+const vector<Terminal*> &Interpreter::getOperands() const {
     return operands;
 }
 
-const std::vector<std::unordered_map<std::string, Terminal*>>& Interpreter::getMemory() const {
+const vector<unordered_map<string, Terminal*>>& Interpreter::getMemory() const {
+    return variables;
+}
+
+vector<unordered_map<string, Terminal*> >& Interpreter::getMemory() {
     return variables;
 }
 
