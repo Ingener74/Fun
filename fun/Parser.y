@@ -11,6 +11,7 @@
 
 class Lexer;
 
+#include "Errors.h"
 #include "AST.h"
 
 // POCO compability
@@ -202,9 +203,9 @@ throw           Throw оператор (выброс исключений)
     // Initial code
 };
 
-%left "="
+%right "="
 %left ","
-%left "<" ">" "!=" "<=" ">="
+%nonassoc "<" ">" "!=" "<=" ">="
 %left "+" "-"
 %left "*" "/"
 %left "."
@@ -403,6 +404,6 @@ int yylex(fun::Parser::semantic_type* yylval, fun::location* yylloc, Lexer& myLe
 }
 
 void fun::Parser::error(const location& loc, const std::string& message) {
-    cerr << "error: " << loc << ": " << message << endl;
+    throw fun::ParserError(loc, message);
 }
 

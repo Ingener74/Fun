@@ -47,9 +47,7 @@ int Statement::counter() {
 
 ACCEPT_E(Break)
 
-ACCEPT(Class, {
-    fassert(name, "Class must have the name");
-})
+ACCEPT_E(Class)
 
 Class::~Class() {
     SAFE_RELEASE(name)

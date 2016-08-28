@@ -9,6 +9,7 @@
 
 using namespace std;
 
+#include <Errors.h>
 #include <Parser.hpp>
 #include <Lexer.h>
 
@@ -31,8 +32,14 @@ int str_start_line = 0, str_start_column = 0;
 %option c++
 %option yyclass="Lexer"
 
-digit    [0-9]
-ID       [a-zA-Z_][a-zA-Z_0-9_]*
+digit       [0-9]
+letter      [a-zA-Z]
+underscore  [_]
+
+id          ({letter}|{underscore})({letter}|{underscore}|{digit})*
+integer     {digit}+
+real        ({digit}+[.]{digit}*)|({digit}*[.]{digit}+)
+exp         ({integer}|{real})[eE][+-]?{integer} 
 
 %x comment
 %x strng
@@ -54,8 +61,6 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
 "fun"       { LOCATION(3); return fun::Parser::token::FUN;        }
 "ret"       { LOCATION(3); return fun::Parser::token::RETURN;     }
 "end"       { LOCATION(3); return fun::Parser::token::END;        }
-"true"      { LOCATION(4); return fun::Parser::token::TRUE;       }
-"false"     { LOCATION(5); return fun::Parser::token::FALSE;      }
 "nil"       { LOCATION(3); return fun::Parser::token::NIL;        }
 "break"     { LOCATION(5); return fun::Parser::token::BREAK;      }
 "continue"  { LOCATION(8); return fun::Parser::token::CONTINUE;   }
@@ -64,6 +69,9 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
 "as"        { LOCATION(2); return fun::Parser::token::AS;         }
 "throw"     { LOCATION(5); return fun::Parser::token::THROW;      }
 "class"     { LOCATION(5); return fun::Parser::token::CLASS;      }
+
+[tT][rR][uU][eE]     { LOCATION(4); return fun::Parser::token::TRUE;  }
+[fF][aA][lL][sS][eE] { LOCATION(5); return fun::Parser::token::FALSE; }
 
 ":"         { LOCATION(1); return fun::Parser::token::COLON;      }
 ";"         { LOCATION(1); return fun::Parser::token::SEMICOLON;  }
@@ -94,19 +102,19 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
 "=="        { LOCATION(2); return fun::Parser::token::EQUAL;      }
 "!="        { LOCATION(2); return fun::Parser::token::NOT_EQUAL;  }
 
-{digit}+ {
+{integer} {
     yylval->integer = atoi(yytext); 
     LOCATION(strlen(yytext));
     return fun::Parser::token::INTEGER;
 }
 
-{digit}+"."{digit}* {
+{real}|{exp} {
     yylval->real = atof(yytext); 
     LOCATION(strlen(yytext));
     return fun::Parser::token::REAL;
 }
 
-{ID} {
+{id} {
     yylval->str = new string(yytext);
     LOCATION(strlen(yytext));
     return fun::Parser::token::ID;
@@ -124,7 +132,6 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
     return fun::Parser::token::STRING;
 }
 <strng>\n {
-	// throw std::runtime_error("error - unterminated string constant");
 	ss << '\n';
 	column = 0;
 	line++;
@@ -137,15 +144,15 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
      
     if ( result > 0xff )
     {
-    	throw std::runtime_error("error, constant is out-of-bounds");
     	ss << result;
+    	throw fun::LexerError("error, constant is out-of-bounds");
 	}
 }
 <strng>\\[0-9]+ {
 	/* generate error - bad escape sequence; something
 	*  like '\48' or '\0777777'
 	*/
-	throw std::runtime_error("error - bad escape sequence");
+	throw fun::LexerError("error - bad escape sequence");
 }
 <strng>\\n {
 	ss << '\n'; 
@@ -188,7 +195,7 @@ ID       [a-zA-Z_][a-zA-Z_0-9_]*
 [\t] { column++; };
 [\n] { column = 0; line++; };
 
-. { cerr << "Invalid symbol " << yytext << endl; throw std::runtime_error(std::string("Invalid symbol ") + yytext); }
+. { throw fun::LexerError(std::string("Invalid symbol ") + yytext); }
 
 %%
 
