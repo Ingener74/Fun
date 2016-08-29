@@ -1,0 +1,16 @@
+diff -Naur b/CMakeLists.txt a/CMakeLists.txt
+--- b/CMakeLists.txt	2013-09-19 00:32:04 +0000
++++ a/CMakeLists.txt	2016-08-29 19:52:46 +0000
+@@ -12,11 +12,7 @@
+ option(gmock_build_tests "Build all of Google Mock's own tests." OFF)
+ 
+ # A directory to find Google Test sources.
+-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtest/CMakeLists.txt")
+-  set(gtest_dir gtest)
+-else()
+-  set(gtest_dir ../gtest)
+-endif()
++set(gtest_dir "${GTEST_DIR}")
+ 
+ # Defines pre_project_set_up_hermetic_build() and set_up_hermetic_build().
+ include("${gtest_dir}/cmake/hermetic_build.cmake" OPTIONAL)
