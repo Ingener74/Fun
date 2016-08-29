@@ -46,7 +46,7 @@ if(NOT EXISTS ${SYSROOT})
     endif()
 endif()
 
-set(GTEST_LIBRARIES "gmock gtest gmock_main gtest_main" CACHE STRING "" FORCE)
+set(GTEST_LIBRARIES gmock gtest gmock_main gtest_main CACHE STRING "" FORCE)
 
 message(STATUS "gtest libraries ${GTEST_LIBRARIES}")
 
