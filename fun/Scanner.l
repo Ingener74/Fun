@@ -120,6 +120,10 @@ exp         ({integer}|{real})[eE][+-]?{integer}
     return fun::Parser::token::ID;
 }
 
+{digit}+({letter}|{underscore})+ {
+	throw fun::LexerError("identifier can't start from digits");
+}
+
 \" {
     str_start_line = line;
     str_start_column = ++column;

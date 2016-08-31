@@ -124,7 +124,7 @@ TEST(Parse, Id_9) {
     {
         EXPECT_THROW(parse(R"(
 1aBc
-)"), ParserError);
+)"), LexerError);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
@@ -133,7 +133,7 @@ TEST(Parse, Id_10) {
     {
         EXPECT_THROW(parse(R"(
 123aBc
-)"), ParserError);
+)"), LexerError);
     }
     ASSERT_EQ(Statement::counter(), 0);
 }
