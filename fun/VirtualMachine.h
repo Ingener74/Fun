@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <Declarations.h>
 
 namespace fun {
 
@@ -9,7 +9,7 @@ public:
     VirtualMachine();
     virtual ~VirtualMachine();
 
-    void run(const std::vector<unsigned char>& program);
+    void run(const Program& program);
 };
 
 }

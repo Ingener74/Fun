@@ -1,12 +1,9 @@
 #pragma once
 
-#include <vector>
-
+#include <Declarations.h>
 #include <Visitor.h>
 
 namespace fun {
-
-using Program = std::vector<unsigned char>;
 
 class Compiler: public Visitor {
 public:
