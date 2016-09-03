@@ -3,49 +3,27 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, For_1) {
-    {
-        EXPECT_THROW(parse(R"(
-for
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define PARSE_FOR_VALID(n, str) PARSE_VALID2(For, n, str)
+#define PARSE_FOR_INVALID(n, str, errCls) PARSE_INVALID(For, n, str, errCls)
 
-TEST(Parse, For_2) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_FOR_INVALID(1, R"(
+for
+)", ParserError);
+
+PARSE_FOR_INVALID(2, R"(
 for
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, For_3) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_FOR_INVALID(3, R"(
 for ;;:
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, For_4) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_FOR_INVALID(4, R"(
 for end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, For_5) {
-    {
-        EXPECT_NO_THROW(parse(R"(
+PARSE_FOR_VALID(5, R"(
 for 0; 1; 2: end
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)");

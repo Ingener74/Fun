@@ -4,15 +4,15 @@
 using namespace std;
 using namespace fun;
 
-bool parse(const std::string& source, bool parser_debug) {
+void parse(const std::string& source, bool parser_debug) {
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);
     Ast ast;
     Parser parser(lexer, &ast);
     parser.set_debug_level(parser_debug);
-    int result = parser.parse();
-    return result == 0;
+    if (parser.parse())
+        cerr << "Warning: parser.parse() not 0" << endl;
 }
 
 ParseResult parseAst(const std::string& source) {
@@ -22,8 +22,9 @@ ParseResult parseAst(const std::string& source) {
     std::unique_ptr<Ast> ast(new Ast);
     Parser parser(lexer, ast.get());
     parser.set_debug_level(0);
-    int result = parser.parse();
-    return {result == 0, move(ast)};
+    if (parser.parse())
+        cerr << "Warning: parser.parse() not 0" << endl;
+    return {move(ast)};
 }
 
 Result interpret(const std::string& source) {
@@ -35,7 +36,8 @@ Result interpret(const std::string& source) {
     Lexer lexer("", &ss);
     Parser parser(lexer, ast.get());
     parser.set_debug_level(0);
-    bool result = parser.parse();
+    if (parser.parse())
+        cerr << "Warning: parser.parse() not 0" << endl;
     ast->accept(interpreter.get());
     return {move(interpreter), move(debugger), move(ast)};
 }

@@ -3,108 +3,42 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, While_1) {
-    {
-        EXPECT_THROW(parse(R"(
-while
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define PARSE_WHILE_VALID(n, str) PARSE_VALID2(While, n, str)
+#define PARSE_WHILE_INVALID(n, str, errCls) PARSE_INVALID(While, n, str, errCls)
 
-TEST(Parse, While_2) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(1, R"(
+while
+)", ParserError);
+
+PARSE_WHILE_INVALID(2, R"(
 while
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, While_3) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(3, R"(
 while nil
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, While_4) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(4, R"(
 while:
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, While_5) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(5, R"(
 while:end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, While_6) {
-    {
-        EXPECT_NO_THROW(parse(R"(
+PARSE_WHILE_VALID(6, R"(
 while nil:
 end
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)");
 
-TEST(Parse, While_7) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(7, R"(
 whilenil:end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, While_8) {
-    {
-        EXPECT_THROW(parse(R"(
+PARSE_WHILE_INVALID(8, R"(
 while0:
 end
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
-
-//TEST(Parse, While_9) {
-//    {
-//        ASSERT_EQ(parse(R"(
-//if 0:
-//elif 1:
-//else
-//end
-//)"), true);
-//    }
-//    ASSERT_EQ(Statement::counter(), 0);
-//}
-//
-//TEST(Parse, While_10) {
-//    {
-//        ASSERT_EQ(parse(R"(
-//if 0:
-//    ""
-//elif 1:
-//    5
-//else
-//    4
-//else
-//    2
-//end
-//)"), false);
-//    }
-//    ASSERT_EQ(Statement::counter(), 0);
-//}
+)", ParserError);

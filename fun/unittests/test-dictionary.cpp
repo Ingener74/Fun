@@ -3,23 +3,24 @@
 using namespace std;
 using namespace fun;
 
-#define TEST_PARSE(n, body) TEST(Parse, Dict_##n) { body ASSERT_EQ(Statement::counter(), 0); }
+#define PARSE_DICT_VALID(n, str) PARSE_VALID2(Dict, n, str)
+#define PARSE_DICT_INVALID(n, str) PARSE_INVALID(Dict, n, str)
 
-TEST_PARSE(0, { EXPECT_NO_THROW(parse(R"({})")); })
+PARSE_DICT_VALID(0, R"({})");
 
-TEST_PARSE(1, { EXPECT_NO_THROW(parse(R"({a=1})")); })
+PARSE_DICT_VALID(1, R"({a=1})");
 
-TEST_PARSE(2, { EXPECT_NO_THROW(parse(R"({a=1 b=nil})")); })
+PARSE_DICT_VALID(2, R"({a=1 b=nil})");
 
-TEST_PARSE(3, { EXPECT_NO_THROW(parse(R"({a=1 b=nil f="test"})")); })
+PARSE_DICT_VALID(3, R"({a=1 b=nil f="test"})");
 
-TEST_PARSE(4, { EXPECT_NO_THROW(parse(R"({a=1 b=nil f="test" c=false})")); })
+PARSE_DICT_VALID(4, R"({a=1 b=nil f="test" c=false})");
 
-TEST_PARSE(5, { EXPECT_NO_THROW(parse(R"({a=1 b=nil f="test" c=false d=true})")); })
+PARSE_DICT_VALID(5, R"({a=1 b=nil f="test" c=false d=true})");
 
-TEST_PARSE(6, { EXPECT_NO_THROW(parse(R"({a=1 b=nil f="test" c=false d=true e=2.72})")); })
+PARSE_DICT_VALID(6, R"({a=1 b=nil f="test" c=false d=true e=2.72})");
 
-TEST_PARSE(7, { EXPECT_NO_THROW(parse(R"(
+PARSE_DICT_VALID(7, R"(
 {
   a=1
   b=nil
@@ -28,5 +29,5 @@ TEST_PARSE(7, { EXPECT_NO_THROW(parse(R"(
   d=true
   e=2.72
   g=fun()end
-})")); })
+})");
 

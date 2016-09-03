@@ -3,30 +3,31 @@
 using namespace std;
 using namespace fun;
 
-#define TEST_PARSE(n, body) TEST(Parse, Function_##n) { body ASSERT_EQ(Statement::counter(), 0); }
+#define PARSE_FUN_VALID(n, str) PARSE_VALID2(Fun, n, str)
+#define PARSE_FUN_INVALID(n, str, errCls) PARSE_INVALID(Fun, n, str, errCls)
 
-TEST_PARSE(0, { EXPECT_THROW(parse(R"(fun)"), ParserError); })
+PARSE_FUN_INVALID(0, R"(fun)", ParserError);
 
-TEST_PARSE(1, { EXPECT_THROW(parse(R"(fun end)"), ParserError); })
+PARSE_FUN_INVALID(1, R"(fun end)", ParserError);
 
-TEST_PARSE(2, { EXPECT_THROW(parse(R"(
+PARSE_FUN_INVALID(2, R"(
 fun
 end
-)"), ParserError); })
+)", ParserError);
 
-TEST_PARSE(3, { EXPECT_THROW(parse(R"(fun end)"), ParserError); })
+PARSE_FUN_INVALID(3, R"(fun end)", ParserError);
 
-TEST_PARSE(4, { EXPECT_NO_THROW(parse(R"(fun()end)")); })
+PARSE_FUN_VALID(4, R"(fun()end)");
 
-TEST_PARSE(5, { EXPECT_NO_THROW(parse(R"(fun()
-end)")); })
+PARSE_FUN_VALID(5, R"(fun()
+end)");
 
-TEST_PARSE(6, { EXPECT_NO_THROW(parse(R"(fun(a)
-end)")); })
+PARSE_FUN_VALID(6, R"(fun(a)
+end)");
 
-TEST_PARSE(7, { EXPECT_THROW(parse(R"(fun(42)
-end)"), ParserError); })
+PARSE_FUN_INVALID(7, R"(fun(42)
+end)", ParserError);
 
-TEST_PARSE(8, { EXPECT_THROW(parse(R"(fun(nil)
-end)"), ParserError); })
+PARSE_FUN_INVALID(8, R"(fun(nil)
+end)", ParserError);
 

@@ -3,7 +3,8 @@
 using namespace std;
 using namespace fun;
 
-#define TEST_PARSE(n, body) TEST(Parse, BinaryOps_##n) { body ASSERT_EQ(Statement::counter(), 0); }
+#define PARSE_BINARYOP_VALID(n, str) PARSE_VALID2(BinaryOp, n, str)
+#define PARSE_BINARYOP_INVALID(n, str, errCls) PARSE_INVALID(BinaryOp, n, str, errCls)
 
-TEST_PARSE(0, { EXPECT_THROW(parse(R"(42 + )"), ParserError); })
+PARSE_BINARYOP_INVALID(0, R"(42 + )", ParserError);
 

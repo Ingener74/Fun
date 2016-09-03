@@ -3,38 +3,15 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, Integer_0) {
-    {
-        ASSERT_TRUE(parse(R"(
-42
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define PARSE_INTEGER_VALID(n, str, v) PARSE_VALID(Integer, n, str, v)
+#define PARSE_INTEGER_INVALID(n, str, errCls) PARSE_INVALID(Integer, n, str, errCls)
 
-TEST(Parse, Integer_1) {
-    {
-        ASSERT_TRUE(parse(R"(
-1000000000
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define INTERPRET_INTEGER(n, body) TEST_INTERPRET(Integer, n, body)
 
-TEST(Parse, Integer_2) {
-    {
-        ASSERT_TRUE(parse(R"(
-0
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_INTEGER_VALID(0, R"(42)", 42);
 
-TEST(Parse, Integer_3) {
-    {
-        ASSERT_TRUE(parse(R"(
-100
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_INTEGER_VALID(1, R"(1000000000)", 1000000000);
+
+PARSE_INTEGER_VALID(2, R"(0)", 0);
+
+PARSE_INTEGER_VALID(3, R"(100)", 100);

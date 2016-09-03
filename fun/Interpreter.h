@@ -18,8 +18,6 @@ namespace fun {
 
 class Terminal;
 
-class Interpreter;
-
 class Interpreter: public Visitor {
 public:
     Interpreter(Debugger* = nullptr);

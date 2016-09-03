@@ -3,24 +3,19 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, String_0) {
-    {
-        ASSERT_TRUE(parse(R"(
-"Test string"
-)"));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define PARSE_INTEGER_VALID(n, str, v) PARSE_VALID(String, n, str, v)
+#define PARSE_INTEGER_INVALID(n, str, errCls) PARSE_INVALID(String, n, str, errCls)
 
-TEST(Parse, String_1) {
-    {
-        auto result = parseAst(R"(
+PARSE_INTEGER_VALID(0, R"(
+"Test string"
+)", "Test string");
+
+TEST_PARSE(String, 1, {
+    ParseResult r;
+    EXPECT_NO_THROW(r = parseAst(R"(
 "Test
 string"
-)");
-        ASSERT_TRUE(result.successful);
-        ASSERT_EQ(result.ast->root()->loc, location(position(nullptr, 2, 1), position(nullptr, 3, 6)));
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)"););
+    ASSERT_EQ(r.ast->root()->loc, location(position(nullptr, 2, 1), position(nullptr, 3, 6)));
+});
 

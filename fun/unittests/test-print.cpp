@@ -3,9 +3,12 @@
 using namespace std;
 using namespace fun;
 
+#define PARSE_INTEGER_VALID(n, str, v) PARSE_VALID(Print, n, str, v)
+#define PARSE_INTEGER_INVALID(n, str, errCls) PARSE_INVALID(Print, n, str, errCls)
+
 TEST(Parse, Print_0) {
     {
-        ASSERT_TRUE(parse(R"(
+        EXPECT_NO_THROW(parse(R"(
 print 42
 print 3.14
 print "foo"
@@ -28,10 +31,10 @@ print
 
 TEST(Parse, Print_2) {
     {
-        auto r = parseAst(R"(
+        ParseResult r;
+        EXPECT_NO_THROW(r = parseAst(R"(
 print 42
-)");
-        ASSERT_TRUE(r.successful);
+)"););
 
         auto print = dynamic_cast<Print*>(r.ast->root());
 

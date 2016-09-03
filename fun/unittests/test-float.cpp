@@ -3,179 +3,35 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, Float_0) {
-    {
-        auto r = parseAst(R"(
-0.0
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 0.0);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+#define PARSE_FLOAT_VALID(n, str, v) PARSE_VALID(Real, n, str, v)
+#define PARSE_FLOAT_INVALID(n, str, errCls) PARSE_INVALID(Real, n, str, errCls)
 
-TEST(Parse, Float_1) {
-    {
-        auto r = parseAst(R"(
-1.0
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 1.0);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(0, R"(0.0)", 0.0);
 
-TEST(Parse, Float_2) {
-    {
-        auto r = parseAst(R"(
-.0
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, .0);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(1, R"(1.0)", 1.0);
 
-TEST(Parse, Float_3) {
-    {
-        auto r = parseAst(R"(
-10.
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 10.);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(2, R"(.0)", .0);
 
-TEST(Parse, Float_4) {
-    {
-        auto r = parseAst(R"(
-1.0e1
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 1.0e1);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(3, R"(10.)", 10.);
 
-TEST(Parse, Float_5) {
-    {
-        auto r = parseAst(R"(
-1.0E1
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 1.0E1);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(4, R"(1.0e1)", 1.0e1);
 
-TEST(Parse, Float_6) {
-    {
-        auto r = parseAst(R"(
-.1e-3
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, .1e-3);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(5, R"(1.0E1)", 1.0E1);
 
-TEST(Parse, Float_7) {
-    {
-        auto r = parseAst(R"(
-.13145E-12
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, .13145E-12);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(6, R"(.1e-3)", .1e-3);
 
-TEST(Parse, Float_8) {
-    {
-        auto r = parseAst(R"(
-12.3E+12
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 12.3E+12);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(7, R"(.13145E-12)", .13145E-12);
 
-TEST(Parse, Float_9) {
-    {
-        auto r = parseAst(R"(
-1.e+3
-)");
-        ASSERT_TRUE(r.successful);
-        Real* real = dynamic_cast<Real*>(r.ast->root());
-        ASSERT_NE(real, nullptr);
-        ASSERT_DOUBLE_EQ(real->value, 1.e+3);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(8, R"(12.3E+12)", 12.3E+12);
 
-TEST(Parse, Float_10) {
-    {
-        EXPECT_THROW(parse(R"(
-..13145E-12
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_VALID(9, R"(1.e+3)", 1.e+3);
 
-TEST(Parse, Float_11) {
-    {
-        EXPECT_THROW(parse(R"(
-00.13145E-
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_INVALID(10, R"(..13145E-12)", ParserError)
 
-TEST(Parse, Float_12) {
-    {
-        EXPECT_THROW(parse(R"(
-0.001e-
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_INVALID(11, R"(00.13145E-)", ParserError)
 
-TEST(Parse, Float_13) {
-    {
-        EXPECT_THROW(parse(R"(
-0,1
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_INVALID(12, R"(0.001e-)", ParserError)
 
-TEST(Parse, Float_14) {
-    {
-        EXPECT_THROW(parse(R"(
-3,1415
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_FLOAT_INVALID(13, R"(0,1)", ParserError)
 
-
+PARSE_FLOAT_INVALID(14, R"(3,1415)", ParserError)

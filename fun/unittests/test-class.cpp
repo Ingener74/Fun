@@ -3,7 +3,8 @@
 using namespace std;
 using namespace fun;
 
-#define TEST_PARSE(n, body) TEST(Parse, Class_##n) { body ASSERT_EQ(Statement::counter(), 0); }
+#define PARSE_CLASS_VALID(n, str) PARSE_VALID2(Class, n, str)
+#define PARSE_CLASS_INVALID(n, str) PARSE_INVALID(Class, n, str)
 
-TEST_PARSE(0, { ASSERT_TRUE(parse(R"(class Foo() end)")); })
+PARSE_CLASS_VALID(0, R"(class Foo() end)");
 

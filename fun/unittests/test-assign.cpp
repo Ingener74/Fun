@@ -3,47 +3,34 @@
 using namespace std;
 using namespace fun;
 
-TEST(Parse, Assign_0) {
-    {
-        EXPECT_THROW(parse(R"(
+#define PARSE_ASSIGN_VALID(n, str) PARSE_VALID2(Assign, n, str)
+#define PARSE_ASSIGN_INVALID(n, str, errCls) PARSE_INVALID(Assign, n, str, errCls)
+
+#define INTERPRET_ASSIGN(n, body) TEST_INTERPRET(Assign, n, body)
+
+PARSE_ASSIGN_INVALID(0, R"(
 foo = 
-)"), ParserError);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+)", ParserError);
 
-TEST(Parse, Assign_1) {
-    {
-        ASSERT_EQ(parse(R"(
-foo = 42)"), true);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_ASSIGN_VALID(1, R"(
+foo = 42)");
 
-TEST(Parse, Assign_2) {
-    {
-        ASSERT_EQ(parse(R"(
-foo = 42)"), true);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+PARSE_ASSIGN_VALID(2, R"(
+foo = 42)");
 
-TEST(Interpret, Assign_3) {
-    {
-        auto r = interpret(R"(foo = 42)");
+INTERPRET_ASSIGN(3, {
+    auto r = interpret(R"(foo = 42)");
 
-        ASSERT_EQ(Statement::counter(), 3);
+    ASSERT_EQ(Statement::counter(), 3);
 
-        ASSERT_EQ(r.v->getOperands().size(), 0);
-        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
-        auto var = r.v->getMemory()[0]["foo"];
+    auto var = r.v->getMemory()[0]["foo"];
 
-        auto integer = dynamic_cast<Integer*>(var);
+    auto integer = dynamic_cast<Integer*>(var);
 
-        ASSERT_NE(integer, nullptr);
-        ASSERT_EQ(integer->value, 42);
-    }
-    ASSERT_EQ(Statement::counter(), 0);
-}
+    ASSERT_NE(integer, nullptr);
+    ASSERT_EQ(integer->value, 42);
+})
 
