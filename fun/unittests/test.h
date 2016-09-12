@@ -3,6 +3,9 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gmock/gmock-actions.h>
+
+#include <Poco/Thread.h>
 
 #include <fun.h>
 
@@ -14,12 +17,6 @@ struct ParseResult {
 
 ParseResult parseAst(const std::string& source);
 
-struct Result {
-    std::unique_ptr<fun::Interpreter> v;
-    std::unique_ptr<fun::Debugger> d;
-    std::unique_ptr<fun::Ast> ast;
-};
-
 class DebuggerMock: public fun::Debugger {
 public:
     MOCK_METHOD1(onCatchBreakpoint, void(const fun::Breakpoint &));
@@ -27,7 +24,14 @@ public:
     MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, fun::Terminal*>&));
 };
 
+struct Result {
+    std::unique_ptr<fun::Interpreter> v;
+    std::unique_ptr<DebuggerMock> d;
+    std::unique_ptr<fun::Ast> ast;
+};
+
 Result interpret(const std::string& source);
+Result interpretInteractive(const std::string& source);
 
 #define TEST_PARSE(klass, n, body) TEST(Parse,     klass##_##n) { body ASSERT_EQ(Statement::counter(), 0); }
 #define TEST_INTERPRET(klass, n, body) TEST(Interpret, klass##_##n) { body ASSERT_EQ(Statement::counter(), 0); }

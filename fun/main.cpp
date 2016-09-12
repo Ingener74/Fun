@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
                         throw std::runtime_error("breakpoint command not enough arguments; Usage: b 100");
                     stringstream ss;
                     ss << tokens[1];
-                    int line = 0;
+                    unsigned int line = 0;
                     ss >> line;
                     consoleDebugger.setBreakpoint({"", line});
                     return 1;

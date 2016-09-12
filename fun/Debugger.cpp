@@ -12,7 +12,7 @@ using namespace std;
 using namespace Poco;
 
 
-Breakpoint::Breakpoint(const std::string& module, int line) :
+Breakpoint::Breakpoint(const string& module, unsigned int line) :
         module(module), line(line) {
 }
 
@@ -25,6 +25,10 @@ bool Breakpoint::operator ==(const Breakpoint& rhs) const {
 
 bool Breakpoint::operator !=(const Breakpoint& rhs) const {
     return !(rhs == *this);
+}
+
+ostream& operator<<(ostream& out, const Breakpoint& rhs){
+    return out << "Breakpoint(" << rhs.module << ", " << rhs.line << ")";
 }
 
 Debugger::Debugger(Printer *printer) : _printer(printer), _state(new Normal) {
@@ -87,14 +91,20 @@ void Debugger::Normal::stepOut(Debugger *d) {
 
 void Debugger::Normal::onBeforeStep(Debugger *d, Statement *statement) {
     Mutex::ScopedLock lock(d->_mutex);
+
+    auto line = statement->loc.begin.line;
+
     d->_currentStatement = statement;
-    for (auto &b: d->vb) {
-        if (b.line == statement->loc.begin.line) {
-            while (!d->_run)
+    for (auto &b : d->vb) {
+        if (b.line == line && d->_lastBreakpointLine != line) {
+            while (!d->_run){
+                d->onCatchBreakpoint(b);
                 d->_cond.wait(d->_mutex);
+            }
             d->_run = false;
         }
     }
+    d->_lastBreakpointLine = line;
 }
 
 void Debugger::StepOver::onEnter(Debugger *d) {
@@ -132,6 +142,7 @@ void Debugger::StepOver::onBeforeStep(Debugger *d, Statement *statement) {
     d->_currentStatement = statement;
     while (!d->_run)
         d->_cond.wait(d->_mutex);
+    d->onCatchBreakpoint(Breakpoint{"", statement->loc.begin.line});
     d->_run = false;
 }
 }

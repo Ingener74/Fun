@@ -28,7 +28,7 @@ ParseResult parseAst(const std::string& source) {
 }
 
 Result interpret(const std::string& source) {
-    std::unique_ptr<Debugger> debugger(new DebuggerMock);
+    std::unique_ptr<DebuggerMock> debugger(new DebuggerMock);
     std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
     std::unique_ptr<Ast> ast(new Ast);
     stringstream ss;
@@ -39,6 +39,20 @@ Result interpret(const std::string& source) {
     if (parser.parse())
         cerr << "Warning: parser.parse() not 0" << endl;
     ast->accept(interpreter.get());
+    return {move(interpreter), move(debugger), move(ast)};
+}
+
+Result interpretInteractive(const std::string& source) {
+    std::unique_ptr<DebuggerMock> debugger(new DebuggerMock);
+    std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
+    std::unique_ptr<Ast> ast(new Ast);
+    stringstream ss;
+    ss << source;
+    Lexer lexer("", &ss);
+    Parser parser(lexer, ast.get());
+    parser.set_debug_level(0);
+    if (parser.parse())
+        cerr << "Warning: parser.parse() not 0" << endl;
     return {move(interpreter), move(debugger), move(ast)};
 }
 

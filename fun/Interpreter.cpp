@@ -254,7 +254,6 @@ void Interpreter::visit(Assign* assign) {
             store = false;
         }
     }
-//    fassert(balance == operands.size(), "assign balance broken");
 
     fassertl(operands.empty(), assign->loc, "operands not empty after statement") // assign maybe statement
 //    fassert(!operands.empty(), "operands empty after expression")

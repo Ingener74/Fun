@@ -13,15 +13,17 @@ class Printer;
 
 class Breakpoint {
 public:
-    Breakpoint(const std::string& module = { }, int line = 0);
+    Breakpoint(const std::string& module = { }, unsigned int line = 0);
 
     virtual ~Breakpoint();
 
     bool operator ==(const Breakpoint& rhs) const;
     bool operator !=(const Breakpoint& rhs) const;
 
+    friend std::ostream& operator<<(std::ostream&, const Breakpoint&);
+
     std::string module;
-    int line;
+    unsigned int line;
 };
 
 using Breakpoints = std::vector<Breakpoint>;
@@ -55,6 +57,8 @@ protected:
     bool _run = false;
     Poco::Mutex _mutex;
     Poco::Condition _cond;
+
+    unsigned int _lastBreakpointLine = 1;
 
     Printer *_printer = nullptr;
     Statement *_currentStatement = nullptr;
