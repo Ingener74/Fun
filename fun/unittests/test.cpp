@@ -4,7 +4,7 @@
 using namespace std;
 using namespace fun;
 
-void parse(const std::string& source, bool parser_debug) {
+void parse(const string& source, bool parser_debug) {
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);
@@ -15,11 +15,11 @@ void parse(const std::string& source, bool parser_debug) {
         cerr << "Warning: parser.parse() not 0" << endl;
 }
 
-ParseResult parseAst(const std::string& source) {
+ParseResult parseAst(const string& source) {
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);
-    std::unique_ptr<Ast> ast(new Ast);
+    unique_ptr<Ast> ast(new Ast);
     Parser parser(lexer, ast.get());
     parser.set_debug_level(0);
     if (parser.parse())
@@ -27,10 +27,10 @@ ParseResult parseAst(const std::string& source) {
     return {move(ast)};
 }
 
-Result interpret(const std::string& source) {
-    std::unique_ptr<DebuggerMock> debugger(new DebuggerMock);
-    std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
-    std::unique_ptr<Ast> ast(new Ast);
+Result interpret(const string& source) {
+    unique_ptr<DebuggerMock> debugger(new DebuggerMock);
+    unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
+    unique_ptr<Ast> ast(new Ast);
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);
@@ -42,10 +42,10 @@ Result interpret(const std::string& source) {
     return {move(interpreter), move(debugger), move(ast)};
 }
 
-Result interpretInteractive(const std::string& source) {
-    std::unique_ptr<DebuggerMock> debugger(new DebuggerMock);
-    std::unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
-    std::unique_ptr<Ast> ast(new Ast);
+Result interpretInteractive(const string& source) {
+    unique_ptr<DebuggerMock> debugger(new DebuggerMock);
+    unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
+    unique_ptr<Ast> ast(new Ast);
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);

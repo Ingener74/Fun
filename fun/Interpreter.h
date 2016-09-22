@@ -57,6 +57,8 @@ public:
     const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const;
     std::vector<std::unordered_map<std::string, Terminal*>>& getMemory();
 
+
+
 private:
     std::vector<Terminal*> operands;
     std::vector<std::unordered_map<std::string, Terminal*>> variables;

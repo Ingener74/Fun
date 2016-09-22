@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <list>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <gmock/gmock-actions.h>
@@ -22,6 +23,7 @@ public:
     MOCK_METHOD1(onCatchBreakpoint, void(const fun::Breakpoint &));
     MOCK_METHOD1(onOperandsChanged, void(const std::vector<fun::Terminal*> &));
     MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, fun::Terminal*>&));
+    MOCK_METHOD0(onProgramEnded, void());
 };
 
 struct Result {

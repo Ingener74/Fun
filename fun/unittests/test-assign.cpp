@@ -10,6 +10,12 @@ using namespace testing;
 
 #define INTERPRET_ASSIGN(n, body) TEST_INTERPRET(Assign, n, body)
 
+#define CHECK_INTEGER(name, val) \
+    auto name = dynamic_cast<Integer*>(r.v->getMemory()[0][#name]); \
+    ASSERT_NE(name, nullptr); \
+    ASSERT_EQ(name->value, val);
+
+
 PARSE_ASSIGN_INVALID(0, R"(
 foo = 
 )", ParserError);
@@ -28,12 +34,7 @@ INTERPRET_ASSIGN(3, {
     ASSERT_EQ(r.v->getOperands().size(), 0);
     ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
-    auto var = r.v->getMemory()[0]["foo"];
-
-    auto integer = dynamic_cast<Integer*>(var);
-
-    ASSERT_NE(integer, nullptr);
-    ASSERT_EQ(integer->value, 42);
+    CHECK_INTEGER(foo, 42)
 })
 
 INTERPRET_ASSIGN(4, {
@@ -44,17 +45,8 @@ INTERPRET_ASSIGN(4, {
     ASSERT_EQ(r.v->getOperands().size(), 0);
     ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-    auto foo_term = r.v->getMemory()[0]["foo"];
-    auto bar_term = r.v->getMemory()[0]["bar"];
-
-    auto foo = dynamic_cast<Integer*>(foo_term);
-    auto bar = dynamic_cast<Integer*>(bar_term);
-
-    ASSERT_NE(foo, nullptr);
-    ASSERT_EQ(foo->value, 42);
-
-    ASSERT_NE(bar, nullptr);
-    ASSERT_EQ(bar->value, 24);
+    CHECK_INTEGER(foo, 42)
+    CHECK_INTEGER(bar, 24)
 })
 
 INTERPRET_ASSIGN(5, {
@@ -65,15 +57,10 @@ INTERPRET_ASSIGN(5, {
     ASSERT_EQ(r.v->getOperands().size(), 0);
     ASSERT_EQ(r.v->getMemory()[0].size(), 3);
 
-    auto a = dynamic_cast<Integer*>(r.v->getMemory()[0]["a"]);
-    auto b = dynamic_cast<Integer*>(r.v->getMemory()[0]["b"]);
+    CHECK_INTEGER(a, 1);
+    CHECK_INTEGER(b, 2);
+
     auto c = dynamic_cast<Nil*>(r.v->getMemory()[0]["c"]);
-
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 1);
-
-    ASSERT_NE(b, nullptr);
-    ASSERT_EQ(b->value, 2);
 })
 
 INTERPRET_ASSIGN(6, {
@@ -84,15 +71,51 @@ INTERPRET_ASSIGN(6, {
     ASSERT_EQ(r.v->getOperands().size(), 0);
     ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-    auto a = dynamic_cast<Integer*>(r.v->getMemory()[0]["a"]);
-    auto b = dynamic_cast<Integer*>(r.v->getMemory()[0]["b"]);
-
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 1);
-
-    ASSERT_NE(b, nullptr);
-    ASSERT_EQ(b->value, 2);
+    CHECK_INTEGER(a, 1);
+    CHECK_INTEGER(b, 2);
 })
+
+#define DEBUG_INTERACTIVE(body)                 \
+    bool stop = false;                          \
+    function<void()> f;                         \
+    Mutex mtx;                                  \
+    Condition cond;                             \
+    body                                        \
+    EXPECT_CALL(*r.d.get(), onProgramEnded()).  \
+        WillOnce(InvokeWithoutArgs([&]{         \
+           ScopedLock<Mutex> lock(mtx);         \
+           f = [&]{                             \
+               stop = true;                     \
+               r.d->resume();                   \
+           };                                   \
+           cond.signal();                       \
+        }));                                    \
+    Thread th;                                  \
+    th.startFunc([&r]{                          \
+        r.ast->accept(r.v.get());               \
+    });                                         \
+    while(true){                                \
+        ScopedLock<Mutex> lock(mtx);            \
+        while (!f) cond.wait(mtx);              \
+        f();                                    \
+        f = {};                                 \
+        if (stop) break;                        \
+    }                                           \
+    if(th.isRunning())                          \
+        th.join();
+
+#define BREAKPOINT(line, body)                                \
+r.d->setBreakpoint({"", line});                                \
+EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})). \
+        WillOnce(InvokeWithoutArgs([&]{                           \
+            ScopedLock<Mutex> lock(mtx);                          \
+            body                                                  \
+            f = [&]{                                              \
+                r.d->resume();                                    \
+            };                                                    \
+            cond.signal();                                        \
+        }));
+
 
 INTERPRET_ASSIGN(7, {
     auto r = interpretInteractive(R"(
@@ -103,63 +126,88 @@ b = a
 c = 0
 )");
 
-    r.d->setBreakpoint({"", 2});
-    r.d->setBreakpoint({"", 4});
+    DEBUG_INTERACTIVE({
+        BREAKPOINT(4, {
+            ASSERT_EQ(r.v->getOperands().size(), 0);
+            ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
-    bool stop = false;
-    function<void()> f;
-    Mutex mtx;
-    Condition cond;
+            CHECK_INTEGER(a, 1);
+        })
+        BREAKPOINT(6, {
+           ASSERT_EQ(r.v->getOperands().size(), 0);
+           ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-    EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", 2})).
-            WillOnce(InvokeWithoutArgs([&]{
-                ScopedLock<Mutex> lock(mtx);
-                f = [&]{
-                    r.d->resume();
-                };
-                cond.signal();
-            }));
+           CHECK_INTEGER(a, 1);
+           CHECK_INTEGER(b, 1);
+        })
+    })
 
-    EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", 4})).
-            WillOnce(InvokeWithoutArgs([&]{
-               ScopedLock<Mutex> lock(mtx);
-               f = [&]{
-                   stop = true;
-                   r.d->resume();
-               };
-               cond.signal();
-            }));
-
-    Thread th;
-    th.startFunc([&r]{
-        r.ast->accept(r.v.get());
-    });
-
-    while(true){
-        ScopedLock<Mutex> lock(mtx);
-        while (!f) {
-            cond.wait(mtx);
-        }
-        f();
-        f = {};
-        if (stop){
-            break;
-        }
-    }
-
-    th.join();
-
-//    ASSERT_EQ(r.v->getOperands().size(), 0);
-//    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+//    bool stop = false;
+//    function<void()> f;
+//    Mutex mtx;
+//    Condition cond;
 //
-//    auto a = dynamic_cast<Integer*>(r.v->getMemory()[0]["a"]);
-//    auto b = dynamic_cast<Integer*>(r.v->getMemory()[0]["b"]);
+//    r.d->setBreakpoint({"", 4});
+//    EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", 4})).
+//            WillOnce(InvokeWithoutArgs([&]{
+//                ScopedLock<Mutex> lock(mtx);
 //
-//    ASSERT_NE(a, nullptr);
-//    ASSERT_EQ(a->value, 1);
+//                ASSERT_EQ(r.v->getOperands().size(), 0);
+//                ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 //
-//    ASSERT_NE(b, nullptr);
-//    ASSERT_EQ(b->value, 2);
+//                CHECK_INTEGER(a, 1);
+//
+//                f = [&]{
+//                    r.d->resume();
+//                };
+//                cond.signal();
+//            }));
+//
+//    r.d->setBreakpoint({"", 6});
+//    EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", 6})).
+//            WillOnce(InvokeWithoutArgs([&]{
+//               ScopedLock<Mutex> lock(mtx);
+//
+//               ASSERT_EQ(r.v->getOperands().size(), 0);
+//               ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+//
+//               CHECK_INTEGER(a, 1);
+//               CHECK_INTEGER(b, 1);
+//
+//               f = [&]{
+//                   r.d->resume();
+//               };
+//               cond.signal();
+//            }));
+//
+//    EXPECT_CALL(*r.d.get(), onProgramEnded()).
+//            WillOnce(InvokeWithoutArgs([&]{
+//               ScopedLock<Mutex> lock(mtx);
+//               f = [&]{
+//                   stop = true;
+//                   r.d->resume();
+//               };
+//               cond.signal();
+//            }));
+//
+//    Thread th;
+//    th.startFunc([&r]{
+//        r.ast->accept(r.v.get());
+//    });
+//
+//    while(true){
+//        ScopedLock<Mutex> lock(mtx);
+//        while (!f) {
+//            cond.wait(mtx);
+//        }
+//        f();
+//        f = {};
+//        if (stop){
+//            break;
+//        }
+//    }
+//    if(th.isRunning())
+//        th.join();
 })
 
 
