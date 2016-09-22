@@ -8,4 +8,7 @@ VirtualMachine::VirtualMachine() {
 VirtualMachine::~VirtualMachine() {
 }
 
+void VirtualMachine::run(const Program& program) {
+}
+
 }

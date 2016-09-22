@@ -376,12 +376,13 @@ json.decode("{\"test\": 42}")
 # net
 req1 = net.request("www.api-server.com")
 ws1 = net.websocket("ws://api-server.com", fun(text) end, fun(binary) end, fun(error) end)
+ws1 = net.websocket("ws://api-server.com", ->text;;, ->binary;;, ->error;;)
 
 # native
 lib1 = native.loadLibrary("./libApi.{so, dll, dylib}")
 fi1 = native.create(lib1.getFunction("c_function"), native.pointer, {
-	arg1 = native.int32, 
-	arg2, native.float32
+	arg1 = native.int32
+	arg2 = native.float32
 })
 res1 = native.call(fi1, {42, 3.1415})
 
@@ -393,3 +394,27 @@ res1 = native.call(fi1, {42, 3.1415})
 # debug
 debug.backtrace()
 
+# addtional function definition
+test = -> a, b; 
+	print "a + b = " + (a + b) 
+;
+
+test = fun(a, b) 
+	print "a + b = " + (a + b) 
+end
+
+test(1, 2)
+
+doHardWork(-> print "work done";)
+
+result = nil
+doHardWork(-> res; result = res;)
+
+a = {
+	0 = "Zero"
+	1 = "One"
+}[0]
+
+if true
+	b
+;
