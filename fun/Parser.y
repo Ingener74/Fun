@@ -363,6 +363,8 @@ expr
 fun_expr
     : "fun" "(" ids ")" sttmnts "end" { $$ = ast->add<Function>(@1 + @6, nullptr, $3, $5); }
     ;
+    // : "->" ids ";" sttmnts ";" { $$ = ast->add<Function>(@1 + @5, nullptr,      $4, $6); }
+    // : "->" sttmnts ";"         { $$ = ast->add<Function>(@1 + @3, nullptr, nullptr, $6); }
 
 index
     : expr "[" expr "]"  { $$ = ast->add<Index>(@1 + @4, $1, $3); }
