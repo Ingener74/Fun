@@ -49,3 +49,16 @@ Result interpretInteractive(const std::string& source);
 #define PARSE_VALID2(klass, n, str) TEST_PARSE(klass, n, { EXPECT_NO_THROW(parse(str)); })
 #define PARSE_INVALID(klass, n, str, errorClass) TEST_PARSE(klass, n, { EXPECT_THROW(parse(str), errorClass); })
 
+class ConditionUnlocker {
+public:
+    ConditionUnlocker(Poco::Condition& cond) :
+            cond(cond) {
+    }
+    virtual ~ConditionUnlocker() {
+        cond.signal();
+    }
+private:
+    ConditionUnlocker(const ConditionUnlocker&) = delete;
+    ConditionUnlocker& operator=(const ConditionUnlocker&) = delete;
+    Poco::Condition& cond;
+};

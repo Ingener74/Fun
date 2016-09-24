@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 #if ! defined(yyFlexLexerOnce)
 #include <FlexLexer.h>
 #endif
