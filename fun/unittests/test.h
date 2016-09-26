@@ -62,3 +62,44 @@ private:
     ConditionUnlocker& operator=(const ConditionUnlocker&) = delete;
     Poco::Condition& cond;
 };
+
+#define DEBUGGING(script, body, end)                              \
+    auto r = interpretInteractive(script);                        \
+    bool stop = false;                                            \
+    function<void()> f;                                           \
+    Mutex mtx;                                                    \
+    Condition cond;                                               \
+    body                                                          \
+    EXPECT_CALL(*r.d.get(), onProgramEnded()).                    \
+        WillOnce(InvokeWithoutArgs([&]{                           \
+           ScopedLock<Mutex> lock(mtx);                           \
+           f = [&]{ stop = true; r.d->resume(); };                \
+           ConditionUnlocker unlocker(cond);                      \
+           end                                                    \
+        }));                                                      \
+    Thread th;                                                    \
+    th.startFunc([&r]{                                            \
+        r.ast->accept(r.v.get());                                 \
+    });                                                           \
+    while(true){                                                  \
+        ScopedLock<Mutex> lock(mtx);                              \
+        while (!f) cond.wait(mtx);                                \
+        f();                                                      \
+        f = {};                                                   \
+        if (stop) { break; }                                      \
+    }                                                             \
+    if(th.isRunning())                                            \
+        th.join();
+
+#define EVALUATE(script, end) DEBUGGING(script,,end)
+
+#define BREAKPOINT(line, body)                                    \
+r.d->setBreakpoint({"", line});                                   \
+EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})). \
+    WillOnce(InvokeWithoutArgs([&]{                               \
+        ScopedLock<Mutex> lock(mtx);                              \
+        f = [&]{ r.d->resume(); };                                \
+        ConditionUnlocker unlocker(cond);                         \
+        body                                                      \
+    }));
+

@@ -15,46 +15,6 @@ using namespace testing;
     ASSERT_NE(name, nullptr); \
     ASSERT_EQ(name->value, val);
 
-#define DEBUG_INTERACTIVE(script, body, end)                      \
-    auto r = interpretInteractive(script);                        \
-    bool stop = false;                                            \
-    function<void()> f;                                           \
-    Mutex mtx;                                                    \
-    Condition cond;                                               \
-    body                                                          \
-    EXPECT_CALL(*r.d.get(), onProgramEnded()).                    \
-        WillOnce(InvokeWithoutArgs([&]{                           \
-           ScopedLock<Mutex> lock(mtx);                           \
-           f = [&]{ stop = true; r.d->resume(); };                \
-           ConditionUnlocker unlocker(cond);                      \
-           end                                                    \
-        }));                                                      \
-    Thread th;                                                    \
-    th.startFunc([&r]{                                            \
-        r.ast->accept(r.v.get());                                 \
-    });                                                           \
-    while(true){                                                  \
-        ScopedLock<Mutex> lock(mtx);                              \
-        while (!f) cond.wait(mtx);                                \
-        f();                                                      \
-        f = {};                                                   \
-        if (stop) { break; }                                      \
-    }                                                             \
-    if(th.isRunning())                                            \
-        th.join();
-
-#define DEBUG_NON_INTERACTIVE(script, end) DEBUG_INTERACTIVE(script,,end)
-
-#define BREAKPOINT(line, body)                                    \
-r.d->setBreakpoint({"", line});                                   \
-EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})). \
-    WillOnce(InvokeWithoutArgs([&]{                               \
-        ScopedLock<Mutex> lock(mtx);                              \
-        f = [&]{ r.d->resume(); };                                \
-        ConditionUnlocker unlocker(cond);                         \
-        body                                                      \
-    }));
-
 PARSE_ASSIGN_INVALID(0, R"(
 foo = 
 )", ParserError);
@@ -66,7 +26,7 @@ PARSE_ASSIGN_VALID(2, R"(
 foo = 42)");
 
 INTERPRET_ASSIGN(3, {
-    DEBUG_NON_INTERACTIVE(R"(foo = 42)", {
+    EVALUATE(R"(foo = 42)", {
         ASSERT_EQ(Statement::counter(), 3);
 
         ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -77,7 +37,7 @@ INTERPRET_ASSIGN(3, {
 })
 
 INTERPRET_ASSIGN(4, {
-    DEBUG_NON_INTERACTIVE(R"(foo, bar = 42, 24)", {
+    EVALUATE(R"(foo, bar = 42, 24)", {
         ASSERT_EQ(Statement::counter(), 5);
 
         ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -89,7 +49,7 @@ INTERPRET_ASSIGN(4, {
 })
 
 INTERPRET_ASSIGN(5, {
-    DEBUG_NON_INTERACTIVE(R"(a, b, c = 1, 2)", {
+    EVALUATE(R"(a, b, c = 1, 2)", {
         ASSERT_EQ(Statement::counter(), 6);
 
         ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -104,7 +64,7 @@ INTERPRET_ASSIGN(5, {
 
 
 INTERPRET_ASSIGN(6, {
-    DEBUG_NON_INTERACTIVE(R"(a, b = 1, 2, 3)",
+    EVALUATE(R"(a, b = 1, 2, 3)",
     {
         ASSERT_EQ(Statement::counter(), 6);
 
@@ -117,7 +77,7 @@ INTERPRET_ASSIGN(6, {
 })
 
 INTERPRET_ASSIGN(7, {
-    DEBUG_INTERACTIVE(R"(
+    DEBUGGING(R"(
 a = 1
 
 b = a
