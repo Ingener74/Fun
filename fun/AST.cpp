@@ -13,7 +13,7 @@ CLASS* CLASS::accept(Visitor* v) { \
     return this;                   \
 }
 
-#define ACCEPT_E(CLASS) ACCEPT(CLASS, {})
+#define ACCEPT_E(CLASS) ACCEPT(CLASS, )
 
 namespace fun {
 

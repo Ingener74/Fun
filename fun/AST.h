@@ -51,6 +51,7 @@ public:
     virtual Statement* accept(Visitor*) = 0;
 
     Statement* nextStatement = nullptr;
+    Expression* lastExpression = nullptr;
     location loc;
 
     static int counter();

@@ -30,7 +30,9 @@ set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
 
 set(3RDPARTY_INSTALL ${SYSROOT})
 
-add_subdirectory(3rdparty)
+if(NOT EXISTS ${SYSROOT})
+    add_subdirectory(3rdparty)
+endif()
 
 enable_testing()
 
@@ -56,13 +58,16 @@ if(ENABLE_TAINTED_BULLDOZER)
 endif()
 
 
-option(ENABLE_FUN "Enable Fun" ON)
-if(ENABLE_FUN)
-    add_subdirectory(fun)
+if(EXISTS ${SYSROOT})
+    option(ENABLE_FUN "Enable Fun" ON)
+    if(ENABLE_FUN)
+        add_subdirectory(fun)
+    endif()
+    
+    
+    option(ENABLE_DANCING_COMIC "Enable Dancing-Comic" OFF)
+    if(ENABLE_DANCING_COMIC)
+        add_subdirectory(Dancing-Comic)
+    endif()
 endif()
 
-
-option(ENABLE_DANCING_COMIC "Enable Dancing-Comic" OFF)
-if(ENABLE_DANCING_COMIC)
-    add_subdirectory(Dancing-Comic)
-endif()
