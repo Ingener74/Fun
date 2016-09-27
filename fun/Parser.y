@@ -83,7 +83,13 @@ int yylex(fun::Parser::semantic_type*, fun::location*, Lexer&);
 %token MUL_ASSIGN            "*="
 %token DIV_ASSIGN            "/="
 %token MOD_ASSIGN            "%="
-   
+
+%token LSHIFT_ASSIGN         "<<="
+%token RSHIFT_ASSIGN         ">>="
+%token BINARY_AND_ASSIGN     "&="
+%token BINARY_OR_ASSIGN      "|="
+%token BINARY_XOR_ASSIGN     "^="
+
 %token ADD                   "+"
 %token SUB                   "-"
 %token MUL                   "*"
@@ -92,6 +98,12 @@ int yylex(fun::Parser::semantic_type*, fun::location*, Lexer&);
 
 %token INC                   "++"
 %token DEC                   "--"
+
+%token LSHIFT                "<<"
+%token RSHIFT                ">>"
+%token BINARY_AND            "&"
+%token BINARY_OR             "|"
+%token BINARY_XOR            "^"
 
 /*
 ++   --         Суффиксальный/постфиксный инкремент и декремент
@@ -126,6 +138,7 @@ throw           Throw оператор (выброс исключений)
 %token EQUAL                 "=="
 %token NOT_EQUAL             "!="
 
+%token INTERROGATION         "?"
 %token COLON                 ":"
 %token SEMICOLON             ";"
 %token COMMA                 ","
@@ -333,14 +346,19 @@ ids
 
 expr
     : assign_expr        { $$ = $1; }
-    | expr "+" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::ADD,        $1, $3); }
-    | expr "-" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::SUB,        $1, $3); }
-    | expr "*" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MUL,        $1, $3); }
-    | expr "/" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::DIV,        $1, $3); }
-    | expr "%" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MOD,        $1, $3); }
-    | expr ">" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MORE,       $1, $3); }
+    | expr "+"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::ADD,        $1, $3); }
+    | expr "-"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::SUB,        $1, $3); }
+    | expr "*"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MUL,        $1, $3); }
+    | expr "/"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::DIV,        $1, $3); }
+    | expr "%"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MOD,        $1, $3); }
+    | expr ">"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MORE,       $1, $3); }
+    | expr "<<" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LSHIFT,     $1, $3); }
+    | expr ">>" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::RSHIFT,     $1, $3); }
+    | expr "&"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::BINARY_AND, $1, $3); }
+    | expr "|"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::BINARY_OR,  $1, $3); }
+    | expr "^"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::BINARY_XOR, $1, $3); }
     | expr ">=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::MORE_EQUAL, $1, $3); }
-    | expr "<" expr      { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LESS,       $1, $3); }
+    | expr "<"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LESS,       $1, $3); }
     | expr "<=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::LESS_EQUAL, $1, $3); }
     | expr "==" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::EQUAL,      $1, $3); }
     | expr "!=" expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOp::NOT_EQUAL,  $1, $3); }
@@ -371,12 +389,17 @@ index
     ;
 
 assign_expr
-    : assign           { $$ = $1; }
-    | exprs "+=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::ADD); }
-    | exprs "-=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::SUB); }
-    | exprs "*=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MUL); }
-    | exprs "/=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::DIV); }
-    | exprs "%=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MOD); }
+    : assign            { $$ = $1; }
+    | exprs "+="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::ADD);               }
+    | exprs "-="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::SUB);               }
+    | exprs "*="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MUL);               }
+    | exprs "/="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::DIV);               }
+    | exprs "%="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::MOD);               }
+    | exprs "<<=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::LSHIFT_ASSIGN);     }
+    | exprs ">>=" exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::RSHIFT_ASSIGN);     }
+    | exprs "&="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::BINARY_AND_ASSIGN); }
+    | exprs "|="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::BINARY_OR_ASSIGN);  }
+    | exprs "^="  exprs { $$ = ast->add<Assign>(@1 + @3, $1, $3, Assign::BINARY_XOR_ASSIGN); }
     ;
 
 assign

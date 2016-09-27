@@ -49,58 +49,73 @@ exp         ({integer}|{real})[eE][+-]?{integer}
 %{
 %}
 
-"import"    { LOCATION(6); return fun::Parser::token::IMPORT;     }
-"if"        { LOCATION(2); return fun::Parser::token::IF;         }
-"elif"      { LOCATION(4); return fun::Parser::token::ELIF;       }
-"else"      { LOCATION(4); return fun::Parser::token::ELSE;       }
-"for"       { LOCATION(3); return fun::Parser::token::FOR;        }
-"in"        { LOCATION(2); return fun::Parser::token::IN;         }
-"while"     { LOCATION(5); return fun::Parser::token::WHILE;      }
-"do"        { LOCATION(2); return fun::Parser::token::DO;         }
-"print"     { LOCATION(5); return fun::Parser::token::PRINT;      }
-"fun"       { LOCATION(3); return fun::Parser::token::FUN;        }
-"ret"       { LOCATION(3); return fun::Parser::token::RETURN;     }
-"end"       { LOCATION(3); return fun::Parser::token::END;        }
-"nil"       { LOCATION(3); return fun::Parser::token::NIL;        }
-"break"     { LOCATION(5); return fun::Parser::token::BREAK;      }
-"continue"  { LOCATION(8); return fun::Parser::token::CONTINUE;   }
-"try"       { LOCATION(3); return fun::Parser::token::TRY;        }
-"catch"     { LOCATION(5); return fun::Parser::token::CATCH;      }
-"as"        { LOCATION(2); return fun::Parser::token::AS;         }
-"throw"     { LOCATION(5); return fun::Parser::token::THROW;      }
-"class"     { LOCATION(5); return fun::Parser::token::CLASS;      }
+"import"    { LOCATION(6); return fun::Parser::token::IMPORT;            }
+"if"        { LOCATION(2); return fun::Parser::token::IF;                }
+"elif"      { LOCATION(4); return fun::Parser::token::ELIF;              }
+"else"      { LOCATION(4); return fun::Parser::token::ELSE;              }
+"for"       { LOCATION(3); return fun::Parser::token::FOR;               }
+"in"        { LOCATION(2); return fun::Parser::token::IN;                }
+"while"     { LOCATION(5); return fun::Parser::token::WHILE;             }
+"do"        { LOCATION(2); return fun::Parser::token::DO;                }
+"print"     { LOCATION(5); return fun::Parser::token::PRINT;             }
+"fun"       { LOCATION(3); return fun::Parser::token::FUN;               }
+"ret"       { LOCATION(3); return fun::Parser::token::RETURN;            }
+"end"       { LOCATION(3); return fun::Parser::token::END;               }
+"nil"       { LOCATION(3); return fun::Parser::token::NIL;               }
+"break"     { LOCATION(5); return fun::Parser::token::BREAK;             }
+"continue"  { LOCATION(8); return fun::Parser::token::CONTINUE;          }
+"try"       { LOCATION(3); return fun::Parser::token::TRY;               }
+"catch"     { LOCATION(5); return fun::Parser::token::CATCH;             }
+"as"        { LOCATION(2); return fun::Parser::token::AS;                }
+"throw"     { LOCATION(5); return fun::Parser::token::THROW;             }
+"class"     { LOCATION(5); return fun::Parser::token::CLASS;             }
 
-[tT][rR][uU][eE]     { LOCATION(4); return fun::Parser::token::TRUE;  }
-[fF][aA][lL][sS][eE] { LOCATION(5); return fun::Parser::token::FALSE; }
+[tT][rR][uU][eE]     { LOCATION(4); return fun::Parser::token::TRUE;     }
+[fF][aA][lL][sS][eE] { LOCATION(5); return fun::Parser::token::FALSE;    }
 
-":"         { LOCATION(1); return fun::Parser::token::COLON;      }
-";"         { LOCATION(1); return fun::Parser::token::SEMICOLON;  }
-","         { LOCATION(1); return fun::Parser::token::COMMA;      }
-"."         { LOCATION(1); return fun::Parser::token::DOT;        }
-"("         { LOCATION(1); return fun::Parser::token::LPAREN;     }
-")"         { LOCATION(1); return fun::Parser::token::RPAREN;     }
-"{"         { LOCATION(1); return fun::Parser::token::CURLYL;     }
-"}"         { LOCATION(1); return fun::Parser::token::CURLYR;     }
-"["         { LOCATION(1); return fun::Parser::token::SQUAREL;    }
-"]"         { LOCATION(1); return fun::Parser::token::SQUARER;    }
+"?"         { LOCATION(1); return fun::Parser::token::INTERROGATION;     }
+":"         { LOCATION(1); return fun::Parser::token::COLON;             }
+";"         { LOCATION(1); return fun::Parser::token::SEMICOLON;         }
+","         { LOCATION(1); return fun::Parser::token::COMMA;             }
+"."         { LOCATION(1); return fun::Parser::token::DOT;               }
+"("         { LOCATION(1); return fun::Parser::token::LPAREN;            }
+")"         { LOCATION(1); return fun::Parser::token::RPAREN;            }
+"{"         { LOCATION(1); return fun::Parser::token::CURLYL;            }
+"}"         { LOCATION(1); return fun::Parser::token::CURLYR;            }
+"["         { LOCATION(1); return fun::Parser::token::SQUAREL;           }
+"]"         { LOCATION(1); return fun::Parser::token::SQUARER;           }
 
-"="         { LOCATION(1); return fun::Parser::token::ASSIGN;     }
-"+"         { LOCATION(1); return fun::Parser::token::ADD;        }
-"-"         { LOCATION(1); return fun::Parser::token::SUB;        }
-"*"         { LOCATION(1); return fun::Parser::token::MUL;        }
-"/"         { LOCATION(1); return fun::Parser::token::DIV;        }
-"%"         { LOCATION(1); return fun::Parser::token::MOD;        }
-">"         { LOCATION(1); return fun::Parser::token::MORE;       }
-"<"         { LOCATION(1); return fun::Parser::token::LESS;       }
-"+="        { LOCATION(2); return fun::Parser::token::ADD_ASSIGN; }
-"-="        { LOCATION(2); return fun::Parser::token::SUB_ASSIGN; }
-"*="        { LOCATION(2); return fun::Parser::token::MUL_ASSIGN; }
-"/="        { LOCATION(2); return fun::Parser::token::DIV_ASSIGN; }
-"%="        { LOCATION(2); return fun::Parser::token::MOD_ASSIGN; }
-">="        { LOCATION(2); return fun::Parser::token::MORE_EQUAL; }
-"<="        { LOCATION(2); return fun::Parser::token::LESS_EQUAL; }
-"=="        { LOCATION(2); return fun::Parser::token::EQUAL;      }
-"!="        { LOCATION(2); return fun::Parser::token::NOT_EQUAL;  }
+"="         { LOCATION(1); return fun::Parser::token::ASSIGN;            }
+"+"         { LOCATION(1); return fun::Parser::token::ADD;               }
+"-"         { LOCATION(1); return fun::Parser::token::SUB;               }
+"*"         { LOCATION(1); return fun::Parser::token::MUL;               }
+"/"         { LOCATION(1); return fun::Parser::token::DIV;               }
+"%"         { LOCATION(1); return fun::Parser::token::MOD;               }
+">"         { LOCATION(1); return fun::Parser::token::MORE;              }
+"<"         { LOCATION(1); return fun::Parser::token::LESS;              }
+
+"<<"        { LOCATION(2); return fun::Parser::token::LSHIFT;            }
+">>"        { LOCATION(2); return fun::Parser::token::RSHIFT;            }
+"&"         { LOCATION(1); return fun::Parser::token::BINARY_AND;        }
+"|"         { LOCATION(1); return fun::Parser::token::BINARY_OR;         }
+"^"         { LOCATION(1); return fun::Parser::token::BINARY_XOR;        }
+
+"+="        { LOCATION(2); return fun::Parser::token::ADD_ASSIGN;        }
+"-="        { LOCATION(2); return fun::Parser::token::SUB_ASSIGN;        }
+"*="        { LOCATION(2); return fun::Parser::token::MUL_ASSIGN;        }
+"/="        { LOCATION(2); return fun::Parser::token::DIV_ASSIGN;        }
+"%="        { LOCATION(2); return fun::Parser::token::MOD_ASSIGN;        }
+
+"<<="       { LOCATION(3); return fun::Parser::token::LSHIFT_ASSIGN;     }
+">>="       { LOCATION(3); return fun::Parser::token::RSHIFT_ASSIGN;     }
+"&="        { LOCATION(2); return fun::Parser::token::BINARY_AND_ASSIGN; }
+"|="        { LOCATION(2); return fun::Parser::token::BINARY_OR_ASSIGN;  }
+"^="        { LOCATION(2); return fun::Parser::token::BINARY_XOR_ASSIGN; }
+
+">="        { LOCATION(2); return fun::Parser::token::MORE_EQUAL;        }
+"<="        { LOCATION(2); return fun::Parser::token::LESS_EQUAL;        }
+"=="        { LOCATION(2); return fun::Parser::token::EQUAL;             }
+"!="        { LOCATION(2); return fun::Parser::token::NOT_EQUAL;         }
 
 {integer} {
     yylval->integer = atoi(yytext); 

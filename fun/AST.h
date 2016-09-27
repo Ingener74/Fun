@@ -239,7 +239,17 @@ public:
 class Assign: public Expression {
 public:
     enum Type {
-        ASSIGN, ADD, SUB, MUL, DIV, MOD,
+        ASSIGN,
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+        LSHIFT_ASSIGN,
+        RSHIFT_ASSIGN,
+        BINARY_AND_ASSIGN,
+        BINARY_OR_ASSIGN,
+        BINARY_XOR_ASSIGN,
     };
 
     Assign(const location& loc, Expression* ids, Expression* exprs, Type type = ASSIGN) :
@@ -265,6 +275,12 @@ public:
         MUL,
         DIV,
         MOD,
+
+        LSHIFT,
+        RSHIFT,
+        BINARY_AND,
+        BINARY_OR,
+        BINARY_XOR,
 
         MORE,
         MORE_EQUAL,
