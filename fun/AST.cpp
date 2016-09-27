@@ -13,8 +13,6 @@ CLASS* CLASS::accept(Visitor* v) { \
     return this;                   \
 }
 
-#define ACCEPT_E(CLASS) ACCEPT(CLASS, )
-
 namespace fun {
 
 using namespace std;
@@ -45,9 +43,9 @@ int Statement::counter() {
     return stmtCounter;
 }
 
-ACCEPT_E(Break)
+ACCEPT(Break, )
 
-ACCEPT_E(Class)
+ACCEPT(Class, )
 
 Class::~Class() {
     SAFE_RELEASE(name)
@@ -55,9 +53,9 @@ Class::~Class() {
     SAFE_RELEASE(stmts)
 }
 
-ACCEPT_E(Continue)
+ACCEPT(Continue, )
 
-ACCEPT_E(Exception)
+ACCEPT(Exception, )
 
 Exception::~Exception(){
     SAFE_RELEASE(tryStmts)
@@ -66,7 +64,7 @@ Exception::~Exception(){
     SAFE_RELEASE(catchStmts)
 }
 
-ACCEPT_E(For)
+ACCEPT(For, )
 
 For::~For(){
     SAFE_RELEASE(initial)
@@ -75,7 +73,7 @@ For::~For(){
     SAFE_RELEASE(stmts)
 }
 
-ACCEPT_E(Function)
+ACCEPT(Function, )
 
 Function::~Function(){
     SAFE_RELEASE(name)
@@ -84,13 +82,13 @@ Function::~Function(){
     SAFE_RELEASE(nextFunction)
 }
 
-ACCEPT_E(Ifs)
+ACCEPT(Ifs, )
 
 Ifs::~Ifs() {
     SAFE_RELEASE(if_stmts)
 }
 
-ACCEPT_E(If)
+ACCEPT(If, )
 
 If::~If(){
     SAFE_RELEASE(cond)
@@ -114,13 +112,13 @@ Print::~Print(){
     SAFE_RELEASE(expression)
 }
 
-ACCEPT_E(Return)
+ACCEPT(Return, )
 
 Return::~Return(){
     SAFE_RELEASE(expression)
 }
 
-ACCEPT_E(Throw)
+ACCEPT(Throw, )
 
 Throw::~Throw(){
     SAFE_RELEASE(expression)
@@ -170,7 +168,7 @@ BinaryOp::~BinaryOp(){
     SAFE_RELEASE(rhs)
 }
 
-ACCEPT_E(Dot)
+ACCEPT(Dot, )
 
 Dot::~Dot() {
     SAFE_RELEASE(lhs)
@@ -186,13 +184,13 @@ Call::~Call(){
     SAFE_RELEASE(arguments)
 }
 
-ACCEPT_E(Dictionary)
+ACCEPT(Dictionary, )
 
 Dictionary::~Dictionary(){
     SAFE_RELEASE(assign)
 }
 
-ACCEPT_E(Id)
+ACCEPT(Id, )
 
 Id::~Id(){
     SAFE_RELEASE(nextId)
@@ -209,21 +207,21 @@ Index::~Index(){
 //ACCEPT(ForExpression, {
 //})
 
-ACCEPT_E(RoundBrackets)
+ACCEPT(RoundBrackets, )
 
 RoundBrackets::~RoundBrackets(){
     SAFE_RELEASE(expr)
 }
 
-ACCEPT_E(Boolean)
+ACCEPT(Boolean, )
 
-ACCEPT_E(Integer)
+ACCEPT(Integer, )
 
-ACCEPT_E(Nil)
+ACCEPT(Nil, )
 
-ACCEPT_E(Real)
+ACCEPT(Real, )
 
-ACCEPT_E(String)
+ACCEPT(String, )
 
 string Integer::toString() const {
     stringstream ss;

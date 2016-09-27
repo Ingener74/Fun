@@ -11,6 +11,7 @@ namespace fun {
 
 class Visitor;
 class Statement;
+class Expression;
 
 class Ast{
 public:
