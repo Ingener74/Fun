@@ -35,19 +35,36 @@ struct Result {
 Result interpret(const std::string& source);
 Result interpretInteractive(const std::string& source);
 
-#define TEST_PARSE(klass, n, body) TEST(Parse,     klass##_##n) { body ASSERT_EQ(Statement::counter(), 0); }
-#define TEST_INTERPRET(klass, n, body) TEST(Interpret, klass##_##n) { body ASSERT_EQ(Statement::counter(), 0); }
+#define PARSE(CLASS, N, SCRIPT)                                        \
+    TEST(Parse, CLASS##_##N)                                           \
+    {                                                                  \
+        {                                                              \
+            EXPECT_NO_THROW(parse(SCRIPT));                            \
+        }                                                              \
+        ASSERT_EQ(Statement::counter(), 0);                            \
+    }
 
-#define PARSE_VALID(klass, n, str, v) TEST_PARSE(klass, n, { \
-    ParseResult r; \
-    EXPECT_NO_THROW(r = parseAst(str);); \
-    auto instance = dynamic_cast<klass*>(r.ast->root()); \
-    ASSERT_NE(instance, nullptr); \
-    ASSERT_EQ(instance->value, v); \
-})
+#define PARSE_ERR(CLASS, N, SCRIPT, ERROR_CLASS)                       \
+    TEST(Parse, CLASS##_##N)                                           \
+    {                                                                  \
+        {                                                              \
+            EXPECT_THROW(parse(SCRIPT), ERROR_CLASS);                  \
+        }                                                              \
+        ASSERT_EQ(Statement::counter(), 0);                            \
+    }
 
-#define PARSE_VALID2(klass, n, str) TEST_PARSE(klass, n, { EXPECT_NO_THROW(parse(str)); })
-#define PARSE_INVALID(klass, n, str, errorClass) TEST_PARSE(klass, n, { EXPECT_THROW(parse(str), errorClass); })
+#define PARSE_TERM(CLASS, N, SCRIPT, VALUE)                            \
+    TEST(Parse, CLASS##_##N)                                           \
+    {                                                                  \
+        {                                                              \
+            ParseResult r;                                             \
+            EXPECT_NO_THROW(r = parseAst(SCRIPT););                    \
+            auto instance = dynamic_cast<CLASS*>(r.ast->root());       \
+            ASSERT_NE(instance, nullptr);                              \
+            ASSERT_EQ(instance->value, VALUE);                         \
+        }                                                              \
+        ASSERT_EQ(Statement::counter(), 0);                            \
+    }
 
 class ConditionUnlocker {
 public:
@@ -63,43 +80,46 @@ private:
     Poco::Condition& cond;
 };
 
-#define DEBUGGING(script, body, end)                              \
-    auto r = interpretInteractive(script);                        \
-    bool stop = false;                                            \
-    function<void()> f;                                           \
-    Mutex mtx;                                                    \
-    Condition cond;                                               \
-    body                                                          \
-    EXPECT_CALL(*r.d.get(), onProgramEnded()).                    \
-        WillOnce(InvokeWithoutArgs([&]{                           \
-           ScopedLock<Mutex> lock(mtx);                           \
-           f = [&]{ stop = true; r.d->resume(); };                \
-           ConditionUnlocker unlocker(cond);                      \
-           end                                                    \
-        }));                                                      \
-    Thread th;                                                    \
-    th.startFunc([&r]{                                            \
-        r.ast->accept(r.v.get());                                 \
-    });                                                           \
-    while(true){                                                  \
-        ScopedLock<Mutex> lock(mtx);                              \
-        while (!f) cond.wait(mtx);                                \
-        f();                                                      \
-        f = {};                                                   \
-        if (stop) { break; }                                      \
-    }                                                             \
-    if(th.isRunning())                                            \
-        th.join();
+#define EVAL(CLASS, N, SCRIPT, BODY, END) TEST(Interpret, CLASS##_##N) \
+    {                                                                  \
+        {                                                              \
+            auto r = interpretInteractive(SCRIPT);                     \
+            bool stop = false;                                         \
+            function<void()> f;                                        \
+            Mutex mtx;                                                 \
+            Condition cond;                                            \
+            BODY                                                       \
+            EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
+                WillOnce(InvokeWithoutArgs([&]{                        \
+                   ScopedLock<Mutex> lock(mtx);                        \
+                   f = [&]{ stop = true; r.d->resume(); };             \
+                   ConditionUnlocker unlocker(cond);                   \
+                   END                                                 \
+                }));                                                   \
+            Thread th;                                                 \
+            th.startFunc([&r]{                                         \
+                r.ast->accept(r.v.get());                              \
+            });                                                        \
+            while(true){                                               \
+                ScopedLock<Mutex> lock(mtx);                           \
+                while (!f) cond.wait(mtx);                             \
+                f();                                                   \
+                f = {};                                                \
+                if (stop) { break; }                                   \
+            }                                                          \
+            if(th.isRunning())                                         \
+                th.join();                                             \
+        }                                                              \
+        ASSERT_EQ(Statement::counter(), 0);                            \
+    }
 
-#define EVALUATE(script, end) DEBUGGING(script,,end)
-
-#define BREAKPOINT(line, body)                                    \
-r.d->setBreakpoint({"", line});                                   \
-EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})). \
-    WillOnce(InvokeWithoutArgs([&]{                               \
-        ScopedLock<Mutex> lock(mtx);                              \
-        f = [&]{ r.d->resume(); };                                \
-        ConditionUnlocker unlocker(cond);                         \
-        body                                                      \
+#define BREAKPOINT(line, body)                                         \
+r.d->setBreakpoint({"", line});                                        \
+EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})).      \
+    WillOnce(InvokeWithoutArgs([&]{                                    \
+        ScopedLock<Mutex> lock(mtx);                                   \
+        f = [&]{ r.d->resume(); };                                     \
+        ConditionUnlocker unlocker(cond);                              \
+        body                                                           \
     }));
 

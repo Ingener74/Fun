@@ -5,318 +5,303 @@ using namespace Poco;
 using namespace fun;
 using namespace testing;
 
-#define PARSE_ASSIGN_VALID(n, str) PARSE_VALID2(Assign, n, str)
-#define PARSE_ASSIGN_INVALID(n, str, errCls) PARSE_INVALID(Assign, n, str, errCls)
-
-#define INTERPRET_ASSIGN(n, body) TEST_INTERPRET(Assign, n, body)
-
 #define CHECK_INTEGER(name, val) \
     auto name = dynamic_cast<Integer*>(r.v->getMemory()[0][#name]); \
     ASSERT_NE(name, nullptr); \
     ASSERT_EQ(name->value, val);
 
-PARSE_ASSIGN_INVALID(0, R"(
+PARSE_ERR(Assign, 0, R"(
 foo = 
 )", ParserError);
 
-PARSE_ASSIGN_VALID(1, R"(
+PARSE(Assign, 1, R"(
 foo = 42)");
 
-PARSE_ASSIGN_VALID(2, R"(
+PARSE(Assign, 2, R"(
 foo = 42)");
 
-INTERPRET_ASSIGN(3, {
-    EVALUATE(R"(foo = 42)", {
-        ASSERT_EQ(Statement::counter(), 3);
+EVAL(Assign, 3, R"(foo = 42)",,
+    ASSERT_EQ(Statement::counter(), 3);
 
-        ASSERT_EQ(r.v->getOperands().size(), 0);
-        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
-        CHECK_INTEGER(foo, 42)
-    })
-})
+    CHECK_INTEGER(foo, 42)
+)
 
-INTERPRET_ASSIGN(4, {
-    EVALUATE(R"(foo, bar = 42, 24)", {
-        ASSERT_EQ(Statement::counter(), 5);
+EVAL(Assign, 4, R"(foo, bar = 42, 24)",,
+    ASSERT_EQ(Statement::counter(), 5);
 
-        ASSERT_EQ(r.v->getOperands().size(), 0);
-        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-        CHECK_INTEGER(foo, 42)
-        CHECK_INTEGER(bar, 24)
-    })
-})
+    CHECK_INTEGER(foo, 42)
+    CHECK_INTEGER(bar, 24)
+)
 
-INTERPRET_ASSIGN(5, {
-    EVALUATE(R"(a, b, c = 1, 2)", {
-        ASSERT_EQ(Statement::counter(), 6);
+EVAL(Assign, 5, R"(a, b, c = 1, 2)",,
+    ASSERT_EQ(Statement::counter(), 6);
 
-        ASSERT_EQ(r.v->getOperands().size(), 0);
-        ASSERT_EQ(r.v->getMemory()[0].size(), 3);
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 3);
 
-        CHECK_INTEGER(a, 1);
-        CHECK_INTEGER(b, 2);
+    CHECK_INTEGER(a, 1);
+    CHECK_INTEGER(b, 2);
 
-        auto c = dynamic_cast<Nil*>(r.v->getMemory()[0]["c"]);
-    })
-})
+    auto c = dynamic_cast<Nil*>(r.v->getMemory()[0]["c"]);
+)
 
 
-INTERPRET_ASSIGN(6, {
-    EVALUATE(R"(a, b = 1, 2, 3)",
-    {
-        ASSERT_EQ(Statement::counter(), 6);
+EVAL(Assign, 6, R"(a, b = 1, 2, 3)",,
+    ASSERT_EQ(Statement::counter(), 6);
 
-        ASSERT_EQ(r.v->getOperands().size(), 0);
-        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-        CHECK_INTEGER(a, 1);
-        CHECK_INTEGER(b, 2);
-    })
-})
+    CHECK_INTEGER(a, 1);
+    CHECK_INTEGER(b, 2);
+)
 
-INTERPRET_ASSIGN(7, {
-    DEBUGGING(R"(
+EVAL(Assign, 7, R"(
 a = 1
 
 b = a
 
 c = 0
-)", {
-        BREAKPOINT(4, {
-            ASSERT_EQ(r.v->getOperands().size(), 0);
-            ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+)",
+    BREAKPOINT(4,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
-            CHECK_INTEGER(a, 1);
-        })
-        BREAKPOINT(6, {
-           ASSERT_EQ(r.v->getOperands().size(), 0);
-           ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+        CHECK_INTEGER(a, 1);
+    )
+    BREAKPOINT(6,
+       ASSERT_EQ(r.v->getOperands().size(), 0);
+       ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
-           CHECK_INTEGER(a, 1);
-           CHECK_INTEGER(b, 1);
-        })
-    }, )
-})
+       CHECK_INTEGER(a, 1);
+       CHECK_INTEGER(b, 1);
+    )
+    ,
+)
 
-PARSE_ASSIGN_VALID(8, R"(
+PARSE(Assign, 8, R"(
 foo = 0
 foo += 42)");
 
-PARSE_ASSIGN_VALID(9, R"(
+PARSE(Assign, 9, R"(
 bar = 0
 foo += bar)");
 
-PARSE_ASSIGN_VALID(10, R"(
+PARSE(Assign, 10, R"(
 foo = 0
 foo -= 42)");
 
-PARSE_ASSIGN_VALID(11, R"(
+PARSE(Assign, 11, R"(
 bar = 0
 foo -= bar)");
 
-PARSE_ASSIGN_VALID(12, R"(
+PARSE(Assign, 12, R"(
 foo = 0
 foo *= 100)");
 
-PARSE_ASSIGN_VALID(13, R"(
+PARSE(Assign, 13, R"(
 bar = 3
 foo *= bar)");
 
-PARSE_ASSIGN_VALID(14, R"(
+PARSE(Assign, 14, R"(
 foo = 2
 foo /= 4)");
 
-PARSE_ASSIGN_VALID(15, R"(
+PARSE(Assign, 15, R"(
 bar = 2
 foo /= bar)");
 
-PARSE_ASSIGN_VALID(16, R"(
+PARSE(Assign, 16, R"(
 foo = 2
 foo %= bar)");
 
-PARSE_ASSIGN_VALID(17, R"(
+PARSE(Assign, 17, R"(
 bar = 2
 foo %= bar)");
 
-PARSE_ASSIGN_VALID(18, R"(
+PARSE(Assign, 18, R"(
 foo = 123
 foo <<= 4)");
 
-PARSE_ASSIGN_VALID(19, R"(
+PARSE(Assign, 19, R"(
 bar = 2
 foo <<= bar)");
 
-PARSE_ASSIGN_VALID(20, R"(
+PARSE(Assign, 20, R"(
 foo = 2
 foo >>= 1)");
 
-PARSE_ASSIGN_VALID(21, R"(
+PARSE(Assign, 21, R"(
 bar = 2
 foo >>= bar)");
 
-PARSE_ASSIGN_VALID(22, R"(
+PARSE(Assign, 22, R"(
 foo = 234
 foo &= 423)");
 
-PARSE_ASSIGN_VALID(23, R"(
+PARSE(Assign, 23, R"(
 bar = 6345
 foo &= 5234)");
 
-PARSE_ASSIGN_VALID(24, R"(
+PARSE(Assign, 24, R"(
 foo = 6345
 foo |= 7456)");
 
-PARSE_ASSIGN_VALID(25, R"(
+PARSE(Assign, 25, R"(
 bar = bar
 foo |= 3645)");
 
-PARSE_ASSIGN_VALID(26, R"(
+PARSE(Assign, 26, R"(
 foo = 95689
 foo ^= 8567)");
 
-PARSE_ASSIGN_VALID(27, R"(
+PARSE(Assign, 27, R"(
 bar = 746
 foo ^= bar)");
 
-PARSE_ASSIGN_VALID(28, R"(
+PARSE(Assign, 28, R"(
 bar = 36573 + 234
 foo ^= bar)");
 
-PARSE_ASSIGN_INVALID(29, R"(
+PARSE_ERR(Assign, 29, R"(
 foo += 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(30, R"(
+PARSE_ERR(Assign, 30, R"(
 foo ++= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(31, R"(
+PARSE_ERR(Assign, 31, R"(
 foo +== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(32, R"(
+PARSE_ERR(Assign, 32, R"(
 foo ++= 4234
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(33, R"(
+PARSE_ERR(Assign, 33, R"(
 foo +== 235 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(34, R"(
+PARSE_ERR(Assign, 34, R"(
 foo --= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(35, R"(
+PARSE_ERR(Assign, 35, R"(
 foo -== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(36, R"(
+PARSE_ERR(Assign, 36, R"(
 foo --= 243
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(37, R"(
+PARSE_ERR(Assign, 37, R"(
 foo -== asd 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(38, R"(
+PARSE_ERR(Assign, 38, R"(
 foo *= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(39, R"(
+PARSE_ERR(Assign, 39, R"(
 foo **= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(40, R"(
+PARSE_ERR(Assign, 40, R"(
 foo *== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(41, R"(
+PARSE_ERR(Assign, 41, R"(
 foo **= adsf
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(42, R"(
+PARSE_ERR(Assign, 42, R"(
 foo *== 234
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(43, R"(
+PARSE_ERR(Assign, 43, R"(
 foo /= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(44, R"(
+PARSE_ERR(Assign, 44, R"(
 foo /== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(45, R"(
+PARSE_ERR(Assign, 45, R"(
 foo //= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(46, R"(
+PARSE_ERR(Assign, 46, R"(
 foo //= 345
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(47, R"(
+PARSE_ERR(Assign, 47, R"(
 foo /== 2354
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(48, R"(
+PARSE_ERR(Assign, 48, R"(
 foo %= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(49, R"(
+PARSE_ERR(Assign, 49, R"(
 foo %%= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(50, R"(
+PARSE_ERR(Assign, 50, R"(
 foo %== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(51, R"(
+PARSE_ERR(Assign, 51, R"(
 foo %%= 34
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(52, R"(
+PARSE_ERR(Assign, 52, R"(
 foo %== 345 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(53, R"(
+PARSE_ERR(Assign, 53, R"(
 foo &= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(54, R"(
+PARSE_ERR(Assign, 54, R"(
 foo &&= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(55, R"(
+PARSE_ERR(Assign, 55, R"(
 foo &== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(56, R"(
+PARSE_ERR(Assign, 56, R"(
 foo &&= a345
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(57, R"(
+PARSE_ERR(Assign, 57, R"(
 foo &== adsf
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(58, R"(
+PARSE_ERR(Assign, 58, R"(
 foo |= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(59, R"(
+PARSE_ERR(Assign, 59, R"(
 foo ||= 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(60, R"(
+PARSE_ERR(Assign, 60, R"(
 foo |== 
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(61, R"(
+PARSE_ERR(Assign, 61, R"(
 foo ||= asdf
 )", ParserError);
 
-PARSE_ASSIGN_INVALID(62, R"(
+PARSE_ERR(Assign, 62, R"(
 foo |== asdf
 )", ParserError);
 
