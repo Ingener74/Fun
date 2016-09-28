@@ -10,13 +10,11 @@
 
 #include <fun.h>
 
-void parse(const std::string& source, bool parser_debug = false);
-
 struct ParseResult {
     std::unique_ptr<fun::Ast> ast;
 };
 
-ParseResult parseAst(const std::string& source);
+ParseResult parse(const std::string& source);
 
 class DebuggerMock: public fun::Debugger {
 public:
@@ -32,14 +30,14 @@ struct Result {
     std::unique_ptr<fun::Ast> ast;
 };
 
-Result interpret(const std::string& source);
-Result interpretInteractive(const std::string& source);
+Result eval(const std::string& source);
 
 #define PARSE(CLASS, N, SCRIPT)                                        \
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
         {                                                              \
-            EXPECT_NO_THROW(parse(SCRIPT));                            \
+            ParseResult r;                                             \
+            EXPECT_NO_THROW(r = parse(SCRIPT););                       \
         }                                                              \
         ASSERT_EQ(Statement::counter(), 0);                            \
     }
@@ -48,7 +46,8 @@ Result interpretInteractive(const std::string& source);
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
         {                                                              \
-            EXPECT_THROW(parse(SCRIPT), ERROR_CLASS);                  \
+            ParseResult r;                                             \
+            EXPECT_THROW(r = parse(SCRIPT), ERROR_CLASS);              \
         }                                                              \
         ASSERT_EQ(Statement::counter(), 0);                            \
     }
@@ -58,7 +57,7 @@ Result interpretInteractive(const std::string& source);
     {                                                                  \
         {                                                              \
             ParseResult r;                                             \
-            EXPECT_NO_THROW(r = parseAst(SCRIPT););                    \
+            EXPECT_NO_THROW(r = parse(SCRIPT););                       \
             auto instance = dynamic_cast<CLASS*>(r.ast->root());       \
             ASSERT_NE(instance, nullptr);                              \
             ASSERT_EQ(instance->value, VALUE);                         \
@@ -83,7 +82,7 @@ private:
 #define EVAL(CLASS, N, SCRIPT, BODY, END) TEST(Interpret, CLASS##_##N) \
     {                                                                  \
         {                                                              \
-            auto r = interpretInteractive(SCRIPT);                     \
+            auto r = eval(SCRIPT);                                     \
             bool stop = false;                                         \
             function<void()> f;                                        \
             Mutex mtx;                                                 \
