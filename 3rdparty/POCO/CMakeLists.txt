@@ -151,9 +151,9 @@ if(NOT EXISTS ${SYSROOT})
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(POCO_LIBRARIES "PocoFoundationd" CACHE STRING "" FORCE)
+    set(POCO_LIBRARIES PocoFoundationd PocoUtild CACHE STRING "" FORCE)
 else()
-    set(POCO_LIBRARIES "PocoFoundation" CACHE STRING "" FORCE)
+    set(POCO_LIBRARIES PocoFoundation PocoUtil CACHE STRING "" FORCE)
 endif()
 
 message(STATUS "Poco libraries ${POCO_LIBRARIES}")

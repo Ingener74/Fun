@@ -405,10 +405,10 @@ end
 
 test(1, 2)
 
-doHardWork(-> print "work done";)
+doHardWork(->print "work done";)
 
 result = nil
-doHardWork(-> res result = res;)
+doHardWork(->res result = res;)
 
 a = {
 	0 = "Zero"
@@ -422,4 +422,3 @@ if true
 a = 1
 b = if a == 1 2 else 4;
 
-a = if b() 4;
