@@ -13,6 +13,32 @@ class Visitor;
 class Statement;
 class Expression;
 
+enum class BinaryOperation{
+    NOP,
+
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    MOD,
+
+    BINARY_OR,
+    BINARY_AND,
+    BINARY_XOR,
+    LOGIC_OR,
+    LOGIC_AND,
+
+    LSHIFT,
+    RSHIFT,
+
+    LESS,
+    MORE,
+    LESS_EQUAL,
+    MORE_EQUAL,
+    EQUAL,
+    NOT_EQUAL,
+};
+
 class Ast{
 public:
     Ast(){}
@@ -238,28 +264,14 @@ public:
 
 class Assign: public Expression {
 public:
-    enum Type {
-        ASSIGN,
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-        LSHIFT_ASSIGN,
-        RSHIFT_ASSIGN,
-        BINARY_AND_ASSIGN,
-        BINARY_OR_ASSIGN,
-        BINARY_XOR_ASSIGN,
-    };
-
-    Assign(const location& loc, Expression* ids, Expression* exprs, Type type = ASSIGN) :
+    Assign(const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::NOP) :
             Expression(loc), ids(addRef(ids)), exprs(addRef(exprs)), type(type) {
     }
     virtual ~Assign();
 
     virtual Assign* accept(Visitor*);
 
-    Type type;
+    BinaryOperation type;
     Expression* ids = nullptr;
     Expression* exprs = nullptr;
 
@@ -269,35 +281,14 @@ public:
 
 class BinaryOp: public Expression {
 public:
-    enum Op {
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-
-        LSHIFT,
-        RSHIFT,
-        BINARY_AND,
-        BINARY_OR,
-        BINARY_XOR,
-
-        MORE,
-        MORE_EQUAL,
-        LESS,
-        LESS_EQUAL,
-        EQUAL,
-        NOT_EQUAL,
-    };
-
-    BinaryOp(const location& loc, Op op, Expression* lhs, Expression* rhs) :
+    BinaryOp(const location& loc, BinaryOperation op, Expression* lhs, Expression* rhs) :
         Expression(loc), m_operation(op), lhs(addRef(lhs)), rhs(addRef(rhs)) {
     }
     virtual ~BinaryOp();
 
     virtual BinaryOp* accept(Visitor*);
 
-    Op m_operation;
+    BinaryOperation m_operation;
     Expression* lhs = nullptr, *rhs = nullptr;
 };
 

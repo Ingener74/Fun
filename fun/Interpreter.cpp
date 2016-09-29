@@ -233,7 +233,7 @@ void Interpreter::visit(Assign* assign) {
     auto lhs = assign->ids;
     auto rhs = assign->exprs;
     while (lhs && rhs) {
-        if (assign->type == Assign::ASSIGN) {
+        if (assign->type == BinaryOperation::NOP) {
             load = true;
             rhs = debug(rhs)->accept(this)->nextExpression;
             load = false;
@@ -246,9 +246,24 @@ void Interpreter::visit(Assign* assign) {
             lhs = debug(lhs)->accept(this)->nextExpression;
             load = false;
 
+            fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+            auto L = operands.back();
+            operands.pop_back();
+
             load = true;
             rhs = debug(rhs)->accept(this)->nextExpression;
             load = false;
+
+            fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+            auto R = operands.back();
+            operands.pop_back();
+
+            operands.push_back(operate(L, assign->type, R));
+
+            L->release();
+            R->release();
 
             store = true;
             lhs = debug(lhs)->accept(this)->nextExpression;
@@ -427,7 +442,7 @@ void Interpreter::visit(String *str) {
     fassertl(!store, str->loc, "you can't assign to value")
 }
 
-Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
+Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
     switch (a->getType()) {
     case Terminal::Integer: {
 
@@ -435,18 +450,18 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toInteger();
 
         switch (op) {
-        case BinaryOp::ADD: { return new Integer(lhs + rhs); }
-        case BinaryOp::SUB: { return new Integer(lhs - rhs); }
-        case BinaryOp::MUL: { return new Integer(lhs * rhs); }
-        case BinaryOp::DIV: { return new Integer(lhs / rhs); }
-        case BinaryOp::MOD: { return new Integer(lhs % rhs); }
+        case BinaryOperation::ADD: { return new Integer(lhs + rhs); }
+        case BinaryOperation::SUB: { return new Integer(lhs - rhs); }
+        case BinaryOperation::MUL: { return new Integer(lhs * rhs); }
+        case BinaryOperation::DIV: { return new Integer(lhs / rhs); }
+        case BinaryOperation::MOD: { return new Integer(lhs % rhs); }
 
-        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
-        case BinaryOp::MORE:       { return new Boolean(lhs >  rhs); }
-        case BinaryOp::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
-        case BinaryOp::LESS:       { return new Boolean(lhs <  rhs); }
-        case BinaryOp::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
+        case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOperation::MORE:       { return new Boolean(lhs >  rhs); }
+        case BinaryOperation::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
+        case BinaryOperation::LESS:       { return new Boolean(lhs <  rhs); }
+        case BinaryOperation::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
@@ -457,17 +472,17 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toReal();
 
         switch (op) {
-        case BinaryOp::ADD: { return new Real(lhs + rhs); }
-        case BinaryOp::SUB: { return new Real(lhs - rhs); }
-        case BinaryOp::MUL: { return new Real(lhs * rhs); }
-        case BinaryOp::DIV: { return new Real(lhs / rhs); }
+        case BinaryOperation::ADD: { return new Real(lhs + rhs); }
+        case BinaryOperation::SUB: { return new Real(lhs - rhs); }
+        case BinaryOperation::MUL: { return new Real(lhs * rhs); }
+        case BinaryOperation::DIV: { return new Real(lhs / rhs); }
 
-        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
-        case BinaryOp::MORE:       { return new Boolean(lhs >  rhs); }
-        case BinaryOp::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
-        case BinaryOp::LESS:       { return new Boolean(lhs <  rhs); }
-        case BinaryOp::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
+        case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOperation::MORE:       { return new Boolean(lhs >  rhs); }
+        case BinaryOperation::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
+        case BinaryOperation::LESS:       { return new Boolean(lhs <  rhs); }
+        case BinaryOperation::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
@@ -478,10 +493,10 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toString();
 
         switch (op) {
-        case BinaryOp::ADD: { return new String(lhs + rhs); }
+        case BinaryOperation::ADD: { return new String(lhs + rhs); }
 
-        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
 
@@ -493,8 +508,8 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOp::Op op, Terminal* b) {
         auto rhs = b->toBoolean();
 
         switch (op) {
-        case BinaryOp::EQUAL:      { return new Boolean(lhs == rhs); }
-        case BinaryOp::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+        case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
+        case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }

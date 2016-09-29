@@ -221,13 +221,18 @@ void Printer::visit(Assign* assign) {
             cout << ", ";
     }
 
-    static map<Assign::Type, string> assigns{
-        {Assign::Type::ASSIGN, "="},
-        {Assign::Type::ADD, "+="},
-        {Assign::Type::SUB, "-="},
-        {Assign::Type::MUL, "*="},
-        {Assign::Type::DIV, "/="},
-        {Assign::Type::MOD, "%="},
+    static map<BinaryOperation, string> assigns{
+        {BinaryOperation::NOP,         "="},
+        {BinaryOperation::ADD,         "+="},
+        {BinaryOperation::SUB,         "-="},
+        {BinaryOperation::MUL,         "*="},
+        {BinaryOperation::DIV,         "/="},
+        {BinaryOperation::MOD,         "%="},
+        {BinaryOperation::BINARY_OR,   "|="},
+        {BinaryOperation::BINARY_AND,  "&="},
+        {BinaryOperation::BINARY_XOR,  "^="},
+        {BinaryOperation::LSHIFT,      "<<="},
+        {BinaryOperation::RSHIFT,      ">>="},
     };
 
     cout << " " << assigns[assign->type] << " ";
@@ -243,18 +248,25 @@ void Printer::visit(Assign* assign) {
 void Printer::visit(BinaryOp* bin_op) {
     bin_op->lhs->accept(this);
 
-    static map<BinaryOp::Op, string> ops{
-        {BinaryOp::Op::ADD,        "+"},
-        {BinaryOp::Op::SUB,        "-"},
-        {BinaryOp::Op::MUL,        "*"},
-        {BinaryOp::Op::DIV,        "/"},
-        {BinaryOp::Op::MOD,        "%"},
-        {BinaryOp::Op::EQUAL,      "=="},
-        {BinaryOp::Op::NOT_EQUAL,  "!="},
-        {BinaryOp::Op::MORE,       ">"},
-        {BinaryOp::Op::MORE_EQUAL, ">="},
-        {BinaryOp::Op::LESS,       "<"},
-        {BinaryOp::Op::LESS_EQUAL, "<="},
+    static map<BinaryOperation, string> ops{
+        {BinaryOperation::ADD,         "+"},
+        {BinaryOperation::SUB,         "-"},
+        {BinaryOperation::MUL,         "*"},
+        {BinaryOperation::DIV,         "/"},
+        {BinaryOperation::MOD,         "%"},
+        {BinaryOperation::BINARY_OR,   "|"},
+        {BinaryOperation::BINARY_AND,  "&"},
+        {BinaryOperation::BINARY_XOR,  "^"},
+        {BinaryOperation::LOGIC_AND,   "&&"},
+        {BinaryOperation::LOGIC_OR,    "||"},
+        {BinaryOperation::LSHIFT,      "<<"},
+        {BinaryOperation::RSHIFT,      ">>"},
+        {BinaryOperation::LESS,        "<"},
+        {BinaryOperation::MORE,        ">"},
+        {BinaryOperation::LESS_EQUAL,  "<="},
+        {BinaryOperation::MORE_EQUAL,  ">="},
+        {BinaryOperation::EQUAL,       "=="},
+        {BinaryOperation::NOT_EQUAL,   "!="},
     };
     cout << " " << ops[bin_op->m_operation] << " ";
 

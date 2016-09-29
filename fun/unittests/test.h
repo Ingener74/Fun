@@ -10,12 +10,6 @@
 
 #include <fun.h>
 
-struct ParseResult {
-    std::unique_ptr<fun::Ast> ast;
-};
-
-ParseResult parse(const std::string& source);
-
 class DebuggerMock: public fun::Debugger {
 public:
     MOCK_METHOD1(onCatchBreakpoint, void(const fun::Breakpoint &));
@@ -30,13 +24,15 @@ struct Result {
     std::unique_ptr<fun::Ast> ast;
 };
 
+Result parse(const std::string& source);
+
 Result eval(const std::string& source);
 
 #define PARSE(CLASS, N, SCRIPT)                                        \
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
         {                                                              \
-            ParseResult r;                                             \
+            Result r;                                                  \
             EXPECT_NO_THROW(r = parse(SCRIPT););                       \
         }                                                              \
         ASSERT_EQ(Statement::counter(), 0);                            \
@@ -46,7 +42,7 @@ Result eval(const std::string& source);
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
         {                                                              \
-            ParseResult r;                                             \
+            Result r;                                                  \
             EXPECT_THROW(r = parse(SCRIPT), ERROR_CLASS);              \
         }                                                              \
         ASSERT_EQ(Statement::counter(), 0);                            \
@@ -56,7 +52,7 @@ Result eval(const std::string& source);
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
         {                                                              \
-            ParseResult r;                                             \
+            Result r;                                                  \
             EXPECT_NO_THROW(r = parse(SCRIPT););                       \
             auto instance = dynamic_cast<CLASS*>(r.ast->root());       \
             ASSERT_NE(instance, nullptr);                              \
@@ -112,9 +108,9 @@ private:
         ASSERT_EQ(Statement::counter(), 0);                            \
     }
 
-#define BREAKPOINT(line, body)                                         \
-r.d->setBreakpoint({"", line});                                        \
-EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint{"", line})).      \
+#define BREAKPOINT(line, scol, ecol, body)                             \
+r.d->setBreakpoint({line, scol, ecol});                                \
+EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line, scol, ecol))). \
     WillOnce(InvokeWithoutArgs([&]{                                    \
         ScopedLock<Mutex> lock(mtx);                                   \
         f = [&]{ r.d->resume(); };                                     \

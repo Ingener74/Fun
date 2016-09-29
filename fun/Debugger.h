@@ -13,7 +13,13 @@ class Printer;
 
 class Breakpoint {
 public:
-    Breakpoint(const std::string& module = { }, unsigned int line = 0);
+    enum Type {
+        LINE, LOCATION,
+    };
+
+    Breakpoint(const location& location);
+    Breakpoint(unsigned int line, unsigned int startColumn, unsigned int endColumn);
+    Breakpoint(unsigned int line);
 
     virtual ~Breakpoint();
 
@@ -22,8 +28,21 @@ public:
 
     friend std::ostream& operator<<(std::ostream&, const Breakpoint&);
 
-    std::string module;
-    unsigned int line;
+    const location& getLocation() const {
+        return _location;
+    }
+
+    void setLocation(const location& location) {
+        _location = location;
+    }
+
+    Type getType() const {
+        return _type;
+    }
+
+private:
+    location _location;
+    Type _type;
 };
 
 using Breakpoints = std::vector<Breakpoint>;
@@ -54,7 +73,7 @@ public:
     virtual void onBeforeStep(Statement *stmt) { _state->onBeforeStep(this, stmt); }
 
 protected:
-    Breakpoints vb;
+    Breakpoints _breakpoints;
     bool _run = false;
     Poco::Mutex _mutex;
     Poco::Condition _cond;

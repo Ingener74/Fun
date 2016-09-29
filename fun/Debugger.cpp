@@ -12,15 +12,23 @@ using namespace std;
 using namespace Poco;
 
 
-Breakpoint::Breakpoint(const string& module, unsigned int line) :
-        module(module), line(line) {
+Breakpoint::Breakpoint(const location& location) :
+        _location(location), _type(LOCATION) {
+}
+
+Breakpoint::Breakpoint(unsigned int line, unsigned int startColumn, unsigned int endColumn):
+    Breakpoint(location(position(nullptr, line, startColumn), position(nullptr, line, endColumn))) {
+}
+
+Breakpoint::Breakpoint(unsigned int line):
+    _location(position{nullptr, line, 0}), _type(LINE) {
 }
 
 Breakpoint::~Breakpoint() {
 }
 
 bool Breakpoint::operator ==(const Breakpoint& rhs) const {
-    return tie(module, line) == tie(rhs.module, rhs.line);
+    return _location == rhs._location;
 }
 
 bool Breakpoint::operator !=(const Breakpoint& rhs) const {
@@ -28,14 +36,14 @@ bool Breakpoint::operator !=(const Breakpoint& rhs) const {
 }
 
 ostream& operator<<(ostream& out, const Breakpoint& rhs){
-    return out << "Breakpoint(" << rhs.module << ", " << rhs.line << ")";
+    return out << "Breakpoint(" << rhs._location << ")";
 }
 
 Debugger::Debugger(Printer *printer) : _printer(printer), _state(new Normal) {
 }
 
 void Debugger::setBreakpoint(const Breakpoint &breakpoint) {
-    vb.push_back(breakpoint);
+    _breakpoints.push_back(breakpoint);
 
     stringstream ss;
     ss.seekg(0);
@@ -48,14 +56,14 @@ void Debugger::disableBreakpoint(const Breakpoint &breakpoint) {
 }
 
 void Debugger::removeBreakpoint(const Breakpoint &breakpoint) {
-    auto it = find(begin(vb), end(vb), breakpoint);
-    if (it == vb.end())
+    auto it = find(begin(_breakpoints), end(_breakpoints), breakpoint);
+    if (it == _breakpoints.end())
         return;
-    vb.erase(it);
+    _breakpoints.erase(it);
 }
 
 const Breakpoints &Debugger::getBreakpoints() const {
-    return vb;
+    return _breakpoints;
 }
 
 void Debugger::list() {
@@ -95,10 +103,12 @@ void Debugger::Normal::onBeforeStep(Debugger *d, Statement *statement) {
     auto line = statement->loc.begin.line;
 
     d->_currentStatement = statement;
-    for (auto &b : d->vb) {
-        if (b.line == line && d->_lastBreakpointLine != line) {
-            while (!d->_run){
-                d->onCatchBreakpoint(b);
+    for (auto &breakpoint : d->_breakpoints) {
+        if (breakpoint.getType() == Breakpoint::LOCATION ?
+                (breakpoint.getLocation() == statement->loc):
+                (breakpoint.getLocation().begin.line == line && d->_lastBreakpointLine != line)) {
+            while (!d->_run) {
+                d->onCatchBreakpoint(breakpoint);
                 d->_cond.wait(d->_mutex);
             }
             d->_run = false;
@@ -142,7 +152,7 @@ void Debugger::StepOver::onBeforeStep(Debugger *d, Statement *statement) {
     d->_currentStatement = statement;
     while (!d->_run)
         d->_cond.wait(d->_mutex);
-    d->onCatchBreakpoint(Breakpoint{"", statement->loc.begin.line});
+    d->onCatchBreakpoint(Breakpoint{statement->loc});
     d->_run = false;
 }
 }

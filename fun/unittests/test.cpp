@@ -3,7 +3,7 @@
 using namespace std;
 using namespace fun;
 
-ParseResult parse(const string& source) {
+Result parse(const string& source) {
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);
@@ -12,7 +12,7 @@ ParseResult parse(const string& source) {
     parser.set_debug_level(0);
     if (parser.parse())
         cerr << "Warning: parser.parse() not 0" << endl;
-    return {move(ast)};
+    return {{}, {}, move(ast)};
 }
 
 Result eval(const string& source) {

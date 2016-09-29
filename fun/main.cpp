@@ -241,8 +241,8 @@ int main(int argc, char* argv[]) {
 
         if (options.count("file") && file.is_open()) {
 
-            if(options.count("debug"))
-                consoleDebugger.setBreakpoint({"", 1});
+//            if(options.count("debug")) // FIXME
+//                consoleDebugger.setBreakpoint({"", 1});
 
             Thread th;
             th.startFunc([visitor, &file, &options, &filename]{
@@ -319,7 +319,7 @@ int main(int argc, char* argv[]) {
                     ss << tokens[1];
                     unsigned int line = 0;
                     ss >> line;
-                    consoleDebugger.setBreakpoint({"", line});
+                    consoleDebugger.setBreakpoint(line);
                     return 1;
                 };
 

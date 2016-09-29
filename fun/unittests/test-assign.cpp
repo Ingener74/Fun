@@ -10,6 +10,11 @@ using namespace testing;
     ASSERT_NE(name, nullptr); \
     ASSERT_EQ(name->value, val);
 
+//#define CHECK_INTEGER(name, val) \
+//    auto name = dynamic_cast<Integer*>(r.v->getMemory()[0][#name]); \
+//    ASSERT_NE(name, nullptr); \
+//    ASSERT_EQ(name->value, val);
+
 PARSE_ERR(Assign, 0, R"(
 foo = 
 )", ParserError);
@@ -69,13 +74,13 @@ b = a
 
 c = 0
 )",
-    BREAKPOINT(4,
+    BREAKPOINT(4, 0, 5,
         ASSERT_EQ(r.v->getOperands().size(), 0);
         ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
         CHECK_INTEGER(a, 1);
     )
-    BREAKPOINT(6,
+    BREAKPOINT(6, 0, 5,
        ASSERT_EQ(r.v->getOperands().size(), 0);
        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
 
@@ -305,3 +310,368 @@ PARSE_ERR(Assign, 62, R"(
 foo |== asdf
 )", ParserError);
 
+EVAL(Assign, 63, R"(
+foo = 42
+foo += 10
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 52);
+    )
+    ,
+)
+
+EVAL(Assign, 64, R"(
+foo = 42
+bar = 100
+foo += bar
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+        CHECK_INTEGER(bar, 100);
+        CHECK_INTEGER(foo, 142);
+    )
+    ,
+)
+
+EVAL(Assign, 65, R"(
+foo = 42
+foo -= 10
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 32);
+    )
+    ,
+)
+
+EVAL(Assign, 66, R"(
+foo = 42
+a = 12
+foo -= a
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+        CHECK_INTEGER(a, 12);
+        CHECK_INTEGER(foo, 30);
+    )
+    ,
+)
+
+EVAL(Assign, 67, R"(
+foo = 42
+foo *= 10
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 420);
+    )
+    ,
+)
+
+EVAL(Assign, 68, R"(
+foo = 42
+bar = 23
+foo *= bar
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42*23);
+    )
+    ,
+)
+
+EVAL(Assign, 69, R"(
+foo = 42
+foo /= 2
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 21);
+    )
+    ,
+)
+
+EVAL(Assign, 70, R"(
+foo = 42
+bb = 3
+foo /= bb
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42/3);
+    )
+    ,
+)
+
+EVAL(Assign, 71, R"(
+foo = 42
+foo %= 4
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42%4);
+    )
+    ,
+)
+
+EVAL(Assign, 72, R"(
+foo = 42
+q = 5
+foo %= bb
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42%5);
+        CHECK_INTEGER(q, 5);
+    )
+    ,
+)
+
+EVAL(Assign, 73, R"(
+foo = 42
+foo <<= 3
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42<<3);
+    )
+    ,
+)
+
+EVAL(Assign, 74, R"(
+foo = 42
+test = 4
+foo <<= test
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42<<4);
+        CHECK_INTEGER(test, 4);
+    )
+    ,
+)
+
+
+EVAL(Assign, 75, R"(
+foo = 42
+foo >>= 2
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42>>2);
+    )
+    ,
+)
+
+EVAL(Assign, 76, R"(
+foo = 42
+T = 3
+foo >>= T
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42>>3);
+        CHECK_INTEGER(T, 3);
+    )
+    ,
+)
+
+
+EVAL(Assign, 77, R"(
+foo = 42
+foo &= 12
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42&12);
+    )
+    ,
+)
+
+EVAL(Assign, 78, R"(
+foo = 42
+A = 34
+foo &= A
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42&34);
+        CHECK_INTEGER(A, 34);
+    )
+    ,
+)
+
+
+EVAL(Assign, 79, R"(
+foo = 42
+foo |= 54
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42|54);
+    )
+    ,
+)
+
+EVAL(Assign, 80, R"(
+foo = 42
+F = 45
+foo |= F
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42|45);
+        CHECK_INTEGER(F, 45);
+    )
+    ,
+)
+
+
+EVAL(Assign, 81, R"(
+foo = 42
+foo ^= 40
+nil
+)",
+    BREAKPOINT(4, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42^40);
+    )
+    ,
+)
+
+EVAL(Assign, 82, R"(
+foo = 42
+G = 50
+foo ^= G
+nil
+)",
+    BREAKPOINT(5, 0, 3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42^50);
+        CHECK_INTEGER(G, 50);
+    )
+    ,
+)
+
+//
+//EVAL(Assign, 73, R"(
+//foo = 42
+//foo <<= 3
+//nil
+//)",
+//    BREAKPOINT(4, 0, 3,
+//        ASSERT_EQ(r.v->getOperands().size(), 0);
+//        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+//
+//        CHECK_INTEGER(foo, 42<<3);
+//    )
+//    ,
+//)
+//
+//EVAL(Assign, 74, R"(
+//foo = 42
+//test = 4
+//foo <<= test
+//nil
+//)",
+//    BREAKPOINT(5, 0, 3,
+//        ASSERT_EQ(r.v->getOperands().size(), 0);
+//        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+//
+//        CHECK_INTEGER(foo, 42<<4);
+//        CHECK_INTEGER(test, 4);
+//    )
+//    ,
+//)
+//
+//
+//EVAL(Assign, 73, R"(
+//foo = 42
+//foo <<= 3
+//nil
+//)",
+//    BREAKPOINT(4, 0, 3,
+//        ASSERT_EQ(r.v->getOperands().size(), 0);
+//        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+//
+//        CHECK_INTEGER(foo, 42<<3);
+//    )
+//    ,
+//)
+//
+//EVAL(Assign, 74, R"(
+//foo = 42
+//test = 4
+//foo <<= test
+//nil
+//)",
+//    BREAKPOINT(5, 0, 3,
+//        ASSERT_EQ(r.v->getOperands().size(), 0);
+//        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+//
+//        CHECK_INTEGER(foo, 42<<4);
+//        CHECK_INTEGER(test, 4);
+//    )
+//    ,
+//)
+//
+//

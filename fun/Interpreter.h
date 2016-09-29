@@ -71,7 +71,7 @@ private:
 
     // std::vector<Statement*> instructionPointerStack;
 
-    Terminal* operate(Terminal* a, BinaryOp::Op operation, Terminal* b);
+    Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
     Debugger* debugger = nullptr;
 
