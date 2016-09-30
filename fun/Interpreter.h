@@ -19,16 +19,19 @@ namespace fun {
 
 class Terminal;
 
-class Stack: public Poco::RefCountedObject { // Уровень стека
+// Уровень стека
+class Stack: public Poco::RefCountedObject {
 public:
     enum Flag {
         Load, Store, FlagSize
     };
-    std::vector<std::bitset<FlagSize>> flags;
-    std::vector<Statement*> breakIps;
-    std::vector<Statement*> continueIps;
-    std::vector<Statement*> catchIps;
     std::unordered_map<std::string, Terminal*> variables;
+    std::bitset<FlagSize> flags;
+    Statement* breakIp = nullptr;
+    Statement* continueIps = nullptr;
+    Statement* catchIps = nullptr;
+
+    Stack* next = nullptr;
 };
 
 class Interpreter: public Visitor {
@@ -69,8 +72,6 @@ public:
     const std::vector<Terminal*>& getOperands() const;
     const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const;
     std::vector<std::unordered_map<std::string, Terminal*>>& getMemory();
-
-
 
 private:
     std::vector<Terminal*> operands;
