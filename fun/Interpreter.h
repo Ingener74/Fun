@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <bitset>
 #include <unordered_map>
 #include <unordered_set>
 #include <mutex>
@@ -17,6 +18,18 @@
 namespace fun {
 
 class Terminal;
+
+class Stack: public Poco::RefCountedObject { // Уровень стека
+public:
+    enum Flag {
+        Load, Store, FlagSize
+    };
+    std::vector<std::bitset<FlagSize>> flags;
+    std::vector<Statement*> breakIps;
+    std::vector<Statement*> continueIps;
+    std::vector<Statement*> catchIps;
+    std::unordered_map<std::string, Terminal*> variables;
+};
 
 class Interpreter: public Visitor {
 public:
@@ -69,7 +82,7 @@ private:
     bool continue_flag = false;
     bool return_flag = false;
 
-    // std::vector<Statement*> instructionPointerStack;
+    std::vector<Stack*> stack;
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
