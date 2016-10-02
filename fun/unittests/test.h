@@ -26,8 +26,6 @@ struct Result {
 
 Result parse(const std::string& source);
 
-Result eval(const std::string& source);
-
 #define PARSE(CLASS, N, SCRIPT)                                        \
     TEST(Parse, CLASS##_##N)                                           \
     {                                                                  \
@@ -78,7 +76,7 @@ private:
 #define EVAL(CLASS, N, SCRIPT, BODY, END) TEST(Interpret, CLASS##_##N) \
     {                                                                  \
         {                                                              \
-            auto r = eval(SCRIPT);                                     \
+            auto r = parse(SCRIPT);                                    \
             bool stop = false;                                         \
             function<void()> f;                                        \
             Mutex mtx;                                                 \
@@ -108,9 +106,19 @@ private:
         ASSERT_EQ(Statement::counter(), 0);                            \
     }
 
-#define BREAKPOINT(line, scol, ecol, body)                             \
+#define BREAKPOINT_EXPR(line, scol, ecol, body)                        \
 r.d->setBreakpoint({line, scol, ecol});                                \
 EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line, scol, ecol))). \
+    WillOnce(InvokeWithoutArgs([&]{                                    \
+        ScopedLock<Mutex> lock(mtx);                                   \
+        f = [&]{ r.d->resume(); };                                     \
+        ConditionUnlocker unlocker(cond);                              \
+        body                                                           \
+    }));
+
+#define BREAKPOINT_LINE(line, body)                                    \
+r.d->setBreakpoint({line});                                            \
+EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line))).          \
     WillOnce(InvokeWithoutArgs([&]{                                    \
         ScopedLock<Mutex> lock(mtx);                                   \
         f = [&]{ r.d->resume(); };                                     \

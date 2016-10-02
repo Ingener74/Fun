@@ -1,15 +1,23 @@
 #!/usr/bin/env python
 import re
 
-i = 2
 
-regex = re.compile(r"Assign, [0-9]+", re.IGNORECASE)
+def reenumerate(filename, template):
 
-lines = [line.rstrip('\n') for line in open('test-assign.cpp')]
+	regex = re.compile(template, re.IGNORECASE)
 
-for line in lines:
-    changes = regex.subn("Assign, %d" % i, line)
-    if changes[1] > 0:
-		i += 1
-    print changes[0]
+	i = 1
+	in_lines = [line.rstrip('\n') for line in open(filename)]
+	out_lines = []
 
+	for line in in_lines:
+	    changes = regex.subn("Assign, %d" % i, line)
+	    if changes[1] > 0:
+			i += 1
+	    out_lines.append(changes[0])
+
+	with open(filename, 'wr') as f:
+		for line in out_lines:
+			f.write(line + '\n')
+
+reenumerate('test-assign.cpp', r"Assign, [0-9]+")
