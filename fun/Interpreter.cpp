@@ -271,18 +271,39 @@ void Interpreter::visit(Assign* assign) {
                 store = false;
             }
         } else if (lhs) {
-            operands.push_back(new Nil);
+            if (assign->type == BinaryOperation::NOP) {
+                operands.push_back(new Nil);
 
-            store = true;
-            lhs = debug(lhs)->accept(this)->nextExpression;
-            store = false;
+                store = true;
+                lhs = debug(lhs)->accept(this)->nextExpression;
+                store = false;
+            } else {
+                load = true;
+                lhs = debug(lhs)->accept(this);
+                load = false;
+
+                fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+                auto L = operands.back();
+                operands.pop_back();
+
+                auto R = new Nil;
+
+                operands.push_back(operate(L, assign->type, R));
+
+                L->release();
+                R->release();
+
+                store = true;
+                lhs = debug(lhs)->accept(this)->nextExpression;
+                store = false;
+            }
         } else if (rhs) {
             break;
         }
     }
 
     fassertl(operands.empty(), assign->loc, "operands not empty after statement") // assign maybe statement
-//    fassert(!operands.empty(), "operands empty after expression")
 }
 
 void Interpreter::visit(BinaryOp* bin_op) {

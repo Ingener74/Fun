@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdexcept>
 #include <sstream>
+#include <Errors.h>
 
 namespace fun {
 
@@ -22,13 +23,13 @@ Res to_(Arg&& arg) {
 
 #define fassert(condition, message) \
     if(!(condition)) \
-        throw std::runtime_error( \
+        throw InterpretError( \
                 std::string("Error: ") + std::string((message)) + std::string("\n") + \
                 std::string("At: ") + std::string(__FILE__) + std::string(": ") + to_<std::string>(__LINE__));
 
 #define fassertl(condition, loc, message) \
     if(!(condition)) \
-        throw std::runtime_error( \
+        throw InterpretError( \
                 std::string("Error: ") + to_<string>(loc) + ": " + std::string((message)) + std::string("\n") + \
                 std::string("At: ") + std::string(__FILE__) + std::string(": ") + to_<std::string>(__LINE__));
 

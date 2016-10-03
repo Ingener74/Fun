@@ -25,3 +25,10 @@ fun::ParserError::~ParserError() {
 }
 
 }
+
+fun::InterpretError::InterpretError(const std::string& message) :
+        runtime_error(message) {
+}
+
+fun::InterpretError::~InterpretError() {
+}

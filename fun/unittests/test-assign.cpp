@@ -11,7 +11,7 @@ using namespace testing;
     ASSERT_EQ(name->value, val);
 
 #define CHECK_NIL(name) \
-    auto c = dynamic_cast<Nil*>(r.v->getMemory()[0][#name]); \
+    auto name = dynamic_cast<Nil*>(r.v->getMemory()[0][#name]); \
     ASSERT_NE(name, nullptr);
 
 
@@ -425,6 +425,106 @@ foo += bar
 
 EVAL(Assign, 80, R"(
 foo = 42
+bar = 100
+foo, bar += 12, 13
+)",
+    BREAKPOINT_LINE(4,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(bar, 100);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+    CHECK_INTEGER(foo, 42 + 12);
+    CHECK_INTEGER(bar, 100 + 13);
+)
+
+EVAL(Assign, 81, R"(
+foo = 42
+bar = 100
+c = 123
+d = 321
+foo, bar += c, d
+)",
+    BREAKPOINT_LINE(6,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(bar, 100);
+        CHECK_INTEGER(c, 123);
+        CHECK_INTEGER(d, 321);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+    CHECK_INTEGER(foo, 42 + 123);
+    CHECK_INTEGER(bar, 100 + 321);
+    CHECK_INTEGER(c, 123);
+    CHECK_INTEGER(d, 321);
+)
+
+EVAL(Assign, 82, R"(
+foo = 42
+bar = 100
+c = 123
+d = 321
+foo, bar += c, d, 100
+)",
+    BREAKPOINT_LINE(6,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(bar, 100);
+        CHECK_INTEGER(c, 123);
+        CHECK_INTEGER(d, 321);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+    CHECK_INTEGER(foo, 42 + 123);
+    CHECK_INTEGER(bar, 100 + 321);
+    CHECK_INTEGER(c, 123);
+    CHECK_INTEGER(d, 321);
+)
+
+EVAL(Assign, 83, R"(
+foo = 42
+bar = 100
+c = 123
+d = 321
+E = 0
+foo, bar, E += c, d
+)",
+    BREAKPOINT_LINE(6,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(bar, 100);
+        CHECK_INTEGER(c, 123);
+        CHECK_INTEGER(d, 321);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 5);
+
+    CHECK_INTEGER(foo, 42 + 123);
+    CHECK_INTEGER(bar, 100 + 321);
+    CHECK_INTEGER(c, 123);
+    CHECK_INTEGER(d, 321);
+    CHECK_INTEGER(E, 0);
+)
+
+EVAL(Assign, 84, R"(
+foo = 42
 foo -= 10
 )",
     BREAKPOINT_LINE(3,
@@ -440,7 +540,26 @@ foo -= 10
     CHECK_INTEGER(foo, 32);
 )
 
-EVAL(Assign, 81, R"(
+EVAL(Assign, 85, R"(
+foo = 42
+foo, E -= 10
+)",
+    BREAKPOINT_LINE(3,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+        CHECK_INTEGER(foo, 42);
+
+        // http://stackoverflow.com/questions/8648243/google-mock-how-can-i-expect-that-no-method-will-be-called-on-a-mock
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 1);
+
+    CHECK_INTEGER(foo, 32);
+)
+
+EVAL(Assign, 86, R"(
 foo = 42
 a = 12
 foo -= a
@@ -460,7 +579,99 @@ foo -= a
     CHECK_INTEGER(a, 12);
 )
 
-EVAL(Assign, 82, R"(
+EVAL(Assign, 87, R"(
+foo = 42
+b = 10
+foo, b -= 10, 3
+)",
+    BREAKPOINT_LINE(4,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(b, 10);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+    CHECK_INTEGER(foo, 42 - 10);
+    CHECK_INTEGER(b, 10 - 3);
+)
+
+EVAL(Assign, 88, R"(
+foo = 42
+b = 34
+a = 12
+foo, b -= a, a
+)",
+    BREAKPOINT_LINE(5,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 3);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(b, 34);
+        CHECK_INTEGER(a, 12);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 3);
+
+    CHECK_INTEGER(foo, 42 - 12);
+    CHECK_INTEGER(b, 34 - 12);
+    CHECK_INTEGER(a, 12);
+)
+
+EVAL(Assign, 89, R"(
+foo = 42
+b = 34
+a = 12
+foo, b -= a, a, a
+)",
+    BREAKPOINT_LINE(5,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 3);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(b, 34);
+        CHECK_INTEGER(a, 12);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 3);
+
+    CHECK_INTEGER(foo, 42 - 12);
+    CHECK_INTEGER(b, 34 - 12);
+    CHECK_INTEGER(a, 12);
+)
+
+EVAL(Assign, 90, R"(
+foo = 42
+b = 34
+a = 12
+c = 23
+foo, b, c -= a, a
+)",
+    BREAKPOINT_LINE(6,
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+        CHECK_INTEGER(foo, 42);
+        CHECK_INTEGER(b, 34);
+        CHECK_INTEGER(a, 12);
+        CHECK_INTEGER(c, 23);
+    )
+    ,
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 4);
+
+    CHECK_INTEGER(foo, 42 - 12);
+    CHECK_INTEGER(b, 34 - 12);
+    CHECK_INTEGER(a, 12);
+    CHECK_INTEGER(c, 23);
+)
+
+EVAL(Assign, 91, R"(
 foo = 42
 foo *= 10
 )",
@@ -477,7 +688,7 @@ foo *= 10
     CHECK_INTEGER(foo, 420);
 )
 
-EVAL(Assign, 83, R"(
+EVAL(Assign, 92, R"(
 foo = 42
 bar = 23
 foo *= bar
@@ -497,7 +708,7 @@ foo *= bar
     CHECK_INTEGER(bar, 23);
 )
 
-EVAL(Assign, 84, R"(
+EVAL(Assign, 93, R"(
 foo = 42
 foo /= 2
 )",
@@ -514,7 +725,7 @@ foo /= 2
     CHECK_INTEGER(foo, 42/2);
 )
 
-EVAL(Assign, 85, R"(
+EVAL(Assign, 94, R"(
 foo = 42
 bb = 3
 foo /= bb
@@ -534,7 +745,7 @@ foo /= bb
     CHECK_INTEGER(bb, 3);
 )
 
-EVAL(Assign, 86, R"(
+EVAL(Assign, 95, R"(
 foo = 42
 foo %= 4
 nil
@@ -548,7 +759,7 @@ nil
     ,
 )
 
-EVAL(Assign, 87, R"(
+EVAL(Assign, 96, R"(
 foo = 42
 q = 5
 foo %= q
@@ -568,7 +779,7 @@ foo %= q
     CHECK_INTEGER(q, 5);
 )
 
-EVAL(Assign, 88, R"(
+EVAL(Assign, 97, R"(
 foo = 42
 foo <<= 3
 )",
@@ -585,7 +796,7 @@ foo <<= 3
     CHECK_INTEGER(foo, 42<<3);
 )
 
-EVAL(Assign, 89, R"(
+EVAL(Assign, 98, R"(
 foo = 42
 test = 4
 foo <<= test
@@ -606,7 +817,7 @@ foo <<= test
 )
 
 
-EVAL(Assign, 90, R"(
+EVAL(Assign, 99, R"(
 foo = 42
 foo >>= 2
 )",
@@ -623,7 +834,7 @@ foo >>= 2
     CHECK_INTEGER(foo, 42>>2);
 )
 
-EVAL(Assign, 91, R"(
+EVAL(Assign, 100, R"(
 foo = 42
 T = 3
 foo >>= T
@@ -644,7 +855,7 @@ foo >>= T
 )
 
 
-EVAL(Assign, 92, R"(
+EVAL(Assign, 101, R"(
 foo = 42
 foo &= 12
 )",
@@ -661,7 +872,7 @@ foo &= 12
     CHECK_INTEGER(foo, 42&12);
 )
 
-EVAL(Assign, 93, R"(
+EVAL(Assign, 102, R"(
 foo = 42
 A = 34
 foo &= A
@@ -682,7 +893,7 @@ foo &= A
 )
 
 
-EVAL(Assign, 94, R"(
+EVAL(Assign, 103, R"(
 foo = 42
 foo |= 54
 )",
@@ -699,7 +910,7 @@ foo |= 54
     CHECK_INTEGER(foo, 42|54);
 )
 
-EVAL(Assign, 95, R"(
+EVAL(Assign, 104, R"(
 foo = 42
 F = 45
 foo |= F
@@ -720,7 +931,7 @@ foo |= F
 )
 
 
-EVAL(Assign, 96, R"(
+EVAL(Assign, 105, R"(
 foo = 42
 foo ^= 40
 )",
@@ -737,7 +948,7 @@ foo ^= 40
     CHECK_INTEGER(foo, 42^40);
 )
 
-EVAL(Assign, 97, R"(
+EVAL(Assign, 106, R"(
 foo = 42
 G = 50
 foo ^= G

@@ -17,4 +17,10 @@ public:
     virtual ~ParserError();
 };
 
+class InterpretError: public std::runtime_error {
+public:
+    InterpretError(const std::string& message);
+    virtual ~InterpretError();
+};
+
 }

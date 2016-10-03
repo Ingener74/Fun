@@ -90,8 +90,15 @@ private:
                    END                                                 \
                 }));                                                   \
             Thread th;                                                 \
-            th.startFunc([&r]{                                         \
-                r.ast->accept(r.v.get());                              \
+            th.startFunc([&]{                                          \
+                try {                                                  \
+                    r.ast->accept(r.v.get());                          \
+                } catch (InterpretError const& e) {                    \
+                    cerr << e.what() << endl;                          \
+                    ScopedLock<Mutex> lock(mtx);                       \
+                    f = [&]{ stop = true; r.d->resume(); };            \
+                    ConditionUnlocker unlocker(cond);                  \
+                }                                                      \
             });                                                        \
             while(true){                                               \
                 ScopedLock<Mutex> lock(mtx);                           \
@@ -125,4 +132,5 @@ EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line))).          \
         ConditionUnlocker unlocker(cond);                              \
         body                                                           \
     }));
+
 
