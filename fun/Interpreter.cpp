@@ -232,42 +232,52 @@ void Interpreter::visit(Assign* assign) {
     auto balance = operands.size();
     auto lhs = assign->ids;
     auto rhs = assign->exprs;
-    while (lhs && rhs) {
-        if (assign->type == BinaryOperation::NOP) {
-            load = true;
-            rhs = debug(rhs)->accept(this)->nextExpression;
-            load = false;
+    while (lhs || rhs) {
+        if(lhs && rhs){
+            if (assign->type == BinaryOperation::NOP) {
+                load = true;
+                rhs = debug(rhs)->accept(this)->nextExpression;
+                load = false;
+
+                store = true;
+                lhs = debug(lhs)->accept(this)->nextExpression;
+                store = false;
+            } else {
+                load = true;
+                lhs = debug(lhs)->accept(this);
+                load = false;
+
+                fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+                auto L = operands.back();
+                operands.pop_back();
+
+                load = true;
+                rhs = debug(rhs)->accept(this)->nextExpression;
+                load = false;
+
+                fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+                auto R = operands.back();
+                operands.pop_back();
+
+                operands.push_back(operate(L, assign->type, R));
+
+                L->release();
+                R->release();
+
+                store = true;
+                lhs = debug(lhs)->accept(this)->nextExpression;
+                store = false;
+            }
+        } else if (lhs) {
+            operands.push_back(new Nil);
 
             store = true;
             lhs = debug(lhs)->accept(this)->nextExpression;
             store = false;
-        } else {
-            load = true;
-            lhs = debug(lhs)->accept(this)->nextExpression;
-            load = false;
-
-            fassertl(!operands.empty(), assign->loc, "not enogth operands")
-
-            auto L = operands.back();
-            operands.pop_back();
-
-            load = true;
-            rhs = debug(rhs)->accept(this)->nextExpression;
-            load = false;
-
-            fassertl(!operands.empty(), assign->loc, "not enogth operands")
-
-            auto R = operands.back();
-            operands.pop_back();
-
-            operands.push_back(operate(L, assign->type, R));
-
-            L->release();
-            R->release();
-
-            store = true;
-            lhs = debug(lhs)->accept(this)->nextExpression;
-            store = false;
+        } else if (rhs) {
+            break;
         }
     }
 
@@ -383,6 +393,7 @@ void Interpreter::visit(Id* id) {
             auto it = rit->insert({id->value, val});
             fassertl(it.second, id->loc, "can't store top operands value in " + id->value);
         } else {
+            var->second->release();
             var->second = val;
         }
     }
@@ -455,6 +466,12 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::MUL: { return new Integer(lhs * rhs); }
         case BinaryOperation::DIV: { return new Integer(lhs / rhs); }
         case BinaryOperation::MOD: { return new Integer(lhs % rhs); }
+
+        case BinaryOperation::LSHIFT:     { return new Integer(lhs << rhs); }
+        case BinaryOperation::RSHIFT:     { return new Integer(lhs >> rhs); }
+        case BinaryOperation::BINARY_OR:  { return new Integer(lhs | rhs); }
+        case BinaryOperation::BINARY_AND: { return new Integer(lhs & rhs); }
+        case BinaryOperation::BINARY_XOR: { return new Integer(lhs ^ rhs); }
 
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
