@@ -105,6 +105,9 @@ int yylex(fun::Parser::semantic_type*, fun::location*, Lexer&);
 %token BINARY_OR             "|"
 %token BINARY_XOR            "^"
 
+%token LOGIC_AND             "&&"
+%token LOGIC_OR              "||"
+
 %token MORE                  ">"
 %token MORE_EQUAL            ">="
 

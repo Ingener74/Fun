@@ -2,16 +2,16 @@
 import re
 
 
-def reenumerate(filename, template):
+def reenumerate(filename, in_template, out_template):
 
-	regex = re.compile(template, re.IGNORECASE)
+	regex = re.compile(in_template, re.IGNORECASE)
 
 	i = 1
 	in_lines = [line.rstrip('\n') for line in open(filename)]
 	out_lines = []
 
 	for line in in_lines:
-	    changes = regex.subn("Assign, %d" % i, line)
+	    changes = regex.subn(out_template % i, line)
 	    if changes[1] > 0:
 			i += 1
 	    out_lines.append(changes[0])
@@ -20,4 +20,5 @@ def reenumerate(filename, template):
 		for line in out_lines:
 			f.write(line + '\n')
 
-reenumerate('test-assign.cpp', r"Assign, [0-9]+")
+# reenumerate('test-assign.cpp', r"Assign, [0-9]+", "Assign, %d")
+reenumerate('test-binary-ops.cpp', r"BinaryOp, [0-9]+", "BinaryOp, %d")

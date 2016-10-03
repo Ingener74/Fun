@@ -100,6 +100,9 @@ exp         ({integer}|{real})[eE][+-]?{integer}
 "|"         { LOCATION(1); return fun::Parser::token::BINARY_OR;         }
 "^"         { LOCATION(1); return fun::Parser::token::BINARY_XOR;        }
 
+"&&"        { LOCATION(2); return fun::Parser::token::LOGIC_AND;         }
+"||"        { LOCATION(2); return fun::Parser::token::LOGIC_OR;          }
+
 "+="        { LOCATION(2); return fun::Parser::token::ADD_ASSIGN;        }
 "-="        { LOCATION(2); return fun::Parser::token::SUB_ASSIGN;        }
 "*="        { LOCATION(2); return fun::Parser::token::MUL_ASSIGN;        }
