@@ -540,7 +540,7 @@ foo -= 10
     CHECK_INTEGER(foo, 32);
 )
 
-EVAL(Assign, 85, R"(
+EVAL_ERR(Assign, 85, R"(
 foo = 42
 foo, E -= 10
 )",
@@ -549,14 +549,7 @@ foo, E -= 10
         ASSERT_EQ(r.v->getMemory()[0].size(), 1);
 
         CHECK_INTEGER(foo, 42);
-
-        // http://stackoverflow.com/questions/8648243/google-mock-how-can-i-expect-that-no-method-will-be-called-on-a-mock
     )
-    ,
-    ASSERT_EQ(r.v->getOperands().size(), 0);
-    ASSERT_EQ(r.v->getMemory()[0].size(), 1);
-
-    CHECK_INTEGER(foo, 32);
 )
 
 EVAL(Assign, 86, R"(

@@ -91,14 +91,38 @@ private:
                 }));                                                   \
             Thread th;                                                 \
             th.startFunc([&]{                                          \
-                try {                                                  \
-                    r.ast->accept(r.v.get());                          \
-                } catch (InterpretError const& e) {                    \
-                    cerr << e.what() << endl;                          \
-                    ScopedLock<Mutex> lock(mtx);                       \
-                    f = [&]{ stop = true; r.d->resume(); };            \
-                    ConditionUnlocker unlocker(cond);                  \
-                }                                                      \
+                EXPECT_NO_THROW(r.ast->accept(r.v.get()));             \
+            });                                                        \
+            while(true){                                               \
+                ScopedLock<Mutex> lock(mtx);                           \
+                while (!f) cond.wait(mtx);                             \
+                f();                                                   \
+                f = {};                                                \
+                if (stop) { break; }                                   \
+            }                                                          \
+            if(th.isRunning())                                         \
+                th.join();                                             \
+        }                                                              \
+        ASSERT_EQ(Statement::counter(), 0);                            \
+    }
+
+#define EVAL_ERR(CLASS, N, SCRIPT, BODY) TEST(Interpret, CLASS##_##N)  \
+    {                                                                  \
+        {                                                              \
+            auto r = parse(SCRIPT);                                    \
+            bool stop = false;                                         \
+            function<void()> f;                                        \
+            Mutex mtx;                                                 \
+            Condition cond;                                            \
+            BODY                                                       \
+            EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
+                Times(0);                                              \
+            Thread th;                                                 \
+            th.startFunc([&]{                                          \
+                EXPECT_THROW(r.ast->accept(r.v.get()), InterpretError); \
+                ScopedLock<Mutex> lock(mtx);                           \
+                f = [&]{ stop = true; r.d->resume(); };                \
+                ConditionUnlocker unlocker(cond);                      \
             });                                                        \
             while(true){                                               \
                 ScopedLock<Mutex> lock(mtx);                           \
