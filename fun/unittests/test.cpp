@@ -1,12 +1,13 @@
 #include "test.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace fun;
 
 Result parse(const string& source) {
-    unique_ptr<DebuggerMock> debugger(new DebuggerMock);
-    unique_ptr<Interpreter> interpreter(new Interpreter(debugger.get()));
-    unique_ptr<Ast> ast(new Ast);
+    auto debugger = make_unique_<DebuggerMock>();
+    auto interpreter = make_unique_<Interpreter>(debugger.get());
+    auto ast = make_unique_<Ast>();
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);

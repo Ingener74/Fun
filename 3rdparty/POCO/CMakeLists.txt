@@ -131,6 +131,8 @@ if(NOT EXISTS ${SYSROOT})
             URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
             CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                                -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+                                -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
                                 -DENABLE_DATA_ODBC=OFF
                                 -DENABLE_DATA_MYSQL=OFF
                                 -DENABLE_DATA_SQLITE=OFF

@@ -44,9 +44,7 @@ public:
     Ast(){}
     virtual ~Ast();
 
-    void setRoot(Statement* root) {
-        _root = root;
-    }
+    void setRoot(Statement* root);
 
     Statement* root() {
         return _root;

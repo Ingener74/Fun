@@ -17,6 +17,12 @@ namespace fun {
 
 using namespace std;
 
+void Ast::setRoot(Statement* root) {
+    _root = root;
+    if(_root)
+        _root->duplicate();
+}
+
 Ast::~Ast() {
     if(_root)
         _root->release();

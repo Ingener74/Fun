@@ -30,6 +30,15 @@ set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
 
 set(3RDPARTY_INSTALL ${SYSROOT})
 
+option(ENABLE_ASAN "Enable AddressSanitizer" ON)
+if(ENABLE_ASAN)
+    # sudo sysctl vm.overcommit_memory=1
+    # export ASAN_OPTIONS=abort_on_error=1
+    # cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer" -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+endif()
+
 if(NOT EXISTS ${SYSROOT})
     add_subdirectory(3rdparty)
 endif()
