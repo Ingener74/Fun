@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 
 
-if(MSVC)
-	add_definitions(/DYY_NO_UNISTD_H)
-endif()
-
 unset(BUILD_PLATFORM)
 if(MINGW OR MSYS)
     message(STATUS "MinGW or MSYS build")
     set(BUILD_PLATFORM msys_mingw)
     add_definitions(-std=gnu++0x)
+elseif(MSVC)
+    message(STATUS "Microsoft Visual Studio 2013 build")
+    set(BUILD_PLATFORM msys_msvc)
+    add_definitions(/DYY_NO_UNISTD_H)
 elseif(EMSCRIPTEN)
     message(STATUS "Emscripten build")
     set(BUILD_PLATFORM emscripten)
@@ -30,7 +30,7 @@ set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
 
 set(3RDPARTY_INSTALL ${SYSROOT})
 
-option(ENABLE_ASAN "Enable AddressSanitizer" ON)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 if(ENABLE_ASAN)
     # sudo sysctl vm.overcommit_memory=1
     # export ASAN_OPTIONS=abort_on_error=1
