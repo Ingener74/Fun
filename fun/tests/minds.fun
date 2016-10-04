@@ -351,6 +351,10 @@ f1 = fs.open("file.txt", fun(content)
 	print "content: " + content 
 end)
 
+f1 = fs.open("file.txt", ->content:
+	print "content: " + content 
+;)
+
 data2 = f1.read()
 
 f1.close()
@@ -365,6 +369,7 @@ sys.os()
 
 # thread
 thread.create(fun() end)
+thread.create(->;)
 
 # json
 json.encode({
@@ -376,7 +381,7 @@ json.decode("{\"test\": 42}")
 # net
 req1 = net.request("www.api-server.com")
 ws1 = net.websocket("ws://api-server.com", fun(text) end, fun(binary) end, fun(error) end)
-ws1 = net.websocket("ws://api-server.com", ->text;;, ->binary;;, ->error;;)
+ws1 = net.websocket("ws://api-server.com", ->text:;, ->binary:;, ->error:;)
 
 # native
 lib1 = native.loadLibrary("./libApi.{so, dll, dylib}")
@@ -393,9 +398,10 @@ res1 = native.call(fi1, {42, 3.1415})
 # * gui
 # debug
 debug.backtrace()
+debug.breakpoint()
 
 # addtional function definition
-test = -> a, b
+test = -> a, b:
 	print "a + b = " + (a + b) 
 ;
 
