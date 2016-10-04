@@ -1444,24 +1444,62 @@ PARSE(BinaryOp, 649, R"(nil != nil)");
 
 
 EVAL(BinaryOp, 650, R"(42 + 42)",,
-    EXPECT_EQ(Statement::counter(), 3);
-
-    EXPECT_EQ(r.v->getOperands().size(), 1);
+	ASSERT_EQ(Statement::counter(), 4);
+ 	ASSERT_EQ(r.v->getOperands().size(), 1);
 
     auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
-    EXPECT_NE(a, nullptr);
-    EXPECT_EQ(a->value, 42 + 42);
+    ASSERT_NE(a, nullptr);
+    ASSERT_EQ(a->value, 42 + 42);
 );
 
-PARSE(BinaryOp, 651, R"(42 + " test string")");
+EVAL(BinaryOp, 651, R"(42 + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 652, R"(42 + nil)");
+	auto a = dynamic_cast<String*>(r.v->getOperands()[0]);
+	// ASSERT_NE(a, nullptr);
+	// ASSERT_STREQ(a->value.c_str(), "42 test string");
+);
 
-PARSE(BinaryOp, 653, R"(42 + 3.1415)");
+EVAL(BinaryOp, 652, R"(42 + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
 
-PARSE(BinaryOp, 654, R"(42 + true)");
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 655, R"(42 + false)");
+    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
+    ASSERT_NE(a, nullptr);
+    ASSERT_EQ(a->value, 42 + 0);
+);
+
+EVAL(BinaryOp, 653, R"(42 + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    auto a = dynamic_cast<Real*>(r.v->getOperands()[0]);
+    // ASSERT_NE(a, nullptr);
+    // ASSERT_DOUBLE_EQ(a->value, 42 + 3.1415);
+);
+
+EVAL(BinaryOp, 654, R"(42 + true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
+    ASSERT_NE(a, nullptr);
+    ASSERT_EQ(a->value, 42 + true);
+);
+
+EVAL(BinaryOp, 655, R"(42 + false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
+    ASSERT_NE(a, nullptr);
+    ASSERT_EQ(a->value, 42 + false);
+);
 
 
 PARSE(BinaryOp, 656, R"(2.72 + 42)");

@@ -24,6 +24,8 @@ Interpreter::Interpreter(Debugger* debugger) :
 Interpreter::~Interpreter() {
     while (!variables.empty())
         clearTop();
+    for(auto operand: operands)
+        operand->release();
 }
 
 void Interpreter::visit(Break* break_stmt) {
