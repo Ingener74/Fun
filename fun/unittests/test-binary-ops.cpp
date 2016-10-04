@@ -1443,3 +1443,91 @@ PARSE(BinaryOp, 649, R"(nil != nil)");
 
 
 
+EVAL(BinaryOp, 650, R"(42 + 42)",,
+    EXPECT_EQ(Statement::counter(), 3);
+
+    EXPECT_EQ(r.v->getOperands().size(), 1);
+
+    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
+    EXPECT_NE(a, nullptr);
+    EXPECT_EQ(a->value, 42 + 42);
+);
+
+PARSE(BinaryOp, 651, R"(42 + " test string")");
+
+PARSE(BinaryOp, 652, R"(42 + nil)");
+
+PARSE(BinaryOp, 653, R"(42 + 3.1415)");
+
+PARSE(BinaryOp, 654, R"(42 + true)");
+
+PARSE(BinaryOp, 655, R"(42 + false)");
+
+
+PARSE(BinaryOp, 656, R"(2.72 + 42)");
+
+PARSE(BinaryOp, 657, R"(2.72 + " test string")");
+
+PARSE(BinaryOp, 658, R"(2.72 + nil)");
+
+PARSE(BinaryOp, 659, R"(2.72 + 3.1415)");
+
+PARSE(BinaryOp, 660, R"(2.72 + true)");
+
+PARSE(BinaryOp, 661, R"(2.72 + false)");
+
+
+PARSE(BinaryOp, 662, R"("Fun " + 42)");
+
+PARSE(BinaryOp, 663, R"("Fun " + " test string")");
+
+PARSE(BinaryOp, 664, R"("Fun " + nil)");
+
+PARSE(BinaryOp, 665, R"("Fun " + 3.1415)");
+
+PARSE(BinaryOp, 666, R"("Fun " + true)");
+
+PARSE(BinaryOp, 667, R"("Fun " + false)");
+
+
+PARSE(BinaryOp, 668, R"(true + true)");
+
+PARSE(BinaryOp, 669, R"(true + " test string")");
+
+PARSE(BinaryOp, 670, R"(true + nil)");
+
+PARSE(BinaryOp, 671, R"(true + 3.1415)");
+
+PARSE(BinaryOp, 672, R"(true + true)");
+
+PARSE(BinaryOp, 673, R"(true + false)");
+
+
+PARSE(BinaryOp, 674, R"(false + false)");
+
+PARSE(BinaryOp, 675, R"(false + " test string")");
+
+PARSE(BinaryOp, 676, R"(false + nil)");
+
+PARSE(BinaryOp, 677, R"(false + 3.1415)");
+
+PARSE(BinaryOp, 678, R"(false + true)");
+
+PARSE(BinaryOp, 679, R"(false + false)");
+
+
+PARSE(BinaryOp, 680, R"(nil + nil)");
+
+PARSE(BinaryOp, 681, R"(nil + " test string")");
+
+PARSE(BinaryOp, 682, R"(nil + nil)");
+
+PARSE(BinaryOp, 683, R"(nil + 3.1415)");
+
+PARSE(BinaryOp, 684, R"(nil + true)");
+
+PARSE(BinaryOp, 685, R"(nil + nil)");
+
+
+
+

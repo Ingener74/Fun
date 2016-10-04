@@ -79,22 +79,22 @@ private:
             auto r = parse(SCRIPT);                                    \
             bool stop = false;                                         \
             function<void()> f;                                        \
-            Mutex mtx;                                                 \
-            Condition cond;                                            \
+            Poco::Mutex mtx;                                           \
+            Poco::Condition cond;                                      \
             BODY                                                       \
             EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
-                WillOnce(InvokeWithoutArgs([&]{                        \
-                   ScopedLock<Mutex> lock(mtx);                        \
+                WillOnce(testing::InvokeWithoutArgs([&]{               \
+                    Poco::ScopedLock<Poco::Mutex> lock(mtx);           \
                    f = [&]{ stop = true; r.d->resume(); };             \
                    ConditionUnlocker unlocker(cond);                   \
                    END                                                 \
                 }));                                                   \
-            Thread th;                                                 \
+            Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
                 EXPECT_NO_THROW(r.ast->accept(r.v.get()));             \
             });                                                        \
             while(true){                                               \
-                ScopedLock<Mutex> lock(mtx);                           \
+                Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
                 while (!f) cond.wait(mtx);                             \
                 f();                                                   \
                 f = {};                                                \
@@ -112,20 +112,20 @@ private:
             auto r = parse(SCRIPT);                                    \
             bool stop = false;                                         \
             function<void()> f;                                        \
-            Mutex mtx;                                                 \
-            Condition cond;                                            \
+            Poco::Mutex mtx;                                           \
+            Poco::Condition cond;                                      \
             BODY                                                       \
             EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
                 Times(0);                                              \
-            Thread th;                                                 \
+            Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
                 EXPECT_THROW(r.ast->accept(r.v.get()), InterpretError); \
-                ScopedLock<Mutex> lock(mtx);                           \
+                Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
                 f = [&]{ stop = true; r.d->resume(); };                \
                 ConditionUnlocker unlocker(cond);                      \
             });                                                        \
             while(true){                                               \
-                ScopedLock<Mutex> lock(mtx);                           \
+                Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
                 while (!f) cond.wait(mtx);                             \
                 f();                                                   \
                 f = {};                                                \
@@ -140,8 +140,8 @@ private:
 #define BREAKPOINT_EXPR(line, scol, ecol, body)                        \
 r.d->setBreakpoint({line, scol, ecol});                                \
 EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line, scol, ecol))). \
-    WillOnce(InvokeWithoutArgs([&]{                                    \
-        ScopedLock<Mutex> lock(mtx);                                   \
+    WillOnce(testing::InvokeWithoutArgs([&]{                           \
+        Poco::ScopedLock<Poco::Mutex> lock(mtx);                       \
         f = [&]{ r.d->resume(); };                                     \
         ConditionUnlocker unlocker(cond);                              \
         body                                                           \
@@ -150,8 +150,8 @@ EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line, scol, ecol))). \
 #define BREAKPOINT_LINE(line, body)                                    \
 r.d->setBreakpoint({line});                                            \
 EXPECT_CALL(*r.d.get(), onCatchBreakpoint(Breakpoint(line))).          \
-    WillOnce(InvokeWithoutArgs([&]{                                    \
-        ScopedLock<Mutex> lock(mtx);                                   \
+    WillOnce(testing::InvokeWithoutArgs([&]{                           \
+        Poco::ScopedLock<Poco::Mutex> lock(mtx);                       \
         f = [&]{ r.d->resume(); };                                     \
         ConditionUnlocker unlocker(cond);                              \
         body                                                           \

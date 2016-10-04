@@ -1,9 +1,7 @@
 #include "test.h"
 
 using namespace std;
-using namespace Poco;
 using namespace fun;
-using namespace testing;
 
 #define CHECK_INTEGER(name, val) \
     auto name = dynamic_cast<Integer*>(r.v->getMemory()[0][#name]); \
