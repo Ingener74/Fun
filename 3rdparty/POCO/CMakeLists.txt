@@ -31,22 +31,30 @@ if(NOT EXISTS ${SYSROOT})
                                 # -DOPENSSL_CRYPTO_LIBRARY=${3RDPARTY_INSTALL}/lib/libcrypto.a
                                 # -DOPENSSL_SSL_LIBRARY=${3RDPARTY_INSTALL}/lib/libssl.a
         )
-    # elseif(MSVC)
-    #     ExternalProject_Add(
-    #         ${EXT_POCO}
-    #         URL                 http://pocoproject.org/releases/poco-1.6.1/poco-1.6.1-all.tar.gz
-    #         CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
-    #                             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    #                             -DENABLE_DATA_ODBC=OFF
-    #                             -DENABLE_APACHECONNECTOR=OFF
-    #                             -DENABLE_POCODOC=OFF
-    #                             -DENABLE_PDF=OFF
-    #                             -DENABLE_PAGECOMPILER=OFF
-    #                             -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
-    #                             -DENABLE_TESTS=OFF
-    #                             -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-    #     )
-    
+    elseif(MSVC)
+        ExternalProject_Add(
+            ${EXT_POCO}
+            URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
+            CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
+                                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                                -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+                                -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+                                -DENABLE_DATA_ODBC=OFF
+                                -DENABLE_DATA_MYSQL=OFF
+                                -DENABLE_DATA_SQLITE=OFF
+                                -DENABLE_APACHECONNECTOR=OFF
+                                -DENABLE_POCODOC=OFF
+                                -DENABLE_PDF=OFF
+                                -DENABLE_PAGECOMPILER=OFF
+                                -DENABLE_PAGECOMPILER_FILE2PAGE=OFF
+                                -DENABLE_ZIP=OFF
+                                -DENABLE_XML=OFF
+                                -DENABLE_JSON=OFF
+                                -DENABLE_MONGODB=OFF
+                                -DENABLE_TESTS=OFF
+                                -DPOCO_STATIC=OFF
+                                -DFORCE_OPENSSL=OFF
+        )
     elseif(APPLE)
         ExternalProject_Add(
             ${EXT_POCO}

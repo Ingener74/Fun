@@ -47,4 +47,6 @@ build1/
 Fun-IntelliJ-IDEA-Plugin/out/
 3rdparty/sysroot-msys_mingw/
 3rdparty/sysroot-linux/
+3rdparty/sysroot-msys_msvc/
+3rdparty/sysroot-msvc/
 /core
