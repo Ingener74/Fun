@@ -20,5 +20,5 @@ def reenumerate(filename, in_template, out_template):
 		for line in out_lines:
 			f.write(line + '\n')
 
-reenumerate('test-assign.cpp', r"Assign, [0-9]+", "Assign, %d")
-# reenumerate('test-binary-ops.cpp', r"BinaryOp, [0-9]+", "BinaryOp, %d")
+# reenumerate('test-assign.cpp', r"Assign, [0-9]+", "Assign, %d")
+reenumerate('test-binary-ops.cpp', r"BinaryOp, [0-9]+", "BinaryOp, %d")

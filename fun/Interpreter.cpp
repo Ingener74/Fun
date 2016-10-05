@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <Poco/AutoPtr.h>
 #include "AST.h"
 #include "Utils.h"
 #include "Interpreter.h"
@@ -7,6 +8,7 @@
 namespace fun {
 
 using namespace std;
+using namespace Poco;
 
 #define RELEASE_TOP operands.back()->release(); operands.pop_back();
 
@@ -251,7 +253,7 @@ void Interpreter::visit(Assign* assign) {
 
                 fassertl(!operands.empty(), assign->loc, "not enogth operands")
 
-                auto L = operands.back();
+                AutoPtr<Terminal> L = operands.back();
                 operands.pop_back();
 
                 load = true;
@@ -260,13 +262,10 @@ void Interpreter::visit(Assign* assign) {
 
                 fassertl(!operands.empty(), assign->loc, "not enogth operands")
 
-                auto R = operands.back();
+                AutoPtr<Terminal> R = operands.back();
                 operands.pop_back();
 
                 operands.push_back(operate(L, assign->type, R));
-
-                L->release();
-                R->release();
 
                 store = true;
                 lhs = debug(lhs)->accept(this)->nextExpression;
@@ -286,15 +285,12 @@ void Interpreter::visit(Assign* assign) {
 
                 fassertl(!operands.empty(), assign->loc, "not enogth operands")
 
-                auto L = operands.back();
+                AutoPtr<Terminal> L  = operands.back();
                 operands.pop_back();
 
-                auto R = new Nil;
+                AutoPtr<Terminal> R(new Nil);
 
                 operands.push_back(operate(L, assign->type, R));
-
-                L->release();
-                R->release();
 
                 store = true;
                 lhs = debug(lhs)->accept(this)->nextExpression;
@@ -317,7 +313,7 @@ void Interpreter::visit(BinaryOp* bin_op) {
 
     fassertl(!operands.empty(), bin_op->loc, "not enogth operands")
 
-    auto lhs = operands.back();
+    AutoPtr<Terminal> lhs = operands.back();
     operands.pop_back();
 
     load = true;
@@ -326,13 +322,10 @@ void Interpreter::visit(BinaryOp* bin_op) {
 
     fassertl(!operands.empty(), bin_op->loc, "not enogth operands")
 
-    auto rhs = operands.back();
+    AutoPtr<Terminal> rhs = operands.back();
     operands.pop_back();
 
     operands.push_back(operate(lhs, bin_op->m_operation, rhs));
-
-    lhs->release();
-    rhs->release();
 
     fassertl(operands.size() == (ops + 1), bin_op->loc, "operands balance broken after statement")
 }
