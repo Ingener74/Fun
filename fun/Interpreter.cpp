@@ -482,7 +482,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::SUB: { return new Integer(lhs - rhs); }
         case BinaryOperation::MUL: { return new Integer(lhs * rhs); }
         case BinaryOperation::DIV: { fassert(rhs != 0, "divide by zero"); return new Integer(lhs / rhs); }
-        case BinaryOperation::MOD: { return new Integer(lhs % rhs); }
+        case BinaryOperation::MOD: { fassert(rhs != 0, "divide by zero"); return new Integer(lhs % rhs); }
 
         case BinaryOperation::LSHIFT:     { return new Integer(lhs << rhs); }
         case BinaryOperation::RSHIFT:     { return new Integer(lhs >> rhs); }
@@ -528,6 +528,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
 
         switch (op) {
         case BinaryOperation::ADD: { return new String(lhs + rhs); }
+
+        case BinaryOperation::LSHIFT:     { return new String(lhs + rhs); }
+        case BinaryOperation::RSHIFT:     { return new String(lhs + rhs); }
 
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
