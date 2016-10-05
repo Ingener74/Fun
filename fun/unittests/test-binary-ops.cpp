@@ -3,6 +3,15 @@
 using namespace std;
 using namespace fun;
 
+#define CHECK_OPERAND(TYPE, N, VALUE)                        \
+    auto op_##N = dynamic_cast<TYPE*>(r.v->getOperands()[N]); \
+    ASSERT_NE(op_##N, nullptr);                               \
+    ASSERT_EQ(op_##N->value, VALUE);
+
+#define CHECK_INTEGER_OPERAND(N, VALUE) CHECK_OPERAND(Integer, N, VALUE)
+#define CHECK_STRING_OPERAND(N, VALUE) CHECK_OPERAND(String, N, VALUE)
+#define CHECK_REAL_OPERAND(N, VALUE) CHECK_OPERAND(Real, N, VALUE)
+
 PARSE_ERR(BinaryOp, 1, R"(42 + )", ParserError);
 
 PARSE(BinaryOp, 2, R"(42 + 42)");
@@ -1444,127 +1453,243 @@ PARSE(BinaryOp, 649, R"(nil != nil)");
 
 
 EVAL(BinaryOp, 650, R"(42 + 42)",,
-	ASSERT_EQ(Statement::counter(), 4);
- 	ASSERT_EQ(r.v->getOperands().size(), 1);
-
-    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 42 + 42);
-);
-
-EVAL(BinaryOp, 651, R"(42 + " test string")",,
     ASSERT_EQ(Statement::counter(), 4);
     ASSERT_EQ(r.v->getOperands().size(), 1);
 
-	auto a = dynamic_cast<String*>(r.v->getOperands()[0]);
-	// ASSERT_NE(a, nullptr);
-	// ASSERT_STREQ(a->value.c_str(), "42 test string");
+    CHECK_INTEGER_OPERAND(0, 42 + 42)
+);
+
+EVAL(BinaryOp, 651, R"(42 + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4); 
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_STRING_OPERAND(0, "42 test string");
 );
 
 EVAL(BinaryOp, 652, R"(42 + nil)",,
     ASSERT_EQ(Statement::counter(), 4);
-
     ASSERT_EQ(r.v->getOperands().size(), 1);
 
-    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 42 + 0);
+    CHECK_INTEGER_OPERAND(0, 42 + 0);
 );
 
 EVAL(BinaryOp, 653, R"(42 + 3.1415)",,
     ASSERT_EQ(Statement::counter(), 4);
-
     ASSERT_EQ(r.v->getOperands().size(), 1);
 
-    auto a = dynamic_cast<Real*>(r.v->getOperands()[0]);
-    // ASSERT_NE(a, nullptr);
-    // ASSERT_DOUBLE_EQ(a->value, 42 + 3.1415);
+    CHECK_REAL_OPERAND(0, 42 + 3.1415);
 );
 
 EVAL(BinaryOp, 654, R"(42 + true)",,
     ASSERT_EQ(Statement::counter(), 4);
-
     ASSERT_EQ(r.v->getOperands().size(), 1);
 
-    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 42 + true);
+    CHECK_INTEGER_OPERAND(0, 42 + true);
 );
 
 EVAL(BinaryOp, 655, R"(42 + false)",,
     ASSERT_EQ(Statement::counter(), 4);
-
     ASSERT_EQ(r.v->getOperands().size(), 1);
 
-    auto a = dynamic_cast<Integer*>(r.v->getOperands()[0]);
-    ASSERT_NE(a, nullptr);
-    ASSERT_EQ(a->value, 42 + false);
+    CHECK_INTEGER_OPERAND(0, 42 + false);
 );
 
 
-PARSE(BinaryOp, 656, R"(2.72 + 42)");
+EVAL(BinaryOp, 656, R"(2.72 + 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 657, R"(2.72 + " test string")");
+    CHECK_REAL_OPERAND(0, 2.72 + 42);
+);
 
-PARSE(BinaryOp, 658, R"(2.72 + nil)");
+EVAL(BinaryOp, 657, R"(2.72 + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 659, R"(2.72 + 3.1415)");
+    CHECK_STRING_OPERAND(0, "2.72 test string")
+);
 
-PARSE(BinaryOp, 660, R"(2.72 + true)");
+EVAL(BinaryOp, 658, R"(2.72 + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 661, R"(2.72 + false)");
+    CHECK_REAL_OPERAND(0, 2.72)
+);
 
+EVAL(BinaryOp, 659, R"(2.72 + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 662, R"("Fun " + 42)");
+    CHECK_REAL_OPERAND(0, 2.72 + 3.1415)
+);
 
-PARSE(BinaryOp, 663, R"("Fun " + " test string")");
+EVAL(BinaryOp, 660, R"(2.72 + true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 664, R"("Fun " + nil)");
+    CHECK_REAL_OPERAND(0, 2.72 + true)
+);
 
-PARSE(BinaryOp, 665, R"("Fun " + 3.1415)");
+EVAL(BinaryOp, 661, R"(2.72 + false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 666, R"("Fun " + true)");
-
-PARSE(BinaryOp, 667, R"("Fun " + false)");
-
-
-PARSE(BinaryOp, 668, R"(true + true)");
-
-PARSE(BinaryOp, 669, R"(true + " test string")");
-
-PARSE(BinaryOp, 670, R"(true + nil)");
-
-PARSE(BinaryOp, 671, R"(true + 3.1415)");
-
-PARSE(BinaryOp, 672, R"(true + true)");
-
-PARSE(BinaryOp, 673, R"(true + false)");
-
-
-PARSE(BinaryOp, 674, R"(false + false)");
-
-PARSE(BinaryOp, 675, R"(false + " test string")");
-
-PARSE(BinaryOp, 676, R"(false + nil)");
-
-PARSE(BinaryOp, 677, R"(false + 3.1415)");
-
-PARSE(BinaryOp, 678, R"(false + true)");
-
-PARSE(BinaryOp, 679, R"(false + false)");
+    CHECK_REAL_OPERAND(0, 2.72 + false)
+);
 
 
-PARSE(BinaryOp, 680, R"(nil + nil)");
+EVAL(BinaryOp, 662, R"("Fun " + 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
 
-PARSE(BinaryOp, 681, R"(nil + " test string")");
+   	CHECK_STRING_OPERAND(0, "Fun 42")
+);
 
-PARSE(BinaryOp, 682, R"(nil + nil)");
+EVAL(BinaryOp, 663, R"("Fun " + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
 
-PARSE(BinaryOp, 683, R"(nil + 3.1415)");
+    CHECK_STRING_OPERAND(0, "Fun  test string")
+);
 
-PARSE(BinaryOp, 684, R"(nil + true)");
+EVAL(BinaryOp, 664, R"("Fun " + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
 
-PARSE(BinaryOp, 685, R"(nil + nil)");
+    CHECK_STRING_OPERAND(0, "Fun nil")
+);
+
+EVAL(BinaryOp, 665, R"("Fun " + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun 3.1415")
+);
+
+EVAL(BinaryOp, 666, R"("Fun " + true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun true")
+);
+
+EVAL(BinaryOp, 667, R"("Fun " + false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+
+EVAL_ERR(BinaryOp, 668, R"(true + true)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 669, R"(true + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "true test string")
+);
+
+EVAL_ERR(BinaryOp, 670, R"(true + nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 671, R"(true + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_REAL_OPERAND(0, true + 3.1415)
+);
+
+EVAL_ERR(BinaryOp, 672, R"(true + true)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL_ERR(BinaryOp, 673, R"(true + false)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+
+EVAL_ERR(BinaryOp, 674, R"(false + false)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 675, R"(false + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "false test string")
+);
+
+EVAL_ERR(BinaryOp, 676, R"(false + nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 677, R"(false + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 678, R"(false + true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 679, R"(false + false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+
+EVAL(BinaryOp, 680, R"(nil + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 681, R"(nil + " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 682, R"(nil + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 683, R"(nil + 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 684, R"(nil + true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
+
+EVAL(BinaryOp, 685, R"(nil + nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1); 
+
+    CHECK_STRING_OPERAND(0, "Fun false")
+);
 
 
 

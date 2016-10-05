@@ -32,7 +32,31 @@ EVAL(Assign, 4, R"(foo = 42)",,
     CHECK_INTEGER(foo, 42)
 )
 
-EVAL(Assign, 5, R"(foo, bar = 42, 24)",,
+EVAL(Assign, 5, R"(
+a = 42
+b = a
+a = 43
+)",
+    BREAKPOINT_LINE(4,
+        ASSERT_EQ(Statement::counter(), 9);
+
+        ASSERT_EQ(r.v->getOperands().size(), 0);
+        ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+        CHECK_INTEGER(a, 42)
+        CHECK_INTEGER(b, 42)
+    )
+    ,
+    ASSERT_EQ(Statement::counter(), 9);
+
+    ASSERT_EQ(r.v->getOperands().size(), 0);
+    ASSERT_EQ(r.v->getMemory()[0].size(), 2);
+
+    CHECK_INTEGER(a, 43)
+    CHECK_INTEGER(b, 42)
+)
+
+EVAL(Assign, 6, R"(foo, bar = 42, 24)",,
     ASSERT_EQ(Statement::counter(), 5);
 
     ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -42,7 +66,7 @@ EVAL(Assign, 5, R"(foo, bar = 42, 24)",,
     CHECK_INTEGER(bar, 24)
 )
 
-EVAL(Assign, 6, R"(a, b, c = 1, 2)",,
+EVAL(Assign, 7, R"(a, b, c = 1, 2)",,
     ASSERT_EQ(Statement::counter(), 7);
 
     ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -55,7 +79,7 @@ EVAL(Assign, 6, R"(a, b, c = 1, 2)",,
 )
 
 
-EVAL(Assign, 7, R"(a, b = 1, 2, 3)",,
+EVAL(Assign, 8, R"(a, b = 1, 2, 3)",,
     ASSERT_EQ(Statement::counter(), 6);
 
     ASSERT_EQ(r.v->getOperands().size(), 0);
@@ -65,7 +89,7 @@ EVAL(Assign, 7, R"(a, b = 1, 2, 3)",,
     CHECK_INTEGER(b, 2);
 )
 
-EVAL(Assign, 8, R"(
+EVAL(Assign, 9, R"(
 a = 1
 
 b = a
@@ -84,307 +108,307 @@ b = a
     CHECK_INTEGER(b, 1);
 )
 
-PARSE(Assign, 9, R"(
+PARSE(Assign, 10, R"(
 foo = 0
 foo += 42)");
 
-PARSE(Assign, 10, R"(
+PARSE(Assign, 11, R"(
 bar = 0
 foo += bar)");
 
-PARSE(Assign, 11, R"(
+PARSE(Assign, 12, R"(
 foo = 0
 bar = 0
 foo, bar += 42, 32)");
 
-PARSE(Assign, 12, R"(
+PARSE(Assign, 13, R"(
 bar = 0
 foo = 10
 quz = 30
 foo, bar += quz, quz)");
 
-PARSE(Assign, 13, R"(
+PARSE(Assign, 14, R"(
 foo = 0
 bar = 0
 C = 0
 foo, bar, C += 42, 32)");
 
-PARSE(Assign, 14, R"(
+PARSE(Assign, 15, R"(
 bar = 0
 foo = 10
 quz = 30
 foo, bar += quz, quz, quz)");
 
-PARSE(Assign, 15, R"(
+PARSE(Assign, 16, R"(
 foo = 0
 foo -= 42)");
 
-PARSE(Assign, 16, R"(
+PARSE(Assign, 17, R"(
 bar = 0
 foo -= bar)");
 
-PARSE(Assign, 17, R"(
+PARSE(Assign, 18, R"(
 a = 0
 b = 0
 a, b -= 42, 10)");
 
-PARSE(Assign, 18, R"(
+PARSE(Assign, 19, R"(
 a = 100
 b = 100
 c = 24
 a, b -= c, c)");
 
-PARSE(Assign, 19, R"(
+PARSE(Assign, 20, R"(
 a = 50
 b = 50
 n = 3
 a, b -= 42, 234, 23)");
 
-PARSE(Assign, 20, R"(
+PARSE(Assign, 21, R"(
 _a = 340
 _b = 230
 _c = 235
 _d = 35
 _a, _b, _c -= _d, _d)");
 
-PARSE(Assign, 21, R"(
+PARSE(Assign, 22, R"(
 foo = 0
 foo *= 100)");
 
-PARSE(Assign, 22, R"(
+PARSE(Assign, 23, R"(
 bar = 3
 foo *= bar)");
 
-PARSE(Assign, 23, R"(
+PARSE(Assign, 24, R"(
 a = 2
 b = 3
 a, b *= 3, 4)");
 
-PARSE(Assign, 24, R"(
+PARSE(Assign, 25, R"(
 a = 3
 b = 4
 c = 5
 a, b *= c, c)");
 
-PARSE(Assign, 25, R"(
+PARSE(Assign, 26, R"(
 a = 2
 b = 3
 a, b, c *= 3, 4)");
 
-PARSE(Assign, 26, R"(
+PARSE(Assign, 27, R"(
 a = 3
 b = 4
 c = 5
 a, b, d *= c, c)");
 
-PARSE(Assign, 27, R"(
+PARSE(Assign, 28, R"(
 a = 2
 b = 3
 a, b, c *= 3, 4)");
 
-PARSE(Assign, 28, R"(
+PARSE(Assign, 29, R"(
 a = 3
 b = 4
 c = 5
 a, b *= c, c, c)");
 
-PARSE(Assign, 29, R"(
+PARSE(Assign, 30, R"(
 foo = 2
 foo /= 4)");
 
-PARSE(Assign, 30, R"(
+PARSE(Assign, 31, R"(
 bar = 2
 foo /= bar)");
 
-PARSE(Assign, 31, R"(
-foo = 2
-foo %= bar)");
-
 PARSE(Assign, 32, R"(
-bar = 2
+foo = 2
 foo %= bar)");
 
 PARSE(Assign, 33, R"(
+bar = 2
+foo %= bar)");
+
+PARSE(Assign, 34, R"(
 foo = 123
 foo <<= 4)");
 
-PARSE(Assign, 34, R"(
+PARSE(Assign, 35, R"(
 bar = 2
 foo <<= bar)");
 
-PARSE(Assign, 35, R"(
+PARSE(Assign, 36, R"(
 foo = 2
 foo >>= 1)");
 
-PARSE(Assign, 36, R"(
+PARSE(Assign, 37, R"(
 bar = 2
 foo >>= bar)");
 
-PARSE(Assign, 37, R"(
+PARSE(Assign, 38, R"(
 foo = 234
 foo &= 423)");
 
-PARSE(Assign, 38, R"(
+PARSE(Assign, 39, R"(
 bar = 6345
 foo &= 5234)");
 
-PARSE(Assign, 39, R"(
+PARSE(Assign, 40, R"(
 foo = 6345
 foo |= 7456)");
 
-PARSE(Assign, 40, R"(
+PARSE(Assign, 41, R"(
 bar = bar
 foo |= 3645)");
 
-PARSE(Assign, 41, R"(
+PARSE(Assign, 42, R"(
 foo = 95689
 foo ^= 8567)");
 
-PARSE(Assign, 42, R"(
+PARSE(Assign, 43, R"(
 bar = 746
 foo ^= bar)");
 
-PARSE(Assign, 43, R"(
+PARSE(Assign, 44, R"(
 bar = 36573 + 234
 foo ^= bar)");
 
-PARSE_ERR(Assign, 44, R"(
+PARSE_ERR(Assign, 45, R"(
 foo += 
 )", ParserError);
 
-PARSE_ERR(Assign, 45, R"(
+PARSE_ERR(Assign, 46, R"(
 foo ++= 
 )", ParserError);
 
-PARSE_ERR(Assign, 46, R"(
+PARSE_ERR(Assign, 47, R"(
 foo +== 
 )", ParserError);
 
-PARSE_ERR(Assign, 47, R"(
+PARSE_ERR(Assign, 48, R"(
 foo ++= 4234
 )", ParserError);
 
-PARSE_ERR(Assign, 48, R"(
+PARSE_ERR(Assign, 49, R"(
 foo +== 235 
 )", ParserError);
 
-PARSE_ERR(Assign, 49, R"(
+PARSE_ERR(Assign, 50, R"(
 foo --= 
 )", ParserError);
 
-PARSE_ERR(Assign, 50, R"(
+PARSE_ERR(Assign, 51, R"(
 foo -== 
 )", ParserError);
 
-PARSE_ERR(Assign, 51, R"(
+PARSE_ERR(Assign, 52, R"(
 foo --= 243
 )", ParserError);
 
-PARSE_ERR(Assign, 52, R"(
+PARSE_ERR(Assign, 53, R"(
 foo -== asd 
 )", ParserError);
 
-PARSE_ERR(Assign, 53, R"(
+PARSE_ERR(Assign, 54, R"(
 foo *= 
 )", ParserError);
 
-PARSE_ERR(Assign, 54, R"(
+PARSE_ERR(Assign, 55, R"(
 foo **= 
 )", ParserError);
 
-PARSE_ERR(Assign, 55, R"(
+PARSE_ERR(Assign, 56, R"(
 foo *== 
 )", ParserError);
 
-PARSE_ERR(Assign, 56, R"(
+PARSE_ERR(Assign, 57, R"(
 foo **= adsf
 )", ParserError);
 
-PARSE_ERR(Assign, 57, R"(
+PARSE_ERR(Assign, 58, R"(
 foo *== 234
 )", ParserError);
 
-PARSE_ERR(Assign, 58, R"(
+PARSE_ERR(Assign, 59, R"(
 foo /= 
 )", ParserError);
 
-PARSE_ERR(Assign, 59, R"(
+PARSE_ERR(Assign, 60, R"(
 foo /== 
 )", ParserError);
 
-PARSE_ERR(Assign, 60, R"(
+PARSE_ERR(Assign, 61, R"(
 foo //= 
 )", ParserError);
 
-PARSE_ERR(Assign, 61, R"(
+PARSE_ERR(Assign, 62, R"(
 foo //= 345
 )", ParserError);
 
-PARSE_ERR(Assign, 62, R"(
+PARSE_ERR(Assign, 63, R"(
 foo /== 2354
 )", ParserError);
 
-PARSE_ERR(Assign, 63, R"(
+PARSE_ERR(Assign, 64, R"(
 foo %= 
 )", ParserError);
 
-PARSE_ERR(Assign, 64, R"(
+PARSE_ERR(Assign, 65, R"(
 foo %%= 
 )", ParserError);
 
-PARSE_ERR(Assign, 65, R"(
+PARSE_ERR(Assign, 66, R"(
 foo %== 
 )", ParserError);
 
-PARSE_ERR(Assign, 66, R"(
+PARSE_ERR(Assign, 67, R"(
 foo %%= 34
 )", ParserError);
 
-PARSE_ERR(Assign, 67, R"(
+PARSE_ERR(Assign, 68, R"(
 foo %== 345 
 )", ParserError);
 
-PARSE_ERR(Assign, 68, R"(
+PARSE_ERR(Assign, 69, R"(
 foo &= 
 )", ParserError);
 
-PARSE_ERR(Assign, 69, R"(
+PARSE_ERR(Assign, 70, R"(
 foo &&= 
 )", ParserError);
 
-PARSE_ERR(Assign, 70, R"(
+PARSE_ERR(Assign, 71, R"(
 foo &== 
 )", ParserError);
 
-PARSE_ERR(Assign, 71, R"(
+PARSE_ERR(Assign, 72, R"(
 foo &&= a345
 )", ParserError);
 
-PARSE_ERR(Assign, 72, R"(
+PARSE_ERR(Assign, 73, R"(
 foo &== adsf
 )", ParserError);
 
-PARSE_ERR(Assign, 73, R"(
+PARSE_ERR(Assign, 74, R"(
 foo |= 
 )", ParserError);
 
-PARSE_ERR(Assign, 74, R"(
+PARSE_ERR(Assign, 75, R"(
 foo ||= 
 )", ParserError);
 
-PARSE_ERR(Assign, 75, R"(
+PARSE_ERR(Assign, 76, R"(
 foo |== 
 )", ParserError);
 
-PARSE_ERR(Assign, 76, R"(
+PARSE_ERR(Assign, 77, R"(
 foo ||= asdf
 )", ParserError);
 
-PARSE_ERR(Assign, 77, R"(
+PARSE_ERR(Assign, 78, R"(
 foo |== asdf
 )", ParserError);
 
-EVAL(Assign, 78, R"(
+EVAL(Assign, 79, R"(
 foo = 42
 foo += 10
 )",
@@ -401,7 +425,7 @@ foo += 10
     CHECK_INTEGER(foo, 52);
 )
 
-EVAL(Assign, 79, R"(
+EVAL(Assign, 80, R"(
 foo = 42
 bar = 100
 foo += bar
@@ -421,7 +445,7 @@ foo += bar
     CHECK_INTEGER(foo, 142);
 )
 
-EVAL(Assign, 80, R"(
+EVAL(Assign, 81, R"(
 foo = 42
 bar = 100
 foo, bar += 12, 13
@@ -441,7 +465,7 @@ foo, bar += 12, 13
     CHECK_INTEGER(bar, 100 + 13);
 )
 
-EVAL(Assign, 81, R"(
+EVAL(Assign, 82, R"(
 foo = 42
 bar = 100
 c = 123
@@ -467,7 +491,7 @@ foo, bar += c, d
     CHECK_INTEGER(d, 321);
 )
 
-EVAL(Assign, 82, R"(
+EVAL(Assign, 83, R"(
 foo = 42
 bar = 100
 c = 123
@@ -493,7 +517,7 @@ foo, bar += c, d, 100
     CHECK_INTEGER(d, 321);
 )
 
-EVAL(Assign, 83, R"(
+EVAL(Assign, 84, R"(
 foo = 42
 bar = 100
 c = 123
@@ -521,7 +545,7 @@ foo, bar, E += c, d
     CHECK_INTEGER(E, 0);
 )
 
-EVAL(Assign, 84, R"(
+EVAL(Assign, 85, R"(
 foo = 42
 foo -= 10
 )",
@@ -538,7 +562,7 @@ foo -= 10
     CHECK_INTEGER(foo, 32);
 )
 
-EVAL_ERR(Assign, 85, R"(
+EVAL_ERR(Assign, 86, R"(
 foo = 42
 foo, E -= 10
 )",
@@ -550,7 +574,7 @@ foo, E -= 10
     )
 )
 
-EVAL(Assign, 86, R"(
+EVAL(Assign, 87, R"(
 foo = 42
 a = 12
 foo -= a
@@ -570,7 +594,7 @@ foo -= a
     CHECK_INTEGER(a, 12);
 )
 
-EVAL(Assign, 87, R"(
+EVAL(Assign, 88, R"(
 foo = 42
 b = 10
 foo, b -= 10, 3
@@ -590,7 +614,7 @@ foo, b -= 10, 3
     CHECK_INTEGER(b, 10 - 3);
 )
 
-EVAL(Assign, 88, R"(
+EVAL(Assign, 89, R"(
 foo = 42
 b = 34
 a = 12
@@ -613,7 +637,7 @@ foo, b -= a, a
     CHECK_INTEGER(a, 12);
 )
 
-EVAL(Assign, 89, R"(
+EVAL(Assign, 90, R"(
 foo = 42
 b = 34
 a = 12
@@ -636,7 +660,7 @@ foo, b -= a, a, a
     CHECK_INTEGER(a, 12);
 )
 
-EVAL(Assign, 90, R"(
+EVAL(Assign, 91, R"(
 foo = 42
 b = 34
 a = 12
@@ -662,7 +686,7 @@ foo, b, c -= a, a
     CHECK_INTEGER(c, 23);
 )
 
-EVAL(Assign, 91, R"(
+EVAL(Assign, 92, R"(
 foo = 42
 foo *= 10
 )",
@@ -679,7 +703,7 @@ foo *= 10
     CHECK_INTEGER(foo, 420);
 )
 
-EVAL(Assign, 92, R"(
+EVAL(Assign, 93, R"(
 foo = 42
 bar = 23
 foo *= bar
@@ -699,7 +723,7 @@ foo *= bar
     CHECK_INTEGER(bar, 23);
 )
 
-EVAL(Assign, 93, R"(
+EVAL(Assign, 94, R"(
 foo = 42
 foo /= 2
 )",
@@ -716,7 +740,7 @@ foo /= 2
     CHECK_INTEGER(foo, 42/2);
 )
 
-EVAL(Assign, 94, R"(
+EVAL(Assign, 95, R"(
 foo = 42
 bb = 3
 foo /= bb
@@ -736,7 +760,7 @@ foo /= bb
     CHECK_INTEGER(bb, 3);
 )
 
-EVAL(Assign, 95, R"(
+EVAL(Assign, 96, R"(
 foo = 42
 foo %= 4
 nil
@@ -750,7 +774,7 @@ nil
     ,
 )
 
-EVAL(Assign, 96, R"(
+EVAL(Assign, 97, R"(
 foo = 42
 q = 5
 foo %= q
@@ -770,7 +794,7 @@ foo %= q
     CHECK_INTEGER(q, 5);
 )
 
-EVAL(Assign, 97, R"(
+EVAL(Assign, 98, R"(
 foo = 42
 foo <<= 3
 )",
@@ -787,7 +811,7 @@ foo <<= 3
     CHECK_INTEGER(foo, 42<<3);
 )
 
-EVAL(Assign, 98, R"(
+EVAL(Assign, 99, R"(
 foo = 42
 test = 4
 foo <<= test
@@ -808,7 +832,7 @@ foo <<= test
 )
 
 
-EVAL(Assign, 99, R"(
+EVAL(Assign, 100, R"(
 foo = 42
 foo >>= 2
 )",
@@ -825,7 +849,7 @@ foo >>= 2
     CHECK_INTEGER(foo, 42>>2);
 )
 
-EVAL(Assign, 100, R"(
+EVAL(Assign, 101, R"(
 foo = 42
 T = 3
 foo >>= T
@@ -846,7 +870,7 @@ foo >>= T
 )
 
 
-EVAL(Assign, 101, R"(
+EVAL(Assign, 102, R"(
 foo = 42
 foo &= 12
 )",
@@ -863,7 +887,7 @@ foo &= 12
     CHECK_INTEGER(foo, 42&12);
 )
 
-EVAL(Assign, 102, R"(
+EVAL(Assign, 103, R"(
 foo = 42
 A = 34
 foo &= A
@@ -884,7 +908,7 @@ foo &= A
 )
 
 
-EVAL(Assign, 103, R"(
+EVAL(Assign, 104, R"(
 foo = 42
 foo |= 54
 )",
@@ -901,7 +925,7 @@ foo |= 54
     CHECK_INTEGER(foo, 42|54);
 )
 
-EVAL(Assign, 104, R"(
+EVAL(Assign, 105, R"(
 foo = 42
 F = 45
 foo |= F
@@ -922,7 +946,7 @@ foo |= F
 )
 
 
-EVAL(Assign, 105, R"(
+EVAL(Assign, 106, R"(
 foo = 42
 foo ^= 40
 )",
@@ -939,7 +963,7 @@ foo ^= 40
     CHECK_INTEGER(foo, 42^40);
 )
 
-EVAL(Assign, 106, R"(
+EVAL(Assign, 107, R"(
 foo = 42
 G = 50
 foo ^= G

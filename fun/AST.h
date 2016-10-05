@@ -369,7 +369,7 @@ class Terminal: public Expression {
 public:
     enum Type {
         Unknown,
-        Integer, Real, String, Boolean, Nil,
+        Nil, Boolean, Integer, Real, String,
         Object, Function, Dictionary, List
     };
 
@@ -388,6 +388,9 @@ public:
     virtual bool toBoolean() const { return false; }
     virtual long long toInteger() const { return 0; }
     virtual double toReal() const { return 0.0; }
+
+    static Type getSeniorBinaryOpType(Type lhs, Type rhs);
+    static Type getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs);
 };
 
 class Function: public Terminal {
@@ -474,7 +477,7 @@ public:
         return Terminal::Nil;
     }
 
-    virtual std::string toString() const { return ""; }
+    virtual std::string toString() const { return "nil"; }
     virtual bool toBoolean() const { return false; }
     virtual long long toInteger() const { return 0; }
     virtual double toReal() const { return 0.0; }

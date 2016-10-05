@@ -219,6 +219,16 @@ RoundBrackets::~RoundBrackets(){
     SAFE_RELEASE(expr)
 }
 
+Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {
+    fassert(lhs == Nil || lhs == Boolean || lhs == Integer || lhs == Real || lhs == String, "unsupported type");
+    fassert(rhs == Nil || rhs == Boolean || rhs == Integer || rhs == Real || rhs == String, "unsupported type");
+    return std::max<Type>(lhs, rhs);
+}
+
+Terminal::Type Terminal::getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs) {
+    return getSeniorBinaryOpType(lhs->getType(), rhs->getType());
+}
+
 ACCEPT(Boolean, )
 
 ACCEPT(Integer, )

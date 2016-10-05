@@ -477,7 +477,8 @@ void Interpreter::visit(String *str) {
 }
 
 Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
-    switch (a->getType()) {
+    auto seniorType = Terminal::getSeniorBinaryOpType(a, b);
+    switch (seniorType) {
     case Terminal::Integer: {
 
         auto lhs = a->toInteger();
