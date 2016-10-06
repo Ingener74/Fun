@@ -48,7 +48,6 @@ enable_testing()
 include_directories(
     fun
     ${CMAKE_BINARY_DIR}/fun
-    cxxopts/src
     ${SYSROOT}/include
 )
 link_directories(

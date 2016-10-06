@@ -16,14 +16,7 @@
 using namespace std;
 using namespace fun;
 using namespace Poco;
-
-using Poco::Util::Application;
-using Poco::Util::Option;
-using Poco::Util::OptionSet;
-using Poco::Util::HelpFormatter;
-using Poco::Util::AbstractConfiguration;
-using Poco::Util::OptionCallback;
-using Poco::AutoPtr;
+using namespace Poco::Util;
 
 class ConsoleDebugger : public Debugger {
 public:
