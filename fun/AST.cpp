@@ -256,4 +256,13 @@ bool Real::toBoolean() const {
     return value > Eps;
 }
 
+const double Epsilon = 1e-8;
+bool Real::isTrue(double val) {
+    return fabs(val) > Epsilon;
+}
+
+bool String::isTrue(const std::string& str) {
+    return str != "false" && str != "nil" && !str.empty();
+}
+
 }

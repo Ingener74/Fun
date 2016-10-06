@@ -505,6 +505,8 @@ public:
     virtual bool toBoolean() const;
     virtual long long toInteger() const { return static_cast<long long>(value); }
     virtual double toReal() const { return value; }
+
+    static bool isTrue(double);
 };
 
 class String: public Terminal {
@@ -529,6 +531,8 @@ public:
     virtual bool toBoolean() const { return !value.empty(); }
     virtual long long toInteger() const { return value.size(); }
     virtual double toReal() const { return value.size(); }
+
+    static bool isTrue(const std::string&);
 };
 
 }
