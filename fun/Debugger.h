@@ -61,7 +61,6 @@ public:
     virtual void onCatchBreakpoint(const Breakpoint &) = 0;
     virtual void onOperandsChanged(const std::vector<Terminal*> &) = 0;
     virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) = 0;
-    virtual void onProgramEnded(){}
 
     virtual void list();
 

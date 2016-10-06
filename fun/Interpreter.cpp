@@ -15,7 +15,6 @@ using namespace Poco;
 void Interpreter::iterateStatements(Statement *stmts) {
     while (stmts)
         stmts = debug(stmts)->accept(this)->nextStatement;
-    if (debugger) debugger->onProgramEnded();
 }
 
 Interpreter::Interpreter(Debugger* debugger) :

@@ -15,7 +15,6 @@ public:
     MOCK_METHOD1(onCatchBreakpoint, void(const fun::Breakpoint &));
     MOCK_METHOD1(onOperandsChanged, void(const std::vector<fun::Terminal*> &));
     MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, fun::Terminal*>&));
-    MOCK_METHOD0(onProgramEnded, void());
 };
 
 struct Result {
@@ -82,16 +81,13 @@ private:
             Poco::Mutex mtx;                                           \
             Poco::Condition cond;                                      \
             BODY                                                       \
-            EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
-                WillOnce(testing::InvokeWithoutArgs([&]{               \
-                    Poco::ScopedLock<Poco::Mutex> lock(mtx);           \
-                   f = [&]{ stop = true; r.d->resume(); };             \
-                   ConditionUnlocker unlocker(cond);                   \
-                   END                                                 \
-                }));                                                   \
             Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
                 EXPECT_NO_THROW(r.ast->accept(r.v.get()));             \
+                Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
+                f = [&]{ stop = true; r.d->resume(); };                \
+                ConditionUnlocker unlocker(cond);                      \
+                END                                                    \
             });                                                        \
             while(true){                                               \
                 Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
@@ -115,8 +111,6 @@ private:
             Poco::Mutex mtx;                                           \
             Poco::Condition cond;                                      \
             BODY                                                       \
-            EXPECT_CALL(*r.d.get(), onProgramEnded()).                 \
-                Times(0);                                              \
             Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
                 EXPECT_THROW(r.ast->accept(r.v.get()), InterpretError); \
