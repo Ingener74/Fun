@@ -3,8 +3,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <cxxopts.hpp>
-
 #include <Poco/Thread.h>
 #include <Poco/Util/Application.h>
 #include <Poco/Util/Option.h>
@@ -19,13 +17,13 @@ using namespace std;
 using namespace fun;
 using namespace Poco;
 
-//using Poco::Util::Application;
-//using Poco::Util::Option;
-//using Poco::Util::OptionSet;
-//using Poco::Util::HelpFormatter;
-//using Poco::Util::AbstractConfiguration;
-//using Poco::Util::OptionCallback;
-//using Poco::AutoPtr;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
+using Poco::Util::AbstractConfiguration;
+using Poco::Util::OptionCallback;
+using Poco::AutoPtr;
 
 class ConsoleDebugger : public Debugger {
 public:
@@ -55,156 +53,118 @@ bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStr
     return result;
 }
 
-//class FunCommandLineFrontendApplication: public Poco::Util::Application {
-//public:
-//    FunCommandLineFrontendApplication(): _helpRequested(false)
-//    {
-//    }
-//
-//protected:
-//    void initialize(Application& self)
-//    {
-//        loadConfiguration(); // load default configuration files, if present
-//        Application::initialize(self);
-//        // add your own initialization code here
-//    }
-//
-//    void uninitialize()
-//    {
-//        // add your own uninitialization code here
-//        Application::uninitialize();
-//    }
-//
-//    void reinitialize(Application& self)
-//    {
-//        Application::reinitialize(self);
-//        // add your own reinitialization code here
-//    }
-//
-//    void defineOptions(OptionSet& options)
-//    {
-//        Application::defineOptions(options);
-//
-//        options.addOption(
-//            Option("help", "h", "display help information on command line arguments")
-//                .required(false)
-//                .repeatable(false)
-//                .callback(OptionCallback<FunCommandLineFrontendApplication>(this, &FunCommandLineFrontendApplication::handleHelp)));
-//
-//        options.addOption(
-//            Option("define", "D", "define a configuration property")
-//                .required(false)
-//                .repeatable(true)
-//                .argument("name=value")
-//                .callback(OptionCallback<FunCommandLineFrontendApplication>(this, &FunCommandLineFrontendApplication::handleDefine)));
-//
-//        options.addOption(
-//            Option("config-file", "f", "load configuration data from a file")
-//                .required(false)
-//                .repeatable(true)
-//                .argument("file")
-//                .callback(OptionCallback<FunCommandLineFrontendApplication>(this, &FunCommandLineFrontendApplication::handleConfig)));
-//
-//        options.addOption(
-//            Option("bind", "b", "bind option value to test.property")
-//                .required(false)
-//                .repeatable(false)
-//                .argument("value")
-//                .binding("test.property"));
-//    }
-//
-//    void handleHelp(const std::string& name, const std::string& value) {
-//        _helpRequested = true;
-//        displayHelp();
-//        stopOptionsProcessing();
-//    }
-//
-//    void handleDefine(const std::string& name, const std::string& value) {
-//        defineProperty(value);
-//    }
-//
-//    void handleConfig(const std::string& name, const std::string& value) {
-//        loadConfiguration(value);
-//    }
-//
-//    void displayHelp() {
+class FunApplication: public Poco::Util::Application {
+public:
+    FunApplication() {
+    }
+
+protected:
+    void initialize(Application& self) {
+        Application::initialize(self);
+    }
+
+    void uninitialize() {
+        Application::uninitialize();
+    }
+
+    void reinitialize(Application& self) {
+        Application::reinitialize(self);
+    }
+
+    void defineOptions(OptionSet& options) {
+        Application::defineOptions(options);
+
+        options.addOption(
+                Option("help", "h", "help information")
+                .required(false)
+                .repeatable(false)
+                .callback(OptionCallback<FunApplication>(this, &FunApplication::handleHelp)));
+
+        options.addOption(
+                Option("debug", "d", "debug mode")
+                .required(false)
+                .repeatable(false)
+                .callback(OptionCallback<FunApplication>(this, &FunApplication::handleDebug)));
+
+        options.addOption(
+                Option("file", "f", "input script")
+                .required(true)
+                .repeatable(false)
+                .argument("file", true)
+                .callback(OptionCallback<FunApplication>(this, &FunApplication::handleScript)));
+
+        options.addOption(
+            Option("watch", "w", "watch for auto reload")
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleWatch))
+        );
+    }
+
+    void handleHelp(const std::string& name, const std::string& value) {
+        cout << __PRETTY_FUNCTION__ << ", " << name << ": " << value << endl;
+    }
+
+    void handleDebug(const std::string& name, const std::string& value) {
+        cout << __PRETTY_FUNCTION__ << ", " << name << ": " << value << endl;
+    }
+
+    void handleWatch(const std::string& name, const std::string& value) {
+        cout << __PRETTY_FUNCTION__ << ", " << name << ": " << value << endl;
+    }
+
+    void handleScript(const std::string& name, const std::string& value) {
+        scriptFileName = value;
+    }
+
+    void displayHelp() {
 //        HelpFormatter helpFormatter(options());
 //        helpFormatter.setCommand(commandName());
 //        helpFormatter.setUsage("OPTIONS");
 //        helpFormatter.setHeader(
 //                "A sample application that demonstrates some of the features of the Poco::Util::Application class.");
 //        helpFormatter.format(std::cout);
-//    }
-//
-//    void defineProperty(const std::string& def)
-//    {
-//        std::string name;
-//        std::string value;
-//        std::string::size_type pos = def.find('=');
-//        if (pos != std::string::npos)
-//        {
-//            name.assign(def, 0, pos);
-//            value.assign(def, pos + 1, def.length() - pos);
-//        }
-//        else name = def;
-//        config().setString(name, value);
-//    }
-//
-//    int main(const ArgVec& args)
-//    {
-//        if (!_helpRequested)
-//        {
-//            logger().information("Command line:");
-//            std::ostringstream ostr;
-//            for (auto& arg: argv)
-//            {
-//                ostr << arg << ' ';
-//            }
-//            logger().information(ostr.str());
-//            logger().information("Arguments to main():");
-//            for (auto& arg: args)
-//            {
-//                logger().information(arg);
-//            }
-//            logger().information("Application properties:");
-//            printProperties("");
-//        }
-//        return Application::EXIT_OK;
-//    }
-//
-//    void printProperties(const std::string& base)
-//    {
-//        AbstractConfiguration::Keys keys;
-//        config().keys(base, keys);
-//        if (keys.empty())
-//        {
-//            if (config().hasProperty(base))
-//            {
-//                std::string msg;
-//                msg.append(base);
-//                msg.append(" = ");
-//                msg.append(config().getString(base));
-//                logger().information(msg);
-//            }
-//        }
-//        else
-//        {
-//            for (auto& key: keys)
-//            {
-//                std::string fullKey = base;
-//                if (!fullKey.empty()) fullKey += '.';
-//                fullKey.append();
-//                printProperties(fullKey);
-//            }
-//        }
-//    }
-//
-//private:
-//    bool _helpRequested;
-//};
-//
-//POCO_APP_MAIN(FunCommandLineFrontendApplication)
+    }
 
+    int main(const ArgVec& args) {
+
+        try {
+            Printer printer;
+            ConsoleDebugger consoleDebugger(&printer);
+            Interpreter interpret(nullptr);
+            Compiler compiler;
+
+            Visitor* visitor = &interpret;
+
+            string filename = scriptFileName;
+            if (scriptFileName.empty())
+                throw std::runtime_error("no input file");
+            ifstream file(filename);
+
+            Thread th;
+            th.startFunc([visitor, &file, &filename] {
+                try {
+                    parseAndRunCode(visitor, filename, file, false);
+                } catch (std::exception &e) {
+                    cerr << e.what() << endl;
+                }
+            });
+
+            if (th.isRunning()) {
+                th.join();
+            }
+
+            return Application::EXIT_OK;
+        } catch (exception const& e) {
+            return Application::EXIT_SOFTWARE;
+        }
+    }
+
+private:
+    string scriptFileName;
+};
+
+POCO_APP_MAIN(FunApplication)
+
+/*
 int main(int argc, char* argv[]) {
     try {
         cxxopts::Options options(argv[0], "Fun - command line options");
@@ -408,3 +368,4 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 }
+*/
