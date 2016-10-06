@@ -251,9 +251,8 @@ string Real::toString() const {
     return ss.str();
 }
 
-const double Eps = 1e-6;
 bool Real::toBoolean() const {
-    return value > Eps;
+    return isTrue(value);
 }
 
 const double Epsilon = 1e-8;
