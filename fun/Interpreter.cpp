@@ -468,6 +468,16 @@ void Interpreter::visit(String *str) {
     fassertl(!store, str->loc, "you can't assign to value")
 }
 
+const double Epsilon = 1e-8;
+
+bool doubleMoreZero(double val) {
+    return fabs(val) > Epsilon;
+}
+
+bool isLogicTrueString(const std::string& str) {
+    return str != "false" && str != "nil" && !str.empty();
+}
+
 Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
     auto seniorType = Terminal::getSeniorBinaryOpType(a, b);
     switch (seniorType) {
@@ -490,7 +500,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::BINARY_XOR: { return new Integer(lhs ^ rhs); }
 
         case BinaryOperation::LOGIC_OR:  { return new Boolean(lhs || rhs); }
-        case BinaryOperation::LOGIC_AND: { return new Boolean(lhs && rhs); }
+        case BinaryOperation::LOGIC_AND: {
+            return new Boolean(lhs && rhs);
+        }
 
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
@@ -513,6 +525,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::MUL: { return new Real(lhs * rhs); }
         case BinaryOperation::DIV: { fassert(rhs != 0.0, "devide by zero"); return new Real(lhs / rhs); }
 
+        case BinaryOperation::LOGIC_OR:  { return new Boolean(doubleMoreZero(lhs) || doubleMoreZero(rhs)); }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(doubleMoreZero(lhs) && doubleMoreZero(rhs)); }
+
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         case BinaryOperation::MORE:       { return new Boolean(lhs >  rhs); }
@@ -531,8 +546,8 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         switch (op) {
         case BinaryOperation::ADD: { return new String(lhs + rhs); }
 
-        case BinaryOperation::LOGIC_OR:  { return new Boolean(!lhs.empty() || !rhs.empty()); }
-        case BinaryOperation::LOGIC_AND: { return new Boolean(!lhs.empty() && !rhs.empty()); }
+        case BinaryOperation::LOGIC_OR:  { return new Boolean(isLogicTrueString(lhs) || isLogicTrueString(rhs)); }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(isLogicTrueString(lhs) && isLogicTrueString(rhs)); }
 
         case BinaryOperation::LSHIFT:     { return new String(lhs + rhs); }
         case BinaryOperation::RSHIFT:     { return new String(lhs + rhs); }

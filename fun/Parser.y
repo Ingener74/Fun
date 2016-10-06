@@ -368,8 +368,8 @@ expr
     | expr "&"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::BINARY_AND, $1, $3); }
     | expr "|"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::BINARY_OR,  $1, $3); }
     | expr "^"  expr     { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::BINARY_XOR, $1, $3); }
-    | expr "&&"  expr    { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::LOGIC_OR,   $1, $3); }
-    | expr "||"  expr    { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::LOGIC_AND,  $1, $3); }
+    | expr "&&"  expr    { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::LOGIC_AND,  $1, $3); }
+    | expr "||"  expr    { $$ = ast->add<BinaryOp>(@1 + @3, BinaryOperation::LOGIC_OR,   $1, $3); }
     
     | INTEGER            { $$ = ast->add<Integer>(@1, $1);                                 }
     | REAL               { $$ = ast->add<Real>(@1, $1);                                    }
