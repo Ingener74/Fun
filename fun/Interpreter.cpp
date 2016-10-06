@@ -490,6 +490,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::BINARY_AND: { return new Integer(lhs & rhs); }
         case BinaryOperation::BINARY_XOR: { return new Integer(lhs ^ rhs); }
 
+        case BinaryOperation::LOGIC_OR:  { return new Boolean(lhs || rhs); }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(lhs && rhs); }
+
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         case BinaryOperation::MORE:       { return new Boolean(lhs >  rhs); }
@@ -529,6 +532,9 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         switch (op) {
         case BinaryOperation::ADD: { return new String(lhs + rhs); }
 
+        case BinaryOperation::LOGIC_OR:  { return new Boolean(!lhs.empty() || !rhs.empty()); }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(!lhs.empty() && !rhs.empty()); }
+
         case BinaryOperation::LSHIFT:     { return new String(lhs + rhs); }
         case BinaryOperation::RSHIFT:     { return new String(lhs + rhs); }
 
@@ -547,10 +553,23 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         switch (op) {
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
+
+        case BinaryOperation::LOGIC_OR:  { return new Boolean(lhs || rhs); }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(lhs && rhs); }
+
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
         break;
+    }
+    case Terminal::Nil: {
+        switch (op) {
+        case BinaryOperation::LOGIC_AND: { return new Boolean(false); }
+        case BinaryOperation::LOGIC_OR: { return new Boolean(false); }
+
+        default:
+            fassertl(false, a->loc + b->loc, "unsupported operation");
+        }
     }
     default:
         fassertl(false, a->loc + b->loc, "unsupported operation");
