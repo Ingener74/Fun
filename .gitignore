@@ -50,3 +50,4 @@ Fun-IntelliJ-IDEA-Plugin/out/
 3rdparty/sysroot-msys_msvc/
 3rdparty/sysroot-msvc/
 /core
+/linux-build
