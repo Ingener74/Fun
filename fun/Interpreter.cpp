@@ -490,9 +490,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::BINARY_XOR: { return new Integer(lhs ^ rhs); }
 
         case BinaryOperation::LOGIC_OR:  { return new Boolean(lhs || rhs); }
-        case BinaryOperation::LOGIC_AND: {
-            return new Boolean(lhs && rhs);
-        }
+        case BinaryOperation::LOGIC_AND: { return new Boolean(lhs && rhs); }
 
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
@@ -542,11 +540,15 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::LSHIFT:     { return new String(lhs + rhs); }
         case BinaryOperation::RSHIFT:     { return new String(lhs + rhs); }
 
+        case BinaryOperation::MORE:       { return new Boolean(lhs.size() >  rhs.size()); }
+        case BinaryOperation::MORE_EQUAL: { return new Boolean(lhs.size() >= rhs.size()); }
+        case BinaryOperation::LESS:       { return new Boolean(lhs.size() <  rhs.size()); }
+        case BinaryOperation::LESS_EQUAL: { return new Boolean(lhs.size() <= rhs.size()); }
+
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
-
         }
         break;
     }
@@ -555,6 +557,11 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         auto rhs = b->toBoolean();
 
         switch (op) {
+        case BinaryOperation::MORE:       { return new Boolean(lhs >  rhs); }
+        case BinaryOperation::MORE_EQUAL: { return new Boolean(lhs >= rhs); }
+        case BinaryOperation::LESS:       { return new Boolean(lhs <  rhs); }
+        case BinaryOperation::LESS_EQUAL: { return new Boolean(lhs <= rhs); }
+
         case BinaryOperation::EQUAL:      { return new Boolean(lhs == rhs); }
         case BinaryOperation::NOT_EQUAL:  { return new Boolean(lhs != rhs); }
 
@@ -571,13 +578,18 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         case BinaryOperation::LOGIC_AND: { return new Boolean(false); }
         case BinaryOperation::LOGIC_OR: { return new Boolean(false); }
 
+        case BinaryOperation::EQUAL:      { return new Boolean(true); }
+        case BinaryOperation::NOT_EQUAL:  { return new Boolean(false); }
+
         default:
             fassertl(false, a->loc + b->loc, "unsupported operation");
         }
+        break;
     }
     default:
         fassertl(false, a->loc + b->loc, "unsupported operation");
     }
+    return nullptr;
 }
 
 const vector<Terminal*> &Interpreter::getOperands() const {

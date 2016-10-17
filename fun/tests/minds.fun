@@ -428,3 +428,9 @@ if true
 a = 1
 b = if a == 1 2 else 4;
 
+math = import("math")
+json = import("json")
+
+custom = import("custom")
+
+

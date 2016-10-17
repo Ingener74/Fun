@@ -21,14 +21,14 @@ ParserError::ParserError(const location& location, const std::string& message) :
         }()) {
 }
 
-fun::ParserError::~ParserError() {
+ParserError::~ParserError() {
 }
 
-}
-
-fun::InterpretError::InterpretError(const std::string& message) :
+InterpretError::InterpretError(const std::string& message) :
         runtime_error(message) {
 }
 
-fun::InterpretError::~InterpretError() {
+InterpretError::~InterpretError() {
+}
+
 }

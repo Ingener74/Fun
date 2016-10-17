@@ -13,6 +13,8 @@ using namespace fun;
 #define CHECK_REAL_OPERAND(N, VALUE) CHECK_OPERAND(Real, N, VALUE)
 #define CHECK_BOOLEAN_OPERAND(N, VALUE) CHECK_OPERAND(Boolean, N, VALUE)
 
+// TODO последовательность операции, проверка приоритета
+
 PARSE_ERR(BinaryOp, 1, R"(42 + )", ParserError);
 
 PARSE(BinaryOp, 2, R"(42 + 42)");
@@ -3831,6 +3833,1552 @@ EVAL(BinaryOp, 1081, R"(nil || nil)",,
     CHECK_BOOLEAN_OPERAND(0, false)
 );
 
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1082, R"(42 < 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1083, R"(42 < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1084, R"(42 < nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1085, R"(42 < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1086, R"(42 < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1087, R"(42 < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1088, R"(2.72 < 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1089, R"(2.72 < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1090, R"(2.72 < nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1091, R"(2.72 < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1092, R"(2.72 < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1093, R"(2.72 < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1094, R"("Fun " < 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1095, R"("Fun " < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1096, R"("Fun " < nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1097, R"("Fun " < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1098, R"("Fun " < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1099, R"("Fun " < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1100, R"(true < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1101, R"(true < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1102, R"(true < nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1103, R"(true < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1104, R"(true < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1105, R"(true < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1106, R"(false < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1107, R"(false < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1108, R"(false < nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1109, R"(false < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1110, R"(false < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1111, R"(false < false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL_ERR(BinaryOp, 1112, R"(nil < nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1113, R"(nil < " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL_ERR(BinaryOp, 1114, R"(nil < nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1115, R"(nil < 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1116, R"(nil < true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL_ERR(BinaryOp, 1117, R"(nil < nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1118, R"(42 > 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1119, R"(42 > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1120, R"(42 > nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1121, R"(42 > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1122, R"(42 > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1123, R"(42 > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1124, R"(2.72 > 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1125, R"(2.72 > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1126, R"(2.72 > nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1127, R"(2.72 > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1128, R"(2.72 > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1129, R"(2.72 > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1130, R"("Fun " > 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1131, R"("Fun " > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1132, R"("Fun " > nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1133, R"("Fun " > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1134, R"("Fun " > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1135, R"("Fun " > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1136, R"(true > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1137, R"(true > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1138, R"(true > nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1139, R"(true > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1140, R"(true > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1141, R"(true > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1142, R"(false > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1143, R"(false > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1144, R"(false > nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1145, R"(false > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1146, R"(false > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1147, R"(false > false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL_ERR(BinaryOp, 1148, R"(nil > nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1149, R"(nil > " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL_ERR(BinaryOp, 1150, R"(nil > nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1151, R"(nil > 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1152, R"(nil > true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL_ERR(BinaryOp, 1153, R"(nil > nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1154, R"(42 >= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1155, R"(42 >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1156, R"(42 >= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1157, R"(42 >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1158, R"(42 >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1159, R"(42 >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1160, R"(2.72 >= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1161, R"(2.72 >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1162, R"(2.72 >= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1163, R"(2.72 >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1164, R"(2.72 >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1165, R"(2.72 >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1166, R"("Fun " >= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1167, R"("Fun " >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1168, R"("Fun " >= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1169, R"("Fun " >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1170, R"("Fun " >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1171, R"("Fun " >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1172, R"(true >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1173, R"(true >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1174, R"(true >= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1175, R"(true >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1176, R"(true >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1177, R"(true >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1178, R"(false >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1179, R"(false >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1180, R"(false >= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1181, R"(false >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1182, R"(false >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1183, R"(false >= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL_ERR(BinaryOp, 1184, R"(nil >= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1185, R"(nil >= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL_ERR(BinaryOp, 1186, R"(nil >= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1187, R"(nil >= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1188, R"(nil >= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL_ERR(BinaryOp, 1189, R"(nil >= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1190, R"(42 <= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1191, R"(42 <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1192, R"(42 <= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1193, R"(42 <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1194, R"(42 <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1195, R"(42 <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1196, R"(2.72 <= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1197, R"(2.72 <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1198, R"(2.72 <= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1199, R"(2.72 <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1200, R"(2.72 <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1201, R"(2.72 <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1202, R"("Fun " <= 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1203, R"("Fun " <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1204, R"("Fun " <= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1205, R"("Fun " <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1206, R"("Fun " <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1207, R"("Fun " <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1208, R"(true <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1209, R"(true <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1210, R"(true <= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1211, R"(true <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1212, R"(true <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1213, R"(true <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1214, R"(false <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1215, R"(false <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1216, R"(false <= nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1217, R"(false <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1218, R"(false <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1219, R"(false <= false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL_ERR(BinaryOp, 1220, R"(nil <= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1221, R"(nil <= " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL_ERR(BinaryOp, 1222, R"(nil <= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+EVAL(BinaryOp, 1223, R"(nil <= 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1224, R"(nil <= true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL_ERR(BinaryOp, 1225, R"(nil <= nil)",
+    ASSERT_EQ(Statement::counter(), 3);
+);
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1226, R"(42 == 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1227, R"(42 == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1228, R"(42 == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1229, R"(42 == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1230, R"(42 == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1231, R"(42 == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1232, R"(2.72 == 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1233, R"(2.72 == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1234, R"(2.72 == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1235, R"(2.72 == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1236, R"(2.72 == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1237, R"(2.72 == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1238, R"("Fun " == 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1239, R"("Fun " == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1240, R"("Fun " == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1241, R"("Fun " == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1242, R"("Fun " == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1243, R"("Fun " == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1244, R"(true == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1245, R"(true == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1246, R"(true == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1247, R"(true == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1248, R"(true == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1249, R"(true == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1250, R"(false == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1251, R"(false == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1252, R"(false == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1253, R"(false == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1254, R"(false == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1255, R"(false == false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1256, R"(nil == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1257, R"(nil == " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1258, R"(nil == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1259, R"(nil == 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1260, R"(nil == true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1261, R"(nil == nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+
+
+
+
+
+
+EVAL(BinaryOp, 1262, R"(42 != 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1263, R"(42 != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1264, R"(42 != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1265, R"(42 != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1266, R"(42 != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1267, R"(42 != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1268, R"(2.72 != 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1269, R"(2.72 != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1270, R"(2.72 != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1271, R"(2.72 != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1272, R"(2.72 != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1273, R"(2.72 != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1274, R"("Fun " != 42)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1275, R"("Fun " != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1276, R"("Fun " != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1277, R"("Fun " != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1278, R"("Fun " != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1279, R"("Fun " != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1280, R"(true != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1281, R"(true != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1282, R"(true != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1283, R"(true != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1284, R"(true != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1285, R"(true != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+
+EVAL(BinaryOp, 1286, R"(false != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1287, R"(false != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1288, R"(false != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1289, R"(false != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1290, R"(false != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1291, R"(false != false)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+
+EVAL(BinaryOp, 1292, R"(nil != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1293, R"(nil != " test string")",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1294, R"(nil != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
+
+EVAL(BinaryOp, 1295, R"(nil != 3.1415)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1296, R"(nil != true)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, true)
+);
+
+EVAL(BinaryOp, 1297, R"(nil != nil)",,
+    ASSERT_EQ(Statement::counter(), 4);
+    ASSERT_EQ(r.v->getOperands().size(), 1);
+
+    CHECK_BOOLEAN_OPERAND(0, false)
+);
 
 
 
