@@ -128,7 +128,7 @@ protected:
                 Thread th;
                 th.startFunc([visitor, &file, &filename] {
                     try {
-                        parseAndRunCode(visitor, filename, file, false);
+//                        parseAndRunCode(visitor, filename, file, false);
                     }
                     catch (std::exception &e) {
                         cerr << e.what() << endl;
