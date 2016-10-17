@@ -18,34 +18,6 @@ using namespace fun;
 using namespace Poco;
 using namespace Util;
 
-class ConsoleDebugger : public Debugger {
-public:
-    ConsoleDebugger(Printer* printer): Debugger(printer) {
-    }
-
-    virtual ~ConsoleDebugger() {
-    }
-
-    virtual void onOperandsChanged(const std::vector<Terminal*> &) override {
-    }
-
-    virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) override {
-    }
-
-    virtual void onCatchBreakpoint(const Breakpoint &) override {
-    }
-};
-
-bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
-    Lexer lexer(filename, &inputStream);
-    Ast ast;
-    Parser parser(lexer, &ast);
-    parser.set_debug_level(debug);
-    bool result = parser.parse();
-    ast.accept(visitor);
-    return result;
-}
-
 class FunApplication: public Application {
 public:
     FunApplication() {
@@ -56,134 +28,141 @@ protected:
         Application::initialize(self);
     }
 
-	void uninitialize() override {
+    void uninitialize() override {
         Application::uninitialize();
     }
 
-	void reinitialize(Application& self) override {
+    void reinitialize(Application& self) override {
         Application::reinitialize(self);
     }
 
-	void defineOptions(OptionSet& options) override {
+    void defineOptions(OptionSet& options) override {
         Application::defineOptions(options);
 
         options.addOption(
             Option("help", "h", "help information")
             .required(false)
             .repeatable(false)
-            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleHelp)));
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleHelp))
+        );
 
         options.addOption(
             Option("debug", "d", "debug mode")
             .required(false)
             .repeatable(false)
-            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleDebug)));
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleDebug))
+        );
 
         options.addOption(
             Option("file", "f", "input script")
             .required(false)
-            .repeatable(false)
-            .argument("file", true)
-            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleScript)));
-
-		options.addOption(
-			Option("print", "p", "Print program")
-			.callback(OptionCallback<FunApplication>(this, &FunApplication::handlePrint)));
+            .repeatable(false).argument("file", true)
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleScript))
+        );
 
         options.addOption(
-			Option("watch", "w", "watch for auto reload")
-			.callback(OptionCallback<FunApplication>(this, &FunApplication::handleWatch))
+            Option("print", "p", "Print program")
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handlePrint))
+        );
+
+        options.addOption(
+            Option("watch", "w", "watch for auto reload")
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleWatch))
         );
     }
 
     void handleHelp(const std::string& name, const std::string& value) {
-		_help = true;
+        _help = true;
     }
 
     void handleDebug(const std::string& name, const std::string& value) {
-		_debug = true;
+        _debug = true;
     }
 
     void handleWatch(const std::string& name, const std::string& value) {
-		_watch = true;
+        _watch = true;
     }
 
-	void handlePrint(const std::string& name, const std::string& value) {
-		_print = true;
+    void handlePrint(const std::string& name, const std::string& value) {
+        _print = true;
     }
 
     void handleScript(const std::string& name, const std::string& value) {
         scriptFileName = value;
     }
 
-	int main(const ArgVec& args) override {
-
+    int main(const ArgVec& args) override {
         try {
-			if (scriptFileName.empty())
-			{				
-				stringstream sourceStream;
-				while (true) {
-					cout << ">>> ";
+            if (scriptFileName.empty()) {
+                stringstream sourceStream;
+                while (true) {
+                    cout << ">>> ";
 
-					string input;
-					getline(cin, input);
+                    string input;
+                    getline(cin, input);
 
-					if (input == "quit") {
-						return 0;
-					}
-					else if (!input.empty()) {
-						sourceStream << input << endl;
-						continue;
-					}
+                    if (input == "quit") {
+                        return 0;
+                    } else if (!input.empty()) {
+                        sourceStream << input << endl;
+                        continue;
+                    }
 
-					// parseAndRunCode(visitor, {}, sourceStream, _debug);
+                    // parseAndRunCode(visitor, {}, sourceStream, _debug);
 
-					sourceStream.clear();
-				}
-			}
-			else
-			{
-				Printer printer;
-				ConsoleDebugger consoleDebugger(&printer);
-				Interpreter interpret(nullptr);
-				Compiler compiler;
+                    sourceStream.clear();
+                }
+            } else {
+                Printer printer;
+//                ConsoleDebugger consoleDebugger(&printer);
+                Interpreter interpret(nullptr);
+                Compiler compiler;
 
-				Visitor* visitor = &interpret;
+                Visitor* visitor = &interpret;
 
-				string filename = scriptFileName;
-				if (scriptFileName.empty())
-					throw std::runtime_error("no input file");
-				ifstream file(filename);
+                string filename = scriptFileName;
+                if (scriptFileName.empty())
+                    throw std::runtime_error("no input file");
+                ifstream file(filename);
 
-				Thread th;
-				th.startFunc([visitor, &file, &filename] {
-					try {
-						parseAndRunCode(visitor, filename, file, false);
-					}
-					catch (std::exception &e) {
-						cerr << e.what() << endl;
-					}
-				});
+                Thread th;
+                th.startFunc([visitor, &file, &filename] {
+                    try {
+                        parseAndRunCode(visitor, filename, file, false);
+                    }
+                    catch (std::exception &e) {
+                        cerr << e.what() << endl;
+                    }
+                });
 
-				if (th.isRunning()) {
-					th.join();
-				}
-			}
+                if (th.isRunning()) {
+                    th.join();
+                }
+            }
 
-			return EXIT_OK;
+            return EXIT_OK;
         } catch (exception const& e) {
-			cerr << e.what() << endl;
+            cerr << e.what() << endl;
             return EXIT_SOFTWARE;
         }
     }
 
 private:
-	bool _print = false;
-	bool _watch = false;
-	bool _debug = false;
-	bool _help = false;
+    bool _print = false;
+    bool _watch = false;
+    bool _debug = false;
+    bool _help = false;
     string scriptFileName;
 
+    bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
+        Lexer lexer(filename, &inputStream);
+        Ast ast;
+        Parser parser(lexer, &ast);
+        parser.set_debug_level(debug);
+        bool result = parser.parse();
+        ast.accept(visitor);
+        return result;
+    }
 };
 
 POCO_APP_MAIN(FunApplication)
@@ -191,20 +170,6 @@ POCO_APP_MAIN(FunApplication)
 /*
 int main(int argc, char* argv[]) {
     try {
-        cxxopts::Options options(argv[0], "Fun - command line options");
-
-        options.add_options("")
-                ("h,help", "Help")
-                ("f,file", "Input file", cxxopts::value<std::string>())
-                ("r,run", "Interpret script")
-                ("c,compile", "Compile script")
-                ("d,debug", "Enable debug");
-
-        options.parse(argc, argv);
-
-        if (options.count("help")) {
-            cout << options.help({ "" }) << endl;
-        }
 
         Printer printer;
         ConsoleDebugger consoleDebugger(&printer);
