@@ -6,8 +6,6 @@ find_package(FLEX)
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
         .
-        AstNodes
-        AstVisitors
 )
 
 BISON_TARGET(
@@ -40,7 +38,6 @@ add_library(
         Interpreter.h
         Lexer.cpp
         Lexer.h
-        main.cpp
         Printer.cpp
         Printer.h
         Utils.cpp

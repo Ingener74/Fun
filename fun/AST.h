@@ -4,6 +4,7 @@
 #include <location.hh>
 
 #include <Poco/RefCountedObject.h>
+#include <Poco/AutoPtr.h>
 
 namespace fun {
 
@@ -37,7 +38,7 @@ enum class BinaryOperation{
     NOT_EQUAL,
 };
 
-class Pot {
+class Pot: public Poco::RefCountedObject {
 public:
     Pot() {
     }
@@ -63,7 +64,7 @@ public:
     void accept(Visitor*);
 
 private:
-    Statement* _root = nullptr;
+    Poco::AutoPtr<Statement> _root;
     std::vector<Statement*> _statements;
 };
 

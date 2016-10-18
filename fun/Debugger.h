@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <Poco/Mutex.h>
 #include <Poco/Condition.h>
+#include <Poco/RefCountedObject.h>
 
 namespace fun {
 
@@ -47,7 +48,7 @@ private:
 
 using Breakpoints = std::vector<Breakpoint>;
 
-class Debugger {
+class Debugger: public Poco::RefCountedObject {
 public:
     Debugger(Printer *printer = nullptr);
     virtual ~Debugger() = default;

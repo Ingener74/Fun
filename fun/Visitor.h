@@ -1,8 +1,10 @@
 #pragma once
 
+#include <Poco/RefCountedObject.h>
+
 namespace fun {
 
-class Visitor {
+class Visitor: public Poco::RefCountedObject {
 public:
     Visitor();
     virtual ~Visitor();

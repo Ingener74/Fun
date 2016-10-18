@@ -18,9 +18,9 @@ public:
 };
 
 struct Result {
-    std::unique_ptr<fun::Interpreter> v;
-    std::unique_ptr<DebuggerMock> d;
-    std::unique_ptr<fun::Pot> ast;
+    Poco::AutoPtr<fun::Interpreter> v;
+    Poco::AutoPtr<DebuggerMock> d;
+    Poco::AutoPtr<fun::Pot> pot;
 };
 
 Result parse(const std::string& source);
@@ -51,7 +51,7 @@ Result parse(const std::string& source);
         {                                                              \
             Result r;                                                  \
             EXPECT_NO_THROW(r = parse(SCRIPT););                       \
-            auto instance = dynamic_cast<CLASS*>(r.ast->root());       \
+            auto instance = dynamic_cast<CLASS*>(r.pot->root());       \
             ASSERT_NE(instance, nullptr);                              \
             ASSERT_EQ(instance->value, VALUE);                         \
         }                                                              \
@@ -83,7 +83,7 @@ private:
             BODY                                                       \
             Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
-                EXPECT_NO_THROW(r.ast->accept(r.v.get()));             \
+                EXPECT_NO_THROW(r.pot->accept(r.v.get()));             \
                 Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
                 f = [&]{ stop = true; r.d->resume(); };                \
                 ConditionUnlocker unlocker(cond);                      \
@@ -113,7 +113,7 @@ private:
             BODY                                                       \
             Poco::Thread th;                                           \
             th.startFunc([&]{                                          \
-                EXPECT_THROW(r.ast->accept(r.v.get()), InterpretError); \
+                EXPECT_THROW(r.pot->accept(r.v.get()), InterpretError); \
                 Poco::ScopedLock<Poco::Mutex> lock(mtx);               \
                 f = [&]{ stop = true; r.d->resume(); };                \
                 ConditionUnlocker unlocker(cond);                      \

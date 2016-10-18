@@ -18,14 +18,10 @@ namespace fun {
 using namespace std;
 
 void Pot::setRoot(Statement* root) {
-    _root = root;
-    if(_root)
-        _root->duplicate();
+    _root.assign(root, true);
 }
 
 Pot::~Pot() {
-    if(_root)
-        _root->release();
     for (auto i: _statements) i->release();
 }
 

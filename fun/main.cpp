@@ -156,11 +156,11 @@ private:
 
     bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
         Lexer lexer(filename, &inputStream);
-        Pot ast;
-        Parser parser(lexer, &ast);
+        Pot pot;
+        Parser parser(lexer, &pot);
         parser.set_debug_level(debug);
         bool result = parser.parse();
-        ast.accept(visitor);
+        pot.accept(visitor);
         return result;
     }
 };
