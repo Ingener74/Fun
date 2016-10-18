@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd ${CMAKE_BINARY_DIR}/3rdparty/bison/${EXT_BISON}-prefix/src/${EXT_BISON}
+
+export M4=${3RDPARTY_INSTALL}/bin/m4
+
+./configure --prefix=${3RDPARTY_INSTALL}
+make
+make install

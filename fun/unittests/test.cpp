@@ -7,7 +7,7 @@ using namespace fun;
 Result parse(const string& source) {
     auto debugger = make_unique_<DebuggerMock>();
     auto interpreter = make_unique_<Interpreter>(debugger.get());
-    auto ast = make_unique_<Ast>();
+    auto ast = make_unique_<Pot>();
     stringstream ss;
     ss << source;
     Lexer lexer("", &ss);

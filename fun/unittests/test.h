@@ -20,7 +20,7 @@ public:
 struct Result {
     std::unique_ptr<fun::Interpreter> v;
     std::unique_ptr<DebuggerMock> d;
-    std::unique_ptr<fun::Ast> ast;
+    std::unique_ptr<fun::Pot> ast;
 };
 
 Result parse(const std::string& source);

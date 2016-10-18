@@ -17,19 +17,19 @@ namespace fun {
 
 using namespace std;
 
-void Ast::setRoot(Statement* root) {
+void Pot::setRoot(Statement* root) {
     _root = root;
     if(_root)
         _root->duplicate();
 }
 
-Ast::~Ast() {
+Pot::~Pot() {
     if(_root)
         _root->release();
     for (auto i: _statements) i->release();
 }
 
-void Ast::accept(Visitor* v) {
+void Pot::accept(Visitor* v) {
     v->iterateStatements(_root);
 }
 

@@ -85,7 +85,8 @@ private:
 
     template<typename TStatement>
     TStatement* debug(TStatement *stmt) {
-        if (debugger) debugger->onBeforeStep(stmt);
+        if (debugger)
+            debugger->onBeforeStep(stmt);
         return stmt;
     }
 

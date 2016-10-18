@@ -37,10 +37,11 @@ enum class BinaryOperation{
     NOT_EQUAL,
 };
 
-class Ast{
+class Pot {
 public:
-    Ast(){}
-    virtual ~Ast();
+    Pot() {
+    }
+    virtual ~Pot();
 
     void setRoot(Statement* root);
 

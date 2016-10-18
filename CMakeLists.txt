@@ -39,9 +39,7 @@ if(ENABLE_ASAN)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif()
 
-if(NOT EXISTS ${SYSROOT})
-    add_subdirectory(3rdparty)
-endif()
+add_subdirectory(3rdparty)
 
 enable_testing()
 
@@ -51,7 +49,7 @@ include_directories(
     ${SYSROOT}/include
 )
 link_directories(
-        ${SYSROOT}/lib
+    ${SYSROOT}/lib
 )
 
 option(ENABLE_DESERTED_XYLOPHONE "Enable Deserted-Xylophone" OFF)

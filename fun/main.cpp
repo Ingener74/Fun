@@ -156,7 +156,7 @@ private:
 
     bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
         Lexer lexer(filename, &inputStream);
-        Ast ast;
+        Pot ast;
         Parser parser(lexer, &ast);
         parser.set_debug_level(debug);
         bool result = parser.parse();

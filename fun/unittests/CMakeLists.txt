@@ -2,25 +2,47 @@ cmake_minimum_required(VERSION 3.0)
 
 option(ENABLE_FUN_UNITTESTS "Enable fun unittesting" ON)
 
-set(fun_unittests_SOURCES
-    test.cpp
-    test.h
-    # test-empty.cpp
-    # test-integer.cpp
-    # test-bool.cpp
-    # test-float.cpp
-    # test-string.cpp
-    test-id.cpp
-    # test-binary-ops.cpp
-    # test-assign.cpp
-    # test-print.cpp
-    # test-if.cpp
-    # test-while.cpp
-    # test-for.cpp
-    # test-function.cpp
-    # test-dictionary.cpp
-    # test-class.cpp
-)
+if(MSVC)
+    set(fun_unittests_SOURCES
+        test.cpp
+        test.h
+        # test-empty.cpp
+        # test-integer.cpp
+        # test-bool.cpp
+        # test-float.cpp
+        # test-string.cpp
+        test-id.cpp
+        # test-binary-ops.cpp
+        # test-assign.cpp
+        # test-print.cpp
+        # test-if.cpp
+        # test-while.cpp
+        # test-for.cpp
+        # test-function.cpp
+        # test-dictionary.cpp
+        # test-class.cpp
+    )
+else()
+    set(fun_unittests_SOURCES
+        test.cpp
+        test.h
+        test-empty.cpp
+        test-integer.cpp
+        test-bool.cpp
+        test-float.cpp
+        test-string.cpp
+        test-id.cpp
+        test-binary-ops.cpp
+        test-assign.cpp
+        test-print.cpp
+        test-if.cpp
+        test-while.cpp
+        test-for.cpp
+        test-function.cpp
+        test-dictionary.cpp
+        test-class.cpp
+    )
+endif()
 
 if(ENABLE_FUN_UNITTESTS)
     if(MINGW OR MSYS)

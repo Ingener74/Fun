@@ -188,7 +188,7 @@ int yylex(fun::Parser::semantic_type*, fun::location*, Lexer&);
 %type <index_type>           index
 
 %param { Lexer& myLexer };
-%parse-param { Ast* ast };
+%parse-param { Pot* ast };
 
 %initial-action
 {
