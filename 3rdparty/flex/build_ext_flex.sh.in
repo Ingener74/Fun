@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ${CMAKE_BINARY_DIR}/3rdparty/flex/${EXT_FLEX}-prefix/src/${EXT_FLEX}
+
+export YACC=${3RDPARTY_INSTALL}/bin/yacc
+export M4=${3RDPARTY_INSTALL}/bin/m4
+export PATH=${3RDPARTY_INSTALL}/bin:$PATH
+
+./configure --prefix=${3RDPARTY_INSTALL}
+
+make
+make install

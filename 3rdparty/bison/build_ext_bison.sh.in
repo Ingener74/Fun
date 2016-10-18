@@ -3,6 +3,7 @@
 cd ${CMAKE_BINARY_DIR}/3rdparty/bison/${EXT_BISON}-prefix/src/${EXT_BISON}
 
 export M4=${3RDPARTY_INSTALL}/bin/m4
+export PATH=${3RDPARTY_INSTALL}/bin/m4:$PATH
 
 ./configure --prefix=${3RDPARTY_INSTALL}
 make

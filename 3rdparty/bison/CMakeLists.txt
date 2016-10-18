@@ -11,9 +11,9 @@ if(NOT EXISTS ${SYSROOT})
         ExternalProject_Add(
             ${EXT_BISON}
             URL                 http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
-            CONFIGURE_COMMAND   M4=${M4_LOCATION} ${CMAKE_BINARY_DIR}/3rdparty/bison/${EXT_BISON}-prefix/src/${EXT_BISON}/configure --prefix=${3RDPARTY_INSTALL}
-            BUILD_COMMAND       make
-            INSTALL_COMMAND     make install
+            CONFIGURE_COMMAND   ""
+            BUILD_COMMAND       ${CMAKE_BINARY_DIR}/build_ext_bison.sh
+            INSTALL_COMMAND     ""
         )
     elseif(EMSCRIPTEN)
     elseif(ANDROID)
@@ -21,9 +21,6 @@ if(NOT EXISTS ${SYSROOT})
         ExternalProject_Add(
             ${EXT_BISON}
             URL                 http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
-            # CONFIGURE_COMMAND   M4=${M4_LOCATION} ${CMAKE_BINARY_DIR}/3rdparty/bison/${EXT_BISON}-prefix/src/${EXT_BISON}/configure --prefix=${3RDPARTY_INSTALL}
-            # BUILD_COMMAND       make
-            # INSTALL_COMMAND     make install
             CONFIGURE_COMMAND   ""
             BUILD_COMMAND       ${CMAKE_BINARY_DIR}/build_ext_bison.sh
             INSTALL_COMMAND     ""
