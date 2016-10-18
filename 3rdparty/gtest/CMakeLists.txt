@@ -27,6 +27,13 @@ if(NOT EXISTS ${SYSROOT})
                     && cp -R ${CMAKE_BINARY_DIR}/3rdparty/gtest/${EXT_GMOCK}-prefix/src/${EXT_GMOCK}-build/libgmock.a ${3RDPARTY_INSTALL}/lib
                     && cp -R ${CMAKE_BINARY_DIR}/3rdparty/gtest/${EXT_GMOCK}-prefix/src/${EXT_GMOCK}-build/libgmock_main.a ${3RDPARTY_INSTALL}/lib
         )
+    elseif(MSVC)
+        ExternalProject_Add(
+            ${EXT_GTEST}
+            URL                 https://github.com/google/googletest/archive/master.zip
+            CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
+                                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        )
     elseif(EMSCRIPTEN)
     elseif(ANDROID)
     elseif(APPLE)

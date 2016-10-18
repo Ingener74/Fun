@@ -1,8 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <memory>
-#include <string>
 #include <location.hh>
 
 #include <Poco/RefCountedObject.h>

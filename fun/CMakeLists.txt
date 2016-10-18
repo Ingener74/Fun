@@ -56,6 +56,8 @@ add_library(
         VirtualMachine.cpp
         VirtualMachine.h
         
+        fun.h
+        
         ${BISON_Parser_OUTPUTS}
         ${FLEX_Scanner_OUTPUTS}
 )

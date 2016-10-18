@@ -1,15 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <map>
 #include <bitset>
 #include <unordered_map>
-#include <unordered_set>
 #include <mutex>
-#include <condition_variable>
-
-#include <Poco/Mutex.h>
-#include <Poco/Condition.h>
 
 #include <Visitor.h>
 #include "AST.h"
