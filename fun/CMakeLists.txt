@@ -24,6 +24,8 @@ ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 add_library(
         fun_backend
         
+        Fun.cpp
+        Fun.h
         AST.cpp
         AST.h
         Compiler.cpp
@@ -33,7 +35,6 @@ add_library(
         Declarations.h
         Errors.cpp
         Errors.h
-        fun.h
         Interpreter.cpp
         Interpreter.h
         Lexer.cpp
@@ -47,10 +48,10 @@ add_library(
         Visitor.cpp
         Visitor.h
         
-        debuggers/CommandLineDebugger.cpp
-        debuggers/CommandLineDebugger.h
         debuggers/EmptyDebugger.cpp
         debuggers/EmptyDebugger.h
+        debuggers/CommandLineDebugger.cpp
+        debuggers/CommandLineDebugger.h
         debuggers/TcpSocketDebugger.cpp
         debuggers/TcpSocketDebugger.h
         
