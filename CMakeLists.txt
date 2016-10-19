@@ -52,17 +52,6 @@ link_directories(
     ${SYSROOT}/lib
 )
 
-option(ENABLE_DESERTED_XYLOPHONE "Enable Deserted-Xylophone" OFF)
-if(ENABLE_DESERTED_XYLOPHONE)
-    add_subdirectory(Deserted-Xylophone)
-endif()
-
-
-option(ENABLE_TAINTED_BULLDOZER "Enable Tainted-Bulldozer" OFF)
-if(ENABLE_TAINTED_BULLDOZER)
-    add_subdirectory(Tainted-Bulldozer)
-endif()
-
 
 if(EXISTS ${SYSROOT})
     option(ENABLE_FUN "Enable Fun" ON)
