@@ -433,4 +433,13 @@ json = import("json")
 
 custom = import("custom")
 
+# new assign
+
+fun test()
+	ret "foo", "bar"
+end
+a, b, c, d = 10, test(), 42
+
+
+
 

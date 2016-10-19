@@ -8,9 +8,16 @@
 #include <Poco/Condition.h>
 #include <Poco/RefCountedObject.h>
 
+#include <location.hh>
+
 namespace fun {
 
 class Printer;
+class Interpreter;
+class Statement;
+class Terminal;
+class IMemory;
+class IOperands;
 
 class Breakpoint {
 public:
@@ -50,21 +57,27 @@ using Breakpoints = std::vector<Breakpoint>;
 
 class Debugger: public Poco::RefCountedObject {
 public:
-    Debugger(Printer *printer = nullptr);
+    Debugger();
     virtual ~Debugger() = default;
 
+    Debugger* setMemory(IMemory*);
+    Debugger* setOperands(IOperands*);
+
+    // Breakpoints
     virtual void setBreakpoint(const Breakpoint &breakpoint);
     virtual void enableBreakpoint(const Breakpoint &breakpoint);
     virtual void disableBreakpoint(const Breakpoint &breakpoint);
     virtual void removeBreakpoint(const Breakpoint &breakpoint);
     virtual const Breakpoints &getBreakpoints() const;
 
+    // Override
     virtual void onCatchBreakpoint(const Breakpoint &) = 0;
     virtual void onOperandsChanged(const std::vector<Terminal*> &) = 0;
     virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) = 0;
+    virtual void listen() {
+    }
 
-    virtual void list();
-
+    // Control
     virtual void pause() { _state->pause(this); }
     virtual void resume() { _state->resume(this); }
     virtual void stepOver() { _state->stepOver(this); }
@@ -80,8 +93,10 @@ protected:
 
     unsigned int _lastBreakpointLine = 1;
 
-    Printer *_printer = nullptr;
     Statement *_currentStatement = nullptr;
+
+    IMemory* _memory = nullptr;
+    IOperands* _operands = nullptr;
 
 private:
     template<typename T, typename ... Args>
@@ -132,6 +147,16 @@ private:
     };
     std::unique_ptr<State> _state;
 };
+
+inline Debugger* Debugger::setOperands(IOperands* operands) {
+    _operands = operands;
+    return this;
+}
+
+inline Debugger* Debugger::setMemory(IMemory* memory) {
+    _memory = memory;
+    return this;
+}
 
 }
 

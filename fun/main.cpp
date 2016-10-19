@@ -54,6 +54,11 @@ protected:
         );
 
         options.addOption(
+            Option("debugger", "D", "debugger: net or command line")
+            .callback(OptionCallback<FunApplication>(this, &FunApplication::handleDebugger))
+        );
+
+        options.addOption(
             Option("file", "f", "input script")
             .required(false)
             .repeatable(false).argument("file", true)
@@ -77,6 +82,9 @@ protected:
 
     void handleDebug(const std::string& name, const std::string& value) {
         _debug = true;
+    }
+
+    void handleDebugger(const std::string& name, const std::string& value) {
     }
 
     void handleWatch(const std::string& name, const std::string& value) {
@@ -138,6 +146,9 @@ protected:
                 if (th.isRunning()) {
                     th.join();
                 }
+
+//                CommandLineDebugger cld;
+//                cld.listen();
             }
 
             return EXIT_OK;
@@ -153,6 +164,8 @@ private:
     bool _debug = false;
     bool _help = false;
     string scriptFileName;
+
+    int _netDebuggerPort = 54321;
 
     bool parseAndRunCode(Visitor* visitor, const string& filename, istream& inputStream, bool debug) {
         Lexer lexer(filename, &inputStream);

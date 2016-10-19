@@ -47,6 +47,13 @@ add_library(
         Visitor.cpp
         Visitor.h
         
+        debuggers/CommandLineDebugger.cpp
+        debuggers/CommandLineDebugger.h
+        debuggers/EmptyDebugger.cpp
+        debuggers/EmptyDebugger.h
+        debuggers/TcpSocketDebugger.cpp
+        debuggers/TcpSocketDebugger.h
+        
         ${BISON_Parser_OUTPUTS}
         ${FLEX_Scanner_OUTPUTS}
 )

@@ -39,7 +39,8 @@ ostream& operator<<(ostream& out, const Breakpoint& rhs){
     return out << "Breakpoint(" << rhs._location << ")";
 }
 
-Debugger::Debugger(Printer *printer) : _printer(printer), _state(new Normal) {
+Debugger::Debugger() :
+        _state(new Normal) {
 }
 
 void Debugger::setBreakpoint(const Breakpoint &breakpoint) {
@@ -64,11 +65,6 @@ void Debugger::removeBreakpoint(const Breakpoint &breakpoint) {
 
 const Breakpoints &Debugger::getBreakpoints() const {
     return _breakpoints;
-}
-
-void Debugger::list() {
-    if (_currentStatement && _printer)
-        _currentStatement->accept(_printer);
 }
 
 void Debugger::Normal::onEnter(Debugger *debugger) {

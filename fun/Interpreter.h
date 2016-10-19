@@ -8,6 +8,8 @@
 #include <Visitor.h>
 #include "AST.h"
 #include "Debugger.h"
+#include "IOperands.h"
+#include "IMemory.h"
 
 namespace fun {
 
@@ -28,7 +30,7 @@ public:
     Stack* next = nullptr;
 };
 
-class Interpreter: public Visitor {
+class Interpreter: public Visitor, public IOperands, public IMemory {
 public:
     Interpreter(Debugger* = nullptr);
     virtual ~Interpreter();
