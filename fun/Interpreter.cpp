@@ -232,10 +232,48 @@ void Interpreter::visit(Throw* throw_stmt) {
 }
 
 void Interpreter::visit(Assign* assign) {
+    bool load_f = load;
+
     auto balance = operands.size();
     auto lhs = assign->ids;
     auto rhs = assign->exprs;
+
     while (lhs || rhs) {
+/*
+        if (rhs && !lhs)
+            break;
+
+        if (assign->type != BinaryOperation::NOP) {
+            load = true;
+            lhs = debug(lhs)->accept(this);
+            load = false;
+        }
+
+        if (rhs) {
+            load = true;
+            rhs = debug(rhs)->accept(this)->nextExpression;
+            load = false;
+        } else {
+            operands.push_back(new Nil);
+        }
+
+        if (assign->type != BinaryOperation::NOP) {
+            fassertl(!operands.empty(), assign->loc, "not enogth operands")
+            AutoPtr<Terminal> L = operands.back();
+            operands.pop_back();
+
+            fassertl(!operands.empty(), assign->loc, "not enogth operands")
+            AutoPtr<Terminal> R = operands.back();
+            operands.pop_back();
+
+            operands.push_back(operate(L, assign->type, R));
+        }
+
+        store = true;
+        lhs = debug(lhs)->accept(this)->nextExpression;
+        store = false;
+*/
+
         if(lhs && rhs){
             if (assign->type == BinaryOperation::NOP) {
                 load = true;
@@ -300,7 +338,16 @@ void Interpreter::visit(Assign* assign) {
         }
     }
 
-    fassertl(operands.empty(), assign->loc, "operands not empty after statement") // assign maybe statement
+    if(load_f){
+        auto lhs = assign->ids;
+        while (lhs) {
+            load = true;
+            lhs = debug(lhs)->accept(this)->nextExpression;
+            load = false;
+        }
+    } else {
+        fassertl(operands.empty(), assign->loc, "operands not empty after statement") // assign maybe statement
+    }
 }
 
 void Interpreter::visit(BinaryOp* bin_op) {
