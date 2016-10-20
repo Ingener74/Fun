@@ -23,4 +23,10 @@ public:
     virtual ~InterpretError();
 };
 
+class FunError: public std::runtime_error {
+public:
+    FunError(const std::string& message);
+    virtual ~FunError();
+};
+
 }

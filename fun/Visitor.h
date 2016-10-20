@@ -1,11 +1,14 @@
 #pragma once
 
 #include <Poco/RefCountedObject.h>
+#include <Poco/AutoPtr.h>
 
 namespace fun {
 
 class Visitor: public Poco::RefCountedObject {
 public:
+    using Ptr = Poco::AutoPtr<Visitor>;
+
     Visitor();
     virtual ~Visitor();
 

@@ -40,6 +40,8 @@ enum class BinaryOperation{
 
 class Pot: public Poco::RefCountedObject {
 public:
+    using Ptr = Poco::AutoPtr<Pot>;
+
     Pot() {
     }
     virtual ~Pot();

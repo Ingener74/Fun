@@ -16,19 +16,26 @@ public:
     Fun();
     virtual ~Fun();
 
-    enum class Debugger {
+    enum class DebuggerType {
         NoDebugger, NetDebugger, CommandLineDebugger, TestingMockDebugger
     };
 
-    Poco::AutoPtr<Pot> parse(const std::string& source);
-    Poco::AutoPtr<Pot> parse(const std::istream& source);
+    static Poco::AutoPtr<Pot> parseString(const std::string& source);
+    static Poco::AutoPtr<Pot> parseStream(const std::istream& source);
+    static Poco::AutoPtr<Pot> parseFile(const std::string& filename);
 
-    void eval(const std::string& script);
-    void eval(const std::istream& script);
-    void eval(const Poco::AutoPtr<Pot>& pot);
+    void evalString(const std::string& script);
+    void evalStream(const std::istream& script);
+    void evalFile(const std::string& filename);
+    void evalAst(Poco::AutoPtr<Pot> pot);
 
-    Fun& setDebugger(Debugger);
-//    Poco::AutoPtr<Debugger> getDebugger();
+    Fun& setDebugger(DebuggerType);
+    Poco::AutoPtr<Debugger> getDebugger();
+
+    template<typename T>
+    Poco::AutoPtr<T> getConcreteDebugger() {
+        return _debugger.cast<T>();
+    }
 
 private:
     Poco::AutoPtr<Debugger> _debugger;

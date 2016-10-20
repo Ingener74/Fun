@@ -1,3 +1,4 @@
+#include <fstream>
 #include "Fun.h"
 
 namespace fun {
@@ -11,41 +12,51 @@ Fun::Fun() {
 Fun::~Fun() {
 }
 
-AutoPtr<Pot> Fun::parse(const string& source) {
+AutoPtr<Pot> Fun::parseString(const string& source) {
     stringstream ss;
     ss << source;
-    return parse(ss);
+    return parseStream(ss);
 }
 
-AutoPtr<Pot> Fun::parse(const istream& source) {
+AutoPtr<Pot> Fun::parseStream(const istream& source) {
     AutoPtr<Pot> pot;
     Lexer lexer("", &source);
     Parser parser(lexer, pot);
     parser.set_debug_level(0);
     if (parser.parse())
-        cerr << "Warning: parser.parse() not 0" << endl;
+        throw FunError("Warning: parser.parse() not 0");
     return pot;
 }
 
-void Fun::eval(const string& script) {
-    auto pot = parse(script);
-    eval(pot);
+AutoPtr<Pot> Fun::parseFile(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open())
+        throw FunError(string("can't open file ") + filename);
+    return parseStream(file);
 }
 
-void Fun::eval(const std::istream& script) {
-    auto pot = parse(script);
-    eval(pot);
+void Fun::evalString(const string& script) {
+    evalAst(parseString(script));
 }
 
-void Fun::eval(const AutoPtr<Pot>& pot) {
+void Fun::evalStream(const istream& script) {
+    evalAst(parseStream(script));
 }
 
-Fun& Fun::setDebugger(Debugger debugger) {
+void Fun::evalFile(const string& filename) {
+    evalAst(parseFile(filename));
+}
+
+void Fun::evalAst(AutoPtr<Pot> pot) {
+    _debugger->listen(_visitor, pot);
+}
+
+Fun& Fun::setDebugger(DebuggerType debugger) {
     return *this;
 }
 
-//AutoPtr<Debugger> Fun::getDebugger() {
-//    return _debugger;
-//}
+AutoPtr<Debugger> Fun::getDebugger() {
+    return _debugger;
+}
 
 }

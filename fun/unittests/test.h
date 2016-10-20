@@ -8,7 +8,7 @@
 
 #include <Poco/Thread.h>
 
-#include <fun.h>
+#include <Fun.h>
 
 class DebuggerMock: public fun::Debugger {
 public:

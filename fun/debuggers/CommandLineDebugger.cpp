@@ -1,6 +1,8 @@
 #include <map>
 #include <sstream>
+#include <Poco/Thread.h>
 #include "AST.h"
+#include "Visitor.h"
 #include "IOperands.h"
 #include "IMemory.h"
 #include "debuggers/CommandLineDebugger.h"
@@ -8,6 +10,7 @@
 namespace fun {
 
 using namespace std;
+using namespace Poco;
 
 CommandLineDebugger::CommandLineDebugger() {
 }
@@ -24,8 +27,11 @@ void CommandLineDebugger::onOperandsChanged(const std::vector<Terminal*>&) {
 void CommandLineDebugger::onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) {
 }
 
-void CommandLineDebugger::listen() {
-    while(true){
+void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
+    Thread th;
+    th.start(*this);
+
+    while (true) {
         vector<string> lastCmd;
         cout << ">>> ";
         string input;
@@ -51,7 +57,7 @@ void CommandLineDebugger::listen() {
         auto stepOverCmd = [=] {
             stepOver();
 //            list();
-            return 1;
+                return 1;
         };
 
         static map<Terminal::Type, string> types{
@@ -64,9 +70,9 @@ void CommandLineDebugger::listen() {
                 {Terminal::Type::Object, "Object"},
         };
         auto operandsCmd = [&types, this] {
-
             cout << "########### Operands ###########" << endl;
-            for (auto &i: _operands->getOperands()) cout << types[i->getType()] << ": " << i->toString() << endl;
+            for (auto &i: _operands->getOperands())
+                cout << types[i->getType()] << ": " << i->toString() << endl;
             cout << "################################" << endl;
 
             return 1;
@@ -138,13 +144,25 @@ void CommandLineDebugger::listen() {
                 {"l", listCmd},
         };
         auto cmdIt = commands.find(tokens.at(0));
-        if(cmdIt == commands.end())
+        if (cmdIt == commands.end())
             continue;
         if (cmdIt->second()) {
         } else {
             break;
         }
         lastCmd = tokens;
+    }
+
+    if (th.isRunning()) {
+        th.join();
+    }
+}
+
+void CommandLineDebugger::run() {
+    try {
+        _pot->accept(_visitor);
+    } catch (std::exception &e) {
+        cerr << e.what() << endl;
     }
 }
 

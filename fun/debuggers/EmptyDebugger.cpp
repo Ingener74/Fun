@@ -1,6 +1,11 @@
+#include "AST.h"
+#include "Visitor.h"
 #include "debuggers/EmptyDebugger.h"
 
 namespace fun {
+
+using namespace std;
+using namespace Poco;
 
 EmptyDebugger::EmptyDebugger() {
 }
@@ -17,7 +22,8 @@ void EmptyDebugger::onOperandsChanged(const std::vector<Terminal*>&) {
 void EmptyDebugger::onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) {
 }
 
-void EmptyDebugger::listen() {
+void EmptyDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
+    p->accept(v);
 }
 
 }

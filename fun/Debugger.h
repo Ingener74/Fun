@@ -7,8 +7,9 @@
 #include <Poco/Mutex.h>
 #include <Poco/Condition.h>
 #include <Poco/RefCountedObject.h>
+#include <Poco/AutoPtr.h>
 
-#include <location.hh>
+#include "location.hh"
 
 namespace fun {
 
@@ -18,6 +19,8 @@ class Statement;
 class Terminal;
 class IMemory;
 class IOperands;
+class Visitor;
+class Pot;
 
 class Breakpoint {
 public:
@@ -57,6 +60,8 @@ using Breakpoints = std::vector<Breakpoint>;
 
 class Debugger: public Poco::RefCountedObject {
 public:
+    using Ptr = Poco::AutoPtr<Debugger>;
+
     Debugger();
     virtual ~Debugger() = default;
 
@@ -74,7 +79,7 @@ public:
     virtual void onCatchBreakpoint(const Breakpoint &) = 0;
     virtual void onOperandsChanged(const std::vector<Terminal*> &) = 0;
     virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) = 0;
-    virtual void listen() {
+    virtual void listen(Poco::AutoPtr<Visitor>, Poco::AutoPtr<Pot>) {
     }
 
     // Control
