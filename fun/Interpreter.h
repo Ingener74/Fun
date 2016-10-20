@@ -69,6 +69,8 @@ public:
     const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const;
     std::vector<std::unordered_map<std::string, Terminal*>>& getMemory();
 
+    Interpreter* setDebugger(Debugger* debugger);
+
 private:
     std::vector<Terminal*> operands;
     std::vector<std::unordered_map<std::string, Terminal*>> variables;
@@ -94,5 +96,10 @@ private:
 
     void clearTop();
 };
+
+inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {
+    this->debugger = debugger;
+    return this;
+}
 
 }

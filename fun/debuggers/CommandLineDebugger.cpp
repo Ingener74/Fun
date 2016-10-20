@@ -1,6 +1,7 @@
 #include <map>
 #include <sstream>
 #include <Poco/Thread.h>
+
 #include "AST.h"
 #include "Visitor.h"
 #include "IOperands.h"

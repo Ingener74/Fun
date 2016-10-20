@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 find_package(BISON)
 find_package(FLEX)
 
-option(ENABLE_FUN_UNITTESTS "Enable fun unittesting" ON)
-
 include_directories(
         ${CMAKE_CURRENT_BINARY_DIR}
         .
@@ -59,14 +57,6 @@ set(fun_backend_SOURCES
         ${FLEX_Scanner_OUTPUTS}
 )
 
-if(ENABLE_FUN_UNITTESTS)
-    set(fun_backend_SOURCES ${fun_backend_SOURCES}
-            debuggers/MockDebugger.cpp
-            debuggers/MockDebugger.h
-    )
-    add_definitions(-DFUN_UNITTESTS)
-endif()
-
 add_library(fun_backend ${fun_backend_SOURCES})
 set_target_properties(fun_backend PROPERTIES OUTPUT_NAME fun)
 
@@ -80,6 +70,4 @@ add_executable(fun_command_line_frontend main.cpp)
 target_link_libraries(fun_command_line_frontend fun_backend ${POCO_LIBRARIES})
 set_target_properties(fun_command_line_frontend PROPERTIES OUTPUT_NAME fun)
 
-if(ENABLE_FUN_UNITTESTS)
-    add_subdirectory(unittests)
-endif()
+add_subdirectory(unittests)

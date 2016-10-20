@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+option(ENABLE_FUN_UNITTESTS "Enable fun unittesting" ON)
+
 if(MSVC)
     set(fun_unittests_SOURCES
         test.cpp
@@ -39,6 +41,9 @@ else()
         test-function.cpp
         test-dictionary.cpp
         test-class.cpp
+        
+        MockDebugger.cpp
+        MockDebugger.h
     )
 endif()
 

@@ -8,7 +8,7 @@ class IOperands {
 public:
     virtual ~IOperands() = default;
 
-    const std::vector<Terminal*>& getOperands() const;
+    virtual const std::vector<Terminal*>& getOperands() const = 0;
 };
 
 }

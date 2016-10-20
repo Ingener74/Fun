@@ -12,7 +12,7 @@ Result parse(const string& source) {
     r.pot = new Pot;
     stringstream ss;
     ss << source;
-    Lexer lexer("", &ss);
+    Lexer lexer("", ss);
     Parser parser(lexer, r.pot);
     parser.set_debug_level(0);
     if (parser.parse())
