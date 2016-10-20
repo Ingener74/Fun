@@ -17,7 +17,10 @@ public:
     virtual ~Fun();
 
     enum class DebuggerType {
-        NoDebugger, NetDebugger, CommandLineDebugger, TestingMockDebugger
+        NoDebugger, NetDebugger, CommandLineDebugger,
+#if defined(FUN_UNITTESTS)
+        TestingMockDebugger
+#endif
     };
 
     static Poco::AutoPtr<Pot> parseString(const std::string& source);

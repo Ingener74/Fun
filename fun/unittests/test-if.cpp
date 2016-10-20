@@ -3,6 +3,62 @@
 using namespace std;
 using namespace fun;
 
+TEST(Interpret, If_999)
+    {
+        {
+            Fun f;
+            f.setDebugger(Fun::DebuggerType::TestingMockDebugger);
+
+            // BODY
+
+            auto mockDbg = f.getConcreteDebugger<MockDebugger>();
+
+            mockDbg->setBreakpoint(Breakpoint(4));
+
+            EXPECT_CALL(mockDbg.get(), onCatchBreakpoint(Breakpoint(4))).
+                WillOnce(testing::InvokeWithoutArgs([&]{
+                    Poco::ScopedLock<Poco::Mutex> lock(mtx);
+                    f = [&]{ r.d->resume(); };
+                    ConditionUnlocker unlocker(cond);
+                    // body
+
+                    mockDbg->onBreakpoint([&]{
+
+                    });
+
+                }));
+
+            f.evalString(R"(
+a = 1
+
+b = 2
+
+c = 3
+)");
+
+//            Poco::Thread th;
+//            th.startFunc([&]{
+//                EXPECT_NO_THROW(r.pot->accept(r.v.get()));
+//                Poco::ScopedLock<Poco::Mutex> lock(mtx);
+//                f = [&]{ stop = true; r.d->resume(); };
+//                ConditionUnlocker unlocker(cond);
+//
+////                END
+//
+//            });
+//            while(true){
+//                Poco::ScopedLock<Poco::Mutex> lock(mtx);
+//                while (!f) cond.wait(mtx);
+//                f();
+//                f = {};
+//                if (stop) { break; }
+//            }
+//            if(th.isRunning())
+//                th.join();
+        }
+        ASSERT_EQ(Statement::counter(), 0);
+    }
+
 PARSE_ERR(If, 0, R"(
 if
 )", ParserError);

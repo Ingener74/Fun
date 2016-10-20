@@ -52,6 +52,9 @@ void Fun::evalAst(AutoPtr<Pot> pot) {
 }
 
 Fun& Fun::setDebugger(DebuggerType debugger) {
+#ifdef FUN_UNITTESTS
+//        TestingMockDebugger
+#endif
     return *this;
 }
 
