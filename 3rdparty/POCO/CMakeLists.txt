@@ -7,7 +7,7 @@ if(NOT EXISTS ${SYSROOT})
         ExternalProject_Add(
             ${EXT_POCO}
             URL                 http://pocoproject.org/releases/poco-1.7.4/poco-1.7.4-all.zip
-            PATCH_COMMAND       patch -p1 < ${CMAKE_CURRENT_LIST_DIR}/mingw.patch
+            PATCH_COMMAND       ${PATCH_EXECUTABLE} -p1 < ${CMAKE_CURRENT_LIST_DIR}/mingw.patch
             CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                                 -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
                                 -DCMAKE_GENERATOR=${CMAKE_GENERATOR}

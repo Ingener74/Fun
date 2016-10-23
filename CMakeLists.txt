@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 
+# include modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 
 unset(BUILD_PLATFORM)
 if(MINGW OR MSYS)
     message(STATUS "MinGW or MSYS build")
     set(BUILD_PLATFORM msys_mingw)
     add_definitions(-std=gnu++0x)
+    include(FindPatch)
 elseif(MSVC)
     message(STATUS "Microsoft Visual Studio 2013 build")
     set(BUILD_PLATFORM msvc)

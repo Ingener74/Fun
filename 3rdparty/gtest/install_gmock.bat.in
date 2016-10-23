@@ -1,0 +1,11 @@
+
+echo "make dirs"
+mkdir ${3RDPARTY_INSTALL_WIN32}\include
+mkdir ${3RDPARTY_INSTALL_WIN32}\lib
+echo "dirs maked"
+
+echo "copy files"
+xcopy ${CMAKE_BINARY_DIR_WIN32}\3rdparty\gtest\${EXT_GMOCK}-prefix\src\${EXT_GMOCK}\include ${3RDPARTY_INSTALL_WIN32} /E
+xcopy ${CMAKE_BINARY_DIR_WIN32}\3rdparty\gtest\${EXT_GMOCK}-prefix\src\${EXT_GMOCK}-build\libgmock.a ${3RDPARTY_INSTALL_WIN32}\lib /E
+xcopy ${CMAKE_BINARY_DIR_WIN32}\3rdparty\gtest\${EXT_GMOCK}-prefix\src\${EXT_GMOCK}-build\libgmock_main.a ${3RDPARTY_INSTALL_WIN32}\lib /E
+echo "files copied"
