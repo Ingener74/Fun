@@ -19,6 +19,17 @@ public:
 
     virtual void run() override;
 
+private:
+    int resumeCmd();
+    int stepIntoCmd();
+    int stepOverCmd();
+    int operandsCmd();
+    int memoryCmd();
+    int quitCmd();
+    int listCmd();
+    int breakpointCmd(const std::vector<std::string>&);
+
+private:
     Poco::AutoPtr<Visitor> _visitor;
     Poco::AutoPtr<Pot> _pot;
 };

@@ -26,8 +26,10 @@ public:
     MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, fun::Terminal*>&));
     virtual void listen(Poco::AutoPtr<Visitor>, Poco::AutoPtr<Pot>);
 
-    MockDebugger* breakpointHandler(const std::function<void(IOperands*, IMemory*)>&);
-    MockDebugger* endHandler(const std::function<void(IOperands*, IMemory*)>&);
+    using Handler = std::function<void(IOperands*, IMemory*)>;
+
+    MockDebugger* handleBreakpoint(Handler);
+    MockDebugger* handleEnd(Handler);
 
 private:
     virtual void run() override;

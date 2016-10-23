@@ -38,7 +38,6 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
 }
 
 void MockDebugger::run() {
-    // EXPECT_NO_THROW(pot->accept(visitor));
     try {
         _pot->accept(_visitor);
         ScopedLock<Mutex> lock(mtx);
@@ -54,7 +53,7 @@ void MockDebugger::run() {
     }
 }
 
-MockDebugger* MockDebugger::breakpointHandler(const std::function<void(IOperands*, IMemory*)>& function) {
+MockDebugger* MockDebugger::handleBreakpoint(Handler function) {
     Poco::ScopedLock<Poco::Mutex> lock(mtx);
     f = [&] {
         resume();
@@ -65,7 +64,7 @@ MockDebugger* MockDebugger::breakpointHandler(const std::function<void(IOperands
     return this;
 }
 
-MockDebugger* MockDebugger::endHandler(const std::function<void(IOperands*, IMemory*)>& function) {
+MockDebugger* MockDebugger::handleEnd(Handler function) {
     _endHandler = function;
     return this;
 }

@@ -8,28 +8,41 @@ TEST(Interpret, If_999)
     {
         {
             Fun f;
-            f.setDebugger(new MockDebugger);
-            auto mockDbg = f.getDebugger().cast<MockDebugger>();
+            auto dbg = new MockDebugger;
+            f.setDebugger(dbg);
 
-            mockDbg->setBreakpoint(Breakpoint(4));
-            EXPECT_CALL(*mockDbg, onCatchBreakpoint(Breakpoint(4))).
-                WillOnce(testing::InvokeWithoutArgs([&]{
-                    mockDbg->breakpointHandler([&](IOperands* operands, IMemory* memory) {
-                        cout << "breakpoint handler" << endl;
+            dbg->setBreakpoint(Breakpoint(4));
+            EXPECT_CALL(*dbg, onCatchBreakpoint(Breakpoint(4))).
+                WillOnce(testing::InvokeWithoutArgs([dbg]{
+                    dbg->handleBreakpoint([](IOperands* operands, IMemory* memory) {
+                        EXPECT_EQ(operands->getOperands().size(), 0);
+                        EXPECT_EQ(memory->getMemory().at(0).size(), 1);
                     });
                 }));
 
-            mockDbg->endHandler([](IOperands* operands, IMemory* memory) {
-                cout << "end handler" << endl;
+            dbg->setBreakpoint(Breakpoint(6));
+            EXPECT_CALL(*dbg, onCatchBreakpoint(Breakpoint(6))).
+                WillOnce(testing::InvokeWithoutArgs([dbg]{
+                    dbg->handleBreakpoint([](IOperands* operands, IMemory* memory) {
+                        EXPECT_EQ(operands->getOperands().size(), 0);
+                        EXPECT_EQ(memory->getMemory().at(0).size(), 2);
+                    });
+                }));
+
+            dbg->handleEnd([](IOperands* operands, IMemory* memory) {
+                EXPECT_EQ(operands->getOperands().size(), 0);
+                EXPECT_EQ(memory->getMemory().at(0).size(), 3);
             });
 
-            f.evalString(R"(
+            ASSERT_NO_THROW(
+                f.evalString(R"(
 a = 1
 
 b = 2
 
 c = 3
 )");
+            );
 
         }
         ASSERT_EQ(Statement::counter(), 0);
@@ -37,12 +50,12 @@ c = 3
 
 PARSE_ERR(If, 0, R"(
 if
-)", ParserError);
+)", ParserError)
 
 PARSE_ERR(If, 1, R"(
 if
 end
-)", ParserError);
+)", ParserError)
 
 PARSE_ERR(If, 2, R"(
 if nil
