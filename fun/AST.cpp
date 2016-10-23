@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cmath>
 #include "Visitor.h"
 #include "Utils.h"
 #include "AST.h"

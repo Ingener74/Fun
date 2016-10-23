@@ -7,10 +7,6 @@ Lexer::Lexer(const std::string& filename, std::istream &in, bool debug) :
         yyFlexLexer(in, cout), _filename(filename), line(1), column(0), _debug(debug) {
 }
 
-//Lexer::Lexer(const std::string& source, bool debug) :
-//        yyFlexLexer(&sourceCode), sourceCode(source), _filename(), line(1), column(0), _debug(debug) {
-//}
-
 Lexer::~Lexer() {
 }
 

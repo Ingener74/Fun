@@ -30,7 +30,6 @@
 
 test/lex.yy.c
 
-
 .idea/
 build/
 build-msvc/
@@ -38,8 +37,6 @@ build-msvc/
 /.settings/
 /.cproject
 /.project
-Raw-Railroad/FlexLexer.h
-build-mingw/
 CMakeLists.txt.user
 Fun/FlexLexer.h
 /Debug/
@@ -49,5 +46,9 @@ Fun-IntelliJ-IDEA-Plugin/out/
 3rdparty/sysroot-linux/
 3rdparty/sysroot-msys_msvc/
 3rdparty/sysroot-msvc/
-/core
-/linux-build
+
+core
+linux-build/
+build-mingw/
+build-cygwin/
+build-mingw-qt/
