@@ -36,16 +36,12 @@ private:
 
     class ConditionUnlocker {
     public:
-        ConditionUnlocker(Poco::Condition& cond) :
-                cond(cond) {
-        }
-        virtual ~ConditionUnlocker() {
-            cond.signal();
-        }
+        ConditionUnlocker(Poco::Condition& _condition);
+        virtual ~ConditionUnlocker();
     private:
         ConditionUnlocker(const ConditionUnlocker&) = delete;
         ConditionUnlocker& operator=(const ConditionUnlocker&) = delete;
-        Poco::Condition& cond;
+        Poco::Condition& _condition;
     };
 
     Poco::AutoPtr<Visitor> _visitor;
@@ -54,10 +50,10 @@ private:
     std::function<void(IOperands*, IMemory*)> _breakpointHandler;
     std::function<void(IOperands*, IMemory*)> _endHandler;
 
-    bool stop = false;
+    bool _stop = false;
     std::function<void()> f;
-    Poco::Mutex mtx;
-    Poco::Condition cond;
+    Poco::Mutex _mutex;
+    Poco::Condition _condition;
 
     std::exception_ptr _exceptionPtr;
 };

@@ -26,7 +26,6 @@ AutoPtr<Pot> Fun::parseStream(istream& source) {
     AutoPtr<Pot> pot(new Pot);
     Lexer lexer("", source);
     Parser parser(lexer, pot);
-//    parser.set_debug_level(0);
     if (parser.parse())
         throw FunError("Warning: parser.parse() not 0");
     return pot;
