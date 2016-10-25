@@ -238,107 +238,90 @@ void Interpreter::visit(Assign* assign) {
     auto lhs = assign->ids;
     auto rhs = assign->exprs;
 
-    while (lhs || rhs) {
-/*
-        if (rhs && !lhs)
-            break;
+    while (rhs) {
+        load = true;
+        rhs = debug(rhs)->accept(this)->nextExpression;
+        load = false;
 
-        if (assign->type != BinaryOperation::NOP) {
+        auto operands_diff = operands.size() - balance;
+
+        vector<Terminal*> tmp;
+
+        for (decltype(operands_diff) i = 0; i < operands_diff; ++i) {
+            tmp.push_back(operands.at(balance + i));
+        }
+        for (decltype(operands_diff) i = 0; i < operands_diff; ++i) {
+            operands.pop_back();
+        }
+        for (decltype(operands_diff) i = 0; i < operands_diff; ++i) {
+            if (lhs) {
+                if (assign->type == BinaryOperation::NOP) {
+                    operands.push_back(tmp.at(i));
+
+                    store = true;
+                    lhs = debug(lhs)->accept(this)->nextExpression;
+                    store = false;
+                } else {
+                    load = true;
+                    lhs = debug(lhs)->accept(this);
+                    load = false;
+
+                    fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+                    AutoPtr<Terminal> L = operands.back();
+                    operands.pop_back();
+
+                    operands.push_back(tmp.at(i));
+
+                    fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
+                    AutoPtr<Terminal> R = operands.back();
+                    operands.pop_back();
+
+                    operands.push_back(operate(L, assign->type, R));
+
+                    store = true;
+                    lhs = debug(lhs)->accept(this)->nextExpression;
+                    store = false;
+                }
+            } else {
+                tmp.at(i)->release();
+            }
+        }
+    }
+    while (lhs) {
+        if (assign->type == BinaryOperation::NOP) {
+            operands.push_back(new Nil);
+
+            store = true;
+            lhs = debug(lhs)->accept(this)->nextExpression;
+            store = false;
+        } else {
             load = true;
             lhs = debug(lhs)->accept(this);
             load = false;
-        }
 
-        if (rhs) {
-            load = true;
-            rhs = debug(rhs)->accept(this)->nextExpression;
-            load = false;
-        } else {
-            operands.push_back(new Nil);
-        }
-
-        if (assign->type != BinaryOperation::NOP) {
             fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
             AutoPtr<Terminal> L = operands.back();
             operands.pop_back();
 
+            operands.push_back(new Nil);
+
             fassertl(!operands.empty(), assign->loc, "not enogth operands")
+
             AutoPtr<Terminal> R = operands.back();
             operands.pop_back();
 
             operands.push_back(operate(L, assign->type, R));
-        }
 
-        store = true;
-        lhs = debug(lhs)->accept(this)->nextExpression;
-        store = false;
-*/
-
-        if(lhs && rhs){
-            if (assign->type == BinaryOperation::NOP) {
-                load = true;
-                rhs = debug(rhs)->accept(this)->nextExpression;
-                load = false;
-
-                store = true;
-                lhs = debug(lhs)->accept(this)->nextExpression;
-                store = false;
-            } else {
-                load = true;
-                lhs = debug(lhs)->accept(this);
-                load = false;
-
-                fassertl(!operands.empty(), assign->loc, "not enogth operands")
-
-                AutoPtr<Terminal> L = operands.back();
-                operands.pop_back();
-
-                load = true;
-                rhs = debug(rhs)->accept(this)->nextExpression;
-                load = false;
-
-                fassertl(!operands.empty(), assign->loc, "not enogth operands")
-
-                AutoPtr<Terminal> R = operands.back();
-                operands.pop_back();
-
-                operands.push_back(operate(L, assign->type, R));
-
-                store = true;
-                lhs = debug(lhs)->accept(this)->nextExpression;
-                store = false;
-            }
-        } else if (lhs) {
-            if (assign->type == BinaryOperation::NOP) {
-                operands.push_back(new Nil);
-
-                store = true;
-                lhs = debug(lhs)->accept(this)->nextExpression;
-                store = false;
-            } else {
-                load = true;
-                lhs = debug(lhs)->accept(this);
-                load = false;
-
-                fassertl(!operands.empty(), assign->loc, "not enogth operands")
-
-                AutoPtr<Terminal> L  = operands.back();
-                operands.pop_back();
-
-                AutoPtr<Terminal> R(new Nil);
-
-                operands.push_back(operate(L, assign->type, R));
-
-                store = true;
-                lhs = debug(lhs)->accept(this)->nextExpression;
-                store = false;
-            }
-        } else if (rhs) {
-            break;
+            store = true;
+            lhs = debug(lhs)->accept(this)->nextExpression;
+            store = false;
         }
     }
 
-    if(load_f){
+    if (load_f) {
         auto lhs = assign->ids;
         while (lhs) {
             load = true;
@@ -346,7 +329,8 @@ void Interpreter::visit(Assign* assign) {
             load = false;
         }
     } else {
-        fassertl(operands.empty(), assign->loc, "operands not empty after statement") // assign maybe statement
+        // assign maybe statement
+        fassertl(operands.empty(), assign->loc, "operands not empty after statement")
     }
 }
 

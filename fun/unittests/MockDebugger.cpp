@@ -39,7 +39,7 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
 }
 
 void MockDebugger::run() {
-    Finalizer f([this]{
+    Finalizer f([this] {
         ScopedLock<Mutex> lock(_mutex);
         _stop = true;
         _wait = false;
@@ -50,14 +50,14 @@ void MockDebugger::run() {
         if (_endHandler)
             _endHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
     } catch (exception const& e) {
-        if(_errorHandler)
+        if (_errorHandler)
             _errorHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
         _exceptionPtr = current_exception();
     }
 }
 
 MockDebugger* MockDebugger::handleBreakpoint(Handler function) {
-    Finalizer f([this]{
+    Finalizer f([this] {
         Poco::ScopedLock<Poco::Mutex> lock(_mutex);
         _wait = false;
         _condition.signal();
@@ -72,8 +72,7 @@ MockDebugger* MockDebugger::handleEnd(Handler function) {
     return this;
 }
 
-MockDebugger *MockDebugger::handleError(Handler handler)
-{
+MockDebugger *MockDebugger::handleError(Handler handler) {
     _errorHandler = handler;
     return this;
 }

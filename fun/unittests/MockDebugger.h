@@ -35,14 +35,14 @@ public:
 private:
     virtual void run() override;
 
-    class Finalizer{
+    class Finalizer {
     public:
-        Finalizer(const std::function<void()> finally): _finally(finally){}
-        virtual ~Finalizer(){
+        Finalizer(const std::function<void()> finally): _finally(finally) {}
+        virtual ~Finalizer() {
             final();
         }
 
-        void final(){
+        void final() {
             if(_finally)
                 _finally();
             _finally = {};
