@@ -23,12 +23,11 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
     ScopedLock<Mutex> lock(_mutex);
     th.start(*this);
     while (true) {
-        while (!f){
+        while (!_resumer){
             _condition.wait(_mutex);
-            cout << "after wait" << endl;
         }
-        f();
-        f = {};
+        _resumer();
+        _resumer = {};
         if (_stop) {
             break;
         }
@@ -41,31 +40,35 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
 }
 
 void MockDebugger::run() {
-    try {
+    Finalizer f([this]{
         ScopedLock<Mutex> lock(_mutex);
-        f = [&] {
+        _resumer = [&] {
             _stop = true;
             resume();
         };
-        ConditionUnlocker unlocker(_condition);
-
+        _condition.signal();
+    });
+    try {
         _pot->accept(_visitor);
         if (_endHandler)
             _endHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
     } catch (exception const& e) {
+        if(_errorHandler)
+            _errorHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
         _exceptionPtr = current_exception();
     }
 }
 
 MockDebugger* MockDebugger::handleBreakpoint(Handler function) {
-    Poco::ScopedLock<Poco::Mutex> lock(_mutex);
-    f = [&] {
-        resume();
-    };
-    ConditionUnlocker unlocker(_condition);
+    Finalizer f([this]{
+        Poco::ScopedLock<Poco::Mutex> lock(_mutex);
+        _resumer = [&] {
+            resume();
+        };
+        _condition.signal();
+    });
     if (function)
         function(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
-    cout << static_cast<bool>(f) << endl;
     return this;
 }
 
@@ -74,12 +77,17 @@ MockDebugger* MockDebugger::handleEnd(Handler function) {
     return this;
 }
 
+MockDebugger *MockDebugger::handleError(Handler handler)
+{
+    _errorHandler = handler;
+    return this;
+}
+
 MockDebugger::ConditionUnlocker::ConditionUnlocker(Condition &cond) :
     _condition(cond) {
 }
 
 MockDebugger::ConditionUnlocker::~ConditionUnlocker() {
-    cout << "signal" << endl;
     _condition.signal();
 }
 

@@ -612,7 +612,7 @@ foo, E -= 10
         EXPECT_EQ(memory->getMemory()[0].size(), 1);
 
         CHECK_INTEGER(foo, 42);
-    )
+    ),
 )
 
 EVAL(Assign, 91, R"(

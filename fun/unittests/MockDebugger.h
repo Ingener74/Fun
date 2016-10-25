@@ -30,6 +30,7 @@ public:
 
     MockDebugger* handleBreakpoint(Handler);
     MockDebugger* handleEnd(Handler);
+    MockDebugger* handleError(Handler);
 
 private:
     virtual void run() override;
@@ -44,14 +45,32 @@ private:
         Poco::Condition& _condition;
     };
 
+    class Finalizer{
+    public:
+        Finalizer(const std::function<void()> finally): _finally(finally){}
+        virtual ~Finalizer(){
+            final();
+        }
+
+        void final(){
+            if(_finally)
+                _finally();
+            _finally = {};
+        }
+
+    private:
+        std::function<void()> _finally;
+    };
+
     Poco::AutoPtr<Visitor> _visitor;
     Poco::AutoPtr<Pot> _pot;
 
-    std::function<void(IOperands*, IMemory*)> _breakpointHandler;
-    std::function<void(IOperands*, IMemory*)> _endHandler;
+    Handler _breakpointHandler;
+    Handler _endHandler;
+    Handler _errorHandler;
 
     bool _stop = false;
-    std::function<void()> f;
+    std::function<void()> _resumer;
     Poco::Mutex _mutex;
     Poco::Condition _condition;
 
