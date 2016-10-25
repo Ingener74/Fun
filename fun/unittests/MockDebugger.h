@@ -35,16 +35,6 @@ public:
 private:
     virtual void run() override;
 
-    class ConditionUnlocker {
-    public:
-        ConditionUnlocker(Poco::Condition& _condition);
-        virtual ~ConditionUnlocker();
-    private:
-        ConditionUnlocker(const ConditionUnlocker&) = delete;
-        ConditionUnlocker& operator=(const ConditionUnlocker&) = delete;
-        Poco::Condition& _condition;
-    };
-
     class Finalizer{
     public:
         Finalizer(const std::function<void()> finally): _finally(finally){}
@@ -69,8 +59,8 @@ private:
     Handler _endHandler;
     Handler _errorHandler;
 
+    bool _wait = true;
     bool _stop = false;
-    std::function<void()> _resumer;
     Poco::Mutex _mutex;
     Poco::Condition _condition;
 

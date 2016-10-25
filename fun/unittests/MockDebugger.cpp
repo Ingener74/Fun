@@ -23,11 +23,10 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
     ScopedLock<Mutex> lock(_mutex);
     th.start(*this);
     while (true) {
-        while (!_resumer){
+        while (_wait)
             _condition.wait(_mutex);
-        }
-        _resumer();
-        _resumer = {};
+        resume();
+        _wait = true;
         if (_stop) {
             break;
         }
@@ -42,10 +41,8 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
 void MockDebugger::run() {
     Finalizer f([this]{
         ScopedLock<Mutex> lock(_mutex);
-        _resumer = [&] {
-            _stop = true;
-            resume();
-        };
+        _stop = true;
+        _wait = false;
         _condition.signal();
     });
     try {
@@ -62,9 +59,7 @@ void MockDebugger::run() {
 MockDebugger* MockDebugger::handleBreakpoint(Handler function) {
     Finalizer f([this]{
         Poco::ScopedLock<Poco::Mutex> lock(_mutex);
-        _resumer = [&] {
-            resume();
-        };
+        _wait = false;
         _condition.signal();
     });
     if (function)
@@ -81,14 +76,6 @@ MockDebugger *MockDebugger::handleError(Handler handler)
 {
     _errorHandler = handler;
     return this;
-}
-
-MockDebugger::ConditionUnlocker::ConditionUnlocker(Condition &cond) :
-    _condition(cond) {
-}
-
-MockDebugger::ConditionUnlocker::~ConditionUnlocker() {
-    _condition.signal();
 }
 
 }
