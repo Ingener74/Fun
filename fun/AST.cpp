@@ -4,8 +4,6 @@
 #include "Utils.h"
 #include "AST.h"
 
-#define SAFE_RELEASE(x) if (x) x->release();
-
 #define ACCEPT(CLASS, BODY)        \
 CLASS* CLASS::accept(Visitor* v) { \
     fassert(v, "Visitor is null"); \
@@ -38,7 +36,7 @@ Statement::Statement(const location& loc) :
 
 Statement::~Statement(){
     stmtCounter--;
-    SAFE_RELEASE(nextStatement)
+    removeRefs(nextStatement);
 }
 
 int Statement::counter() {
@@ -54,9 +52,7 @@ ACCEPT(Break, )
 ACCEPT(Class, )
 
 Class::~Class() {
-    SAFE_RELEASE(name)
-    SAFE_RELEASE(derived)
-    SAFE_RELEASE(stmts)
+    removeRefs(name, derived, stmts);
 }
 
 ACCEPT(Continue, )
@@ -64,42 +60,31 @@ ACCEPT(Continue, )
 ACCEPT(Exception, )
 
 Exception::~Exception(){
-    SAFE_RELEASE(tryStmts)
-    SAFE_RELEASE(errorClasses)
-    SAFE_RELEASE(errorObject)
-    SAFE_RELEASE(catchStmts)
+    removeRefs(tryStmts, errorClasses, errorObject, catchStmts);
 }
 
 ACCEPT(For, )
 
 For::~For(){
-    SAFE_RELEASE(initial)
-    SAFE_RELEASE(condition)
-    SAFE_RELEASE(increment)
-    SAFE_RELEASE(stmts)
+    removeRefs(initial, condition, increment, stmts);
 }
 
 ACCEPT(Function, )
 
 Function::~Function(){
-    SAFE_RELEASE(name)
-    SAFE_RELEASE(args)
-    SAFE_RELEASE(stmts)
-    SAFE_RELEASE(nextFunction)
+    removeRefs(name, args, stmts, nextFunction);
 }
 
 ACCEPT(Ifs, )
 
 Ifs::~Ifs() {
-    SAFE_RELEASE(if_stmts)
+    removeRefs(if_stmts);
 }
 
 ACCEPT(If, )
 
 If::~If(){
-    SAFE_RELEASE(cond)
-    SAFE_RELEASE(stmts)
-    SAFE_RELEASE(nextIf)
+    removeRefs(cond, stmts, nextIf);
 }
 
 ACCEPT(Import, {
@@ -107,7 +92,7 @@ ACCEPT(Import, {
 })
 
 Import::~Import(){
-    SAFE_RELEASE(id)
+    removeRefs(id);
 }
 
 ACCEPT(Print, {
@@ -115,19 +100,19 @@ ACCEPT(Print, {
 })
 
 Print::~Print(){
-    SAFE_RELEASE(expression)
+    removeRefs(expression);
 }
 
 ACCEPT(Return, )
 
 Return::~Return(){
-    SAFE_RELEASE(expression)
+    removeRefs(expression);
 }
 
 ACCEPT(Throw, )
 
 Throw::~Throw(){
-    SAFE_RELEASE(expression)
+    removeRefs(expression);
 }
 
 ACCEPT(While, {
@@ -135,8 +120,7 @@ ACCEPT(While, {
 })
 
 While::~While(){
-    SAFE_RELEASE(cond)
-    SAFE_RELEASE(stmts)
+    removeRefs(cond, stmts);
 }
 
 void Expression::apply(Expression* expression, Visitor* v) {
@@ -145,7 +129,7 @@ void Expression::apply(Expression* expression, Visitor* v) {
 }
 
 Expression::~Expression(){
-    SAFE_RELEASE(nextExpression)
+    removeRefs(nextExpression);
 }
 
 ACCEPT(Assign, {
@@ -154,9 +138,7 @@ ACCEPT(Assign, {
 })
 
 Assign::~Assign(){
-    SAFE_RELEASE(ids)
-    SAFE_RELEASE(exprs)
-    SAFE_RELEASE(nextAssign)
+    removeRefs(ids, exprs, nextAssign);
 }
 
 void Assign::apply(Assign* assign, Visitor* v) {
@@ -170,15 +152,13 @@ ACCEPT(BinaryOp, {
 })
 
 BinaryOp::~BinaryOp(){
-    SAFE_RELEASE(lhs)
-    SAFE_RELEASE(rhs)
+    removeRefs(lhs, rhs);
 }
 
 ACCEPT(Dot, )
 
 Dot::~Dot() {
-    SAFE_RELEASE(lhs)
-    SAFE_RELEASE(rhs)
+    removeRefs(lhs, rhs);
 }
 
 ACCEPT(Call, {
@@ -186,20 +166,19 @@ ACCEPT(Call, {
 })
 
 Call::~Call(){
-    SAFE_RELEASE(callable)
-    SAFE_RELEASE(arguments)
+    removeRefs(callable, arguments);
 }
 
 ACCEPT(Dictionary, )
 
 Dictionary::~Dictionary(){
-    SAFE_RELEASE(assign)
+    removeRefs(assign);
 }
 
 ACCEPT(Id, )
 
 Id::~Id(){
-    SAFE_RELEASE(nextId)
+    removeRefs(nextId);
 }
 
 ACCEPT(Index, {
@@ -207,8 +186,7 @@ ACCEPT(Index, {
 })
 
 Index::~Index(){
-    SAFE_RELEASE(indexable)
-    SAFE_RELEASE(arg)
+    removeRefs(indexable, arg);
 }
 //ACCEPT(ForExpression, {
 //})
@@ -216,7 +194,7 @@ Index::~Index(){
 ACCEPT(RoundBrackets, )
 
 RoundBrackets::~RoundBrackets(){
-    SAFE_RELEASE(expr)
+    removeRefs(expr);
 }
 
 Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {

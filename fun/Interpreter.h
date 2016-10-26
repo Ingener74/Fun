@@ -18,11 +18,7 @@ class Terminal;
 // Уровень стека
 class Stack: public Poco::RefCountedObject {
 public:
-    enum Flag {
-        Load, Store, FlagsCount
-    };
     std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-    std::bitset<FlagsCount> flags;
     Statement* breakIp = nullptr;
     Statement* continueIps = nullptr;
     Statement* catchIps = nullptr;
@@ -73,6 +69,11 @@ public:
 private:
     std::vector<Poco::AutoPtr<Terminal>> operands;
     std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
+
+    enum Flag {
+        Load, Store, FlagsCount
+    };
+    std::bitset<FlagsCount> flags;
 
     bool load = false;
     bool store = false;

@@ -97,6 +97,18 @@ protected:
             arg->duplicate();
         return arg;
     }
+
+    template<typename T>
+    static void removeRefs(T* t) {
+        if (t)
+            t->release();
+    }
+    template<typename T, typename ... Ts>
+    static void removeRefs(T* t, Ts*... ts) {
+        if (t)
+            t->release();
+        removeRefs(ts...);
+    }
     static int stmtCounter;
 };
 
