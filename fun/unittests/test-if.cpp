@@ -1,4 +1,3 @@
-#include "MockDebugger.h"
 #include "test.h"
 
 using namespace std;
@@ -58,3 +57,17 @@ else
     2
 end
 )", ParserError);
+
+EVAL(If, 9, R"(
+a = 1
+if true:
+	a = 2
+end
+)",
+	BREAKPOINT_LINE(4,
+//        EXPECT_EQ(memory->getMemory().size(), 2);
+//		EXPECT_EQ(memory->getMemory()[0].size(), 1);
+//		EXPECT_EQ(memory->getMemory()[1].size(), 1);
+	)
+	,
+)

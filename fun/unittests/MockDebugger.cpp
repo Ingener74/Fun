@@ -27,9 +27,8 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
             _condition.wait(_mutex);
         resume();
         _wait = true;
-        if (_stop) {
+        if (_stop)
             break;
-        }
     }
     if (th.isRunning())
         th.join();

@@ -10,8 +10,6 @@ namespace fun {
 using namespace std;
 using namespace Poco;
 
-#define RELEASE_TOP operands.back()->release(); operands.pop_back();
-
 void Interpreter::iterateStatements(Statement *stmts) {
     while (stmts)
         stmts = debug(stmts)->accept(this)->nextStatement;
@@ -19,14 +17,10 @@ void Interpreter::iterateStatements(Statement *stmts) {
 
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
-    variables.push_back(unordered_map<string, Terminal*>{});
+    variables.push_back(unordered_map<string, AutoPtr<Terminal>>{});
 }
 
 Interpreter::~Interpreter() {
-    while (!variables.empty())
-        clearTop();
-    for(auto operand: operands)
-        operand->release();
 }
 
 void Interpreter::visit(Break* break_stmt) {
@@ -56,7 +50,7 @@ void Interpreter::visit(For* for_stmt) {
         load = false;
 
         if (operands.back()->toBoolean()) {
-            RELEASE_TOP
+            operands.pop_back();
 
             auto stmt = for_stmt->stmts;
 
@@ -77,7 +71,7 @@ void Interpreter::visit(For* for_stmt) {
             fassertl(for_stmt->increment, for_stmt->loc, "for must have increment expression")
             debug(for_stmt->increment)->accept(this);
         } else {
-            RELEASE_TOP
+            operands.pop_back();
             break;
         }
     }
@@ -86,9 +80,8 @@ void Interpreter::visit(For* for_stmt) {
 }
 
 void Interpreter::visit(Function *function) {
-    if (load || function->name){
-        operands.push_back(function);
-        function->duplicate();
+    if (load || function->name) {
+        operands.emplace_back(function, true);
     }
 
     if (function->name) {
@@ -118,7 +111,7 @@ void Interpreter::visit(If* if_stmt) {
         load = false;
 
         if (operands.back()->toBoolean()) {
-            RELEASE_TOP
+            operands.pop_back();
 
             auto stmt = if_stmt->stmts;
 
@@ -137,7 +130,7 @@ void Interpreter::visit(If* if_stmt) {
 
             break_flag = true;
         } else {
-            RELEASE_TOP
+            operands.pop_back();
         }
     } else {
         auto stmt = if_stmt->stmts;
@@ -173,7 +166,7 @@ void Interpreter::visit(Print* print) {
     load = false;
     cout << operands.back()->toString() << endl;
 
-    operands.back()->release();
+//    operands.back()->release();
     operands.pop_back();
 
     fassertl(operands.size() == ops, print->loc, "operands balance broken after statement")
@@ -245,7 +238,7 @@ void Interpreter::visit(Assign* assign) {
 
         auto operands_diff = operands.size() - balance;
 
-        vector<Terminal*> tmp;
+        vector<AutoPtr<Terminal>> tmp;
 
         for (decltype(operands_diff) i = 0; i < operands_diff; ++i) {
             tmp.push_back(operands.at(balance + i));
@@ -284,8 +277,6 @@ void Interpreter::visit(Assign* assign) {
                     lhs = debug(lhs)->accept(this)->nextExpression;
                     store = false;
                 }
-            } else {
-                tmp.at(i)->release();
             }
         }
     }
@@ -373,7 +364,7 @@ void Interpreter::visit(Call* call) {
      */
     fassertl(operands.size() > 0, call->loc, "callable not found");
     fassertl(operands.back()->getType() == Terminal::Function, call->loc, "must be callable");
-    auto function = dynamic_cast<Function*>(operands.back());
+    auto function = operands.back().cast<Function>();
     operands.pop_back();
 
     /*
@@ -403,9 +394,6 @@ void Interpreter::visit(Call* call) {
             break;
         }
     }
-    function->release();
-
-//    fassert(!operands.empty(), "operands empty after expression")
 }
 
 void Interpreter::visit(Dictionary* dict) {
@@ -419,7 +407,6 @@ void Interpreter::visit(Id* id) {
                 continue;
             } else {
                 operands.push_back(var->second);
-                var->second->duplicate();
                 fassertl(!operands.empty(), id->loc, "operands empty after expression")
                 return;
             }
@@ -439,7 +426,6 @@ void Interpreter::visit(Id* id) {
             auto it = rit->insert({id->value, val});
             fassertl(it.second, id->loc, "can't store top operands value in " + id->value);
         } else {
-            var->second->release();
             var->second = val;
         }
     }
@@ -456,8 +442,7 @@ void Interpreter::visit(RoundBrackets* round_brackets) {
 
 void Interpreter::visit(Boolean *boolean) {
     if (load) {
-        operands.push_back(boolean);
-        boolean->duplicate();
+        operands.emplace_back(boolean, true);
         fassertl(!operands.empty(), boolean->loc, "operands empty after expression")
     }
     fassertl(!store, boolean->loc, "you can't assign to value")
@@ -465,8 +450,7 @@ void Interpreter::visit(Boolean *boolean) {
 
 void Interpreter::visit(Integer *integer) {
     if (load) {
-        operands.push_back(integer);
-        integer->duplicate();
+        operands.emplace_back(integer, true);
         fassertl(!operands.empty(), integer->loc, "operands empty after expression")
     }
     fassertl(!store, integer->loc, "you can't assign to value")
@@ -474,8 +458,7 @@ void Interpreter::visit(Integer *integer) {
 
 void Interpreter::visit(Nil *nil) {
     if (load) {
-        operands.push_back(nil);
-        nil->duplicate();
+        operands.emplace_back(nil, true);
         fassertl(!operands.empty(), nil->loc, "operands empty after expression")
     }
     fassertl(!store, nil->loc, "you can't assign to value")
@@ -483,8 +466,7 @@ void Interpreter::visit(Nil *nil) {
 
 void Interpreter::visit(Real *real) {
     if (load) {
-        operands.push_back(real);
-        real->duplicate();
+        operands.emplace_back(real, true);
         fassertl(!operands.empty(), real->loc, "operands empty after expression")
     }
     fassertl(!store, real->loc, "you can't assign to value")
@@ -492,8 +474,7 @@ void Interpreter::visit(Real *real) {
 
 void Interpreter::visit(String *str) {
     if (load) {
-        operands.push_back(str);
-        str->duplicate();
+        operands.emplace_back(str, true);
         fassertl(!operands.empty(), str->loc, "operands empty after expression")
     }
     fassertl(!store, str->loc, "you can't assign to value")
@@ -623,26 +604,20 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
     return nullptr;
 }
 
-const vector<Terminal*> &Interpreter::getOperands() const {
+const vector<AutoPtr<Terminal>>& Interpreter::getOperands() const {
     return operands;
 }
 
-const vector<unordered_map<string, Terminal*>>& Interpreter::getMemory() const {
+vector<AutoPtr<Terminal> >& Interpreter::getOperands() {
+    return operands;
+}
+
+const vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() const {
     return variables;
 }
 
-vector<unordered_map<string, Terminal*> >& Interpreter::getMemory() {
+vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() {
     return variables;
-}
-
-void Interpreter::clearTop() {
-    auto rit = variables.rbegin();
-    if (rit != variables.rend()) {
-        for (auto &var : *rit) {
-            var.second->release();
-        }
-    }
-    variables.pop_back();
 }
 
 }

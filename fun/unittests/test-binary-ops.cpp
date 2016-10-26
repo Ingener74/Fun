@@ -3,9 +3,10 @@
 using namespace std;
 using namespace fun;
 
-#define CHECK_OPERAND(TYPE, N, VALUE)                        \
-    auto op_##N = dynamic_cast<TYPE*>(operands->getOperands()[N]); \
-    ASSERT_NE(op_##N, nullptr);                               \
+#define CHECK_OPERAND(TYPE, N, VALUE)                              \
+	ASSERT_LT(N, operands->getOperands().size());                  \
+    auto op_##N = operands->getOperands()[N].cast<TYPE>();         \
+    ASSERT_FALSE(op_##N.isNull());                                 \
     EXPECT_EQ(op_##N->value, VALUE);
 
 #define CHECK_INTEGER_OPERAND(N, VALUE) CHECK_OPERAND(Integer, N, VALUE)

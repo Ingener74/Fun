@@ -67,12 +67,19 @@ public:
 
 private:
     Poco::AutoPtr<Statement> _root;
-    std::vector<Statement*> _statements;
+    std::vector<Poco::AutoPtr<Statement>> _statements;
 };
 
 class Statement : public Poco::RefCountedObject {
 public:
     Statement(const location& loc);
+
+//    template<typename ... Args>
+//    Statement(const location& loc, Args...&& args){
+//        m_members = std::make_tuple(Poco::AutoPtr<Args>(args, true)...);
+//    }
+//    std::tuple<Args...> m_members
+
     virtual ~Statement();
 
     virtual Statement* accept(Visitor*) = 0;
@@ -82,6 +89,7 @@ public:
     location loc;
 
     static int counter();
+    static void resetCounter();
 protected:
     template<typename T>
     static T *addRef(T *arg) {

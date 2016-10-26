@@ -19,15 +19,13 @@ class Terminal;
 class Stack: public Poco::RefCountedObject {
 public:
     enum Flag {
-        Load, Store, FlagSize
+        Load, Store, FlagsCount
     };
-    std::unordered_map<std::string, Terminal*> variables;
-    std::bitset<FlagSize> flags;
+    std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
+    std::bitset<FlagsCount> flags;
     Statement* breakIp = nullptr;
     Statement* continueIps = nullptr;
     Statement* catchIps = nullptr;
-
-    Stack* next = nullptr;
 };
 
 class Interpreter: public Visitor, public IOperands, public IMemory {
@@ -65,15 +63,16 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    const std::vector<Terminal*>& getOperands() const;
-    const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const;
-    std::vector<std::unordered_map<std::string, Terminal*>>& getMemory();
+    const std::vector<Poco::AutoPtr<Terminal>>& getOperands() const override;
+    std::vector<Poco::AutoPtr<Terminal>>& getOperands() override;
+    const std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() const override;
+    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() override;
 
     Interpreter* setDebugger(Debugger* debugger);
 
 private:
-    std::vector<Terminal*> operands;
-    std::vector<std::unordered_map<std::string, Terminal*>> variables;
+    std::vector<Poco::AutoPtr<Terminal>> operands;
+    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
 
     bool load = false;
     bool store = false;
@@ -81,7 +80,8 @@ private:
     bool continue_flag = false;
     bool return_flag = false;
 
-    std::vector<Stack*> stack;
+    std::vector<Poco::AutoPtr<Stack>> stack;
+    size_t stackTop = 0;
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
@@ -93,8 +93,6 @@ private:
             debugger->onBeforeStep(stmt);
         return stmt;
     }
-
-    void clearTop();
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {

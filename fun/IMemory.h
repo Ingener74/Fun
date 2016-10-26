@@ -10,8 +10,8 @@ class IMemory {
 public:
     virtual ~IMemory() = default;
 
-    virtual const std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() const = 0;
-    virtual std::vector<std::unordered_map<std::string, Terminal*>>& getMemory() = 0;
+    virtual const std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() const = 0;
+    virtual std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() = 0;
 };
 
 }

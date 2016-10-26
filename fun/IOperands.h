@@ -8,7 +8,8 @@ class IOperands {
 public:
     virtual ~IOperands() = default;
 
-    virtual const std::vector<Terminal*>& getOperands() const = 0;
+    virtual const std::vector<Poco::AutoPtr<Terminal>>& getOperands() const = 0;
+    virtual std::vector<Poco::AutoPtr<Terminal>>& getOperands() = 0;
 };
 
 }

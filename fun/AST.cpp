@@ -23,7 +23,6 @@ void Pot::setRoot(Statement* root) {
 }
 
 Pot::~Pot() {
-    for (auto i: _statements) i->release();
 }
 
 void Pot::accept(Visitor* v) {
@@ -44,6 +43,10 @@ Statement::~Statement(){
 
 int Statement::counter() {
     return stmtCounter;
+}
+
+void Statement::resetCounter() {
+    stmtCounter = 0;
 }
 
 ACCEPT(Break, )
