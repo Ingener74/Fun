@@ -12,7 +12,7 @@ using namespace Poco;
 
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
-    variables.push_back(unordered_map<string, AutoPtr<Terminal>>{});
+//    variables.push_back(unordered_map<string, AutoPtr<Terminal>>{});
 }
 
 Interpreter::~Interpreter() {
@@ -401,9 +401,9 @@ void Interpreter::visit(Dictionary* dict) {
 
 void Interpreter::visit(Id* id) {
     if (load) {
-        for (auto it = variables.rbegin(); it != variables.rend(); ++it) {
-            auto var = it->find(id->value);
-            if (var == it->end()) {
+        for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
+            auto var = (*it)->variables.find(id->value);
+            if (var == (*it)->variables.end()) {
                 continue;
             } else {
                 operands.push_back(var->second);
@@ -415,15 +415,15 @@ void Interpreter::visit(Id* id) {
     } else if (store) {
         fassertl(operands.size() > 0, id->loc, "have no operands");
 
-        auto rit = variables.rbegin();
+        auto rit = stack.rbegin();
 
-        auto var = rit->find(id->value);
+        auto var = (*rit)->variables.find(id->value);
 
         auto val = operands.back();
         operands.pop_back();
 
-        if (var == rit->end()) {
-            auto it = rit->insert({id->value, val});
+        if (var == (*rit)->variables.end()) {
+            auto it = (*rit)->variables.insert({ id->value, val });
             fassertl(it.second, id->loc, "can't store top operands value in " + id->value);
         } else {
             var->second = val;
@@ -613,11 +613,11 @@ vector<AutoPtr<Terminal> >& Interpreter::getOperands() {
 }
 
 const vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() const {
-    return variables;
+    return stack.back()->variables;
 }
 
 vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() {
-    return variables;
+    return stack.back()->variables;
 }
 
 void Interpreter::StackLevel::iterate(Interpreter* i) {

@@ -59,13 +59,10 @@ public:
     Interpreter* setDebugger(Debugger* debugger);
 
 private:
-    std::vector<Poco::AutoPtr<Terminal>> operands;
-    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
-
-    enum Flag {
-        Load, Store, FlagsCount
-    };
-    std::bitset<FlagsCount> flags;
+//    enum Flag {
+//        Load, Store, FlagsCount
+//    };
+//    std::bitset<FlagsCount> flags;
 
     bool load = false;
     bool store = false;
@@ -119,8 +116,10 @@ private:
         Statement* catchIps = nullptr;
     };
 
+    std::vector<Poco::AutoPtr<Terminal>> operands;
+//    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
+
     std::vector<Poco::AutoPtr<StackLevel>> stack;
-    size_t stackTop = 0;
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {

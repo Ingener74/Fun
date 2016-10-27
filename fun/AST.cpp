@@ -188,6 +188,7 @@ ACCEPT(Index, {
 Index::~Index(){
     removeRefs(indexable, arg);
 }
+
 //ACCEPT(ForExpression, {
 //})
 
