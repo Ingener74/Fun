@@ -16,14 +16,6 @@ namespace fun {
 class Terminal;
 
 // Уровень стека
-class Stack: public Poco::RefCountedObject {
-public:
-    std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-    Statement* breakIp = nullptr;
-    Statement* continueIps = nullptr;
-    Statement* catchIps = nullptr;
-};
-
 class Interpreter: public Visitor, public IOperands, public IMemory {
 public:
     Interpreter(Debugger* = nullptr);
@@ -81,9 +73,6 @@ private:
     bool continue_flag = false;
     bool return_flag = false;
 
-    std::vector<Poco::AutoPtr<Stack>> stack;
-    size_t stackTop = 0;
-
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
     Debugger* debugger = nullptr;
@@ -94,6 +83,44 @@ private:
             debugger->onBeforeStep(stmt);
         return stmt;
     }
+
+    class StackLevel: public Poco::RefCountedObject {
+    public:
+        StackLevel(Statement* ip) :
+            ip(ip) {
+        }
+        virtual ~StackLevel() {
+        }
+
+        virtual void iterate(Interpreter*);
+
+        std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
+        Statement* ip = nullptr;
+    };
+
+    class FunctionStackLevel: public StackLevel {
+    public:
+        FunctionStackLevel(Statement* ip): StackLevel(ip) {
+        }
+        virtual ~FunctionStackLevel() {
+        }
+
+        Statement* returnIp = nullptr;
+    };
+
+    class OperatorStackLevel: public StackLevel {
+    public:
+        OperatorStackLevel(Statement* ip): StackLevel(ip) {
+        }
+        virtual ~OperatorStackLevel() {
+        }
+        Statement* breakIp = nullptr;
+        Statement* continueIps = nullptr;
+        Statement* catchIps = nullptr;
+    };
+
+    std::vector<Poco::AutoPtr<StackLevel>> stack;
+    size_t stackTop = 0;
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {

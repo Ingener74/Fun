@@ -10,17 +10,17 @@ namespace fun {
 using namespace std;
 using namespace Poco;
 
-void Interpreter::iterateStatements(Statement *stmts) {
-    while (stmts)
-        stmts = debug(stmts)->accept(this)->nextStatement;
-}
-
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
     variables.push_back(unordered_map<string, AutoPtr<Terminal>>{});
 }
 
 Interpreter::~Interpreter() {
+}
+
+void Interpreter::iterateStatements(Statement *stmts) {
+    stack.push_back(new StackLevel(stmts));
+    stack.back()->iterate(this);
 }
 
 void Interpreter::visit(Break* break_stmt) {
@@ -164,9 +164,9 @@ void Interpreter::visit(Print* print) {
     load = true;
     debug(print->expression)->accept(this);
     load = false;
+
     cout << operands.back()->toString() << endl;
 
-//    operands.back()->release();
     operands.pop_back();
 
     fassertl(operands.size() == ops, print->loc, "operands balance broken after statement")
@@ -618,6 +618,11 @@ const vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory()
 
 vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() {
     return variables;
+}
+
+void Interpreter::StackLevel::iterate(Interpreter* i) {
+    while (ip)
+        ip = i->debug(ip)->accept(i)->nextStatement;
 }
 
 }
