@@ -65,9 +65,9 @@ if true:
 end
 )",
 	BREAKPOINT_LINE(4,
-        EXPECT_EQ(memory->getMemory().size(), 2);
-		EXPECT_EQ(memory->getMemory()[0].size(), 1);
-		EXPECT_EQ(memory->getMemory()[1].size(), 1);
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
 	)
 	,
 )

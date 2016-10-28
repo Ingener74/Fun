@@ -4,17 +4,17 @@ using namespace std;
 using namespace fun;
 
 #define CHECK_INTEGER(name, val)                                \
-    auto name = memory->getMemory()[0][#name].cast<Integer>();  \
+    auto name = memory->variable(0, #name).cast<Integer>();     \
     ASSERT_FALSE(name.isNull());                                \
     EXPECT_EQ(name->value, val);
 
 #define CHECK_STRING(name, val)                                 \
-    auto name = memory->getMemory()[0][#name].cast<String>();   \
+    auto name = memory->variable(0, #name).cast<String>();      \
     ASSERT_FALSE(name.isNull());                                \
     EXPECT_EQ(name->value, val);
 
 #define CHECK_NIL(name)                                         \
-    auto name = memory->getMemory()[0][#name].cast<Nil>();      \
+    auto name = memory->variable(0, #name).cast<Nil>();         \
     EXPECT_FALSE(name.isNull());
 
 
@@ -34,8 +34,8 @@ foo = 42)");
 EVAL(Assign, 5, R"(foo = 42)",,
     EXPECT_EQ(Statement::counter(), 3);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42)
 )
@@ -43,8 +43,8 @@ EVAL(Assign, 5, R"(foo = 42)",,
 EVAL(Assign, 6, R"(foo = bar = 42)",,
     EXPECT_EQ(Statement::counter(), 5);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42)
     CHECK_INTEGER(bar, 42)
@@ -53,8 +53,8 @@ EVAL(Assign, 6, R"(foo = bar = 42)",,
 EVAL(Assign, 7, R"(foo = bar = quz = A = B = C = 42)",,
     EXPECT_EQ(Statement::counter(), 6 + 5 + 2);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 6);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 6);
 
     CHECK_INTEGER(foo, 42)
     CHECK_INTEGER(bar, 42)
@@ -68,8 +68,8 @@ EVAL(Assign, 7, R"(foo = bar = quz = A = B = C = 42)",,
 EVAL(Assign, 8, R"(foo, bar = A, B = 42, 345)",,
     EXPECT_EQ(Statement::counter(), 6 + 2);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 4);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 4);
 
     CHECK_INTEGER(foo, 42)
     CHECK_INTEGER(bar, 345)
@@ -81,8 +81,8 @@ EVAL(Assign, 8, R"(foo, bar = A, B = 42, 345)",,
 EVAL(Assign, 9, R"(a, b, c = d, e, f = 42, 24, 12)",,
     EXPECT_EQ(Statement::counter(), 11);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 6);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 6);
 
     CHECK_INTEGER(a, 42)
     CHECK_INTEGER(b, 24)
@@ -96,8 +96,8 @@ EVAL(Assign, 9, R"(a, b, c = d, e, f = 42, 24, 12)",,
 EVAL(Assign, 10, R"(a, b = c, d = e, f = "test", 24)",,
     EXPECT_EQ(Statement::counter(), 11);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 6);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 6);
 
     CHECK_STRING(a, "test")
     CHECK_INTEGER(b, 24)
@@ -112,8 +112,8 @@ EVAL(Assign, 10, R"(a, b = c, d = e, f = "test", 24)",,
 EVAL(Assign, 11, R"(A, B, C = D, E = 42)",,
     EXPECT_EQ(Statement::counter(), 6 + 4);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 5);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 5);
 
     CHECK_INTEGER(A, 42)
     CHECK_NIL(B)
@@ -126,8 +126,8 @@ EVAL(Assign, 11, R"(A, B, C = D, E = 42)",,
 EVAL(Assign, 12, R"(A = B, C = 42, 24, 12)",,
     EXPECT_EQ(Statement::counter(), 8);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 3);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 3);
 
     CHECK_INTEGER(A, 42)
     CHECK_INTEGER(B, 42)
@@ -142,8 +142,8 @@ a = 43
     BREAKPOINT_LINE(4,
         EXPECT_EQ(Statement::counter(), 9);
 
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(a, 42)
         CHECK_INTEGER(b, 42)
@@ -151,8 +151,8 @@ a = 43
     ,
     EXPECT_EQ(Statement::counter(), 9);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(a, 43)
     CHECK_INTEGER(b, 42)
@@ -161,8 +161,8 @@ a = 43
 EVAL(Assign, 14, R"(foo, bar = 42, 24)",,
     EXPECT_EQ(Statement::counter(), 5);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42)
     CHECK_INTEGER(bar, 24)
@@ -171,8 +171,8 @@ EVAL(Assign, 14, R"(foo, bar = 42, 24)",,
 EVAL(Assign, 15, R"(a, b, c = 1, 2)",,
     EXPECT_EQ(Statement::counter(), 7);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 3);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 3);
 
     CHECK_INTEGER(a, 1);
     CHECK_INTEGER(b, 2);
@@ -184,8 +184,8 @@ EVAL(Assign, 15, R"(a, b, c = 1, 2)",,
 EVAL(Assign, 16, R"(a, b = 1, 2, 3)",,
     EXPECT_EQ(Statement::counter(), 6);
 
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(a, 1);
     CHECK_INTEGER(b, 2);
@@ -197,14 +197,14 @@ a = 1
 b = a
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(a, 1);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(a, 1);
     CHECK_INTEGER(b, 1);
@@ -515,14 +515,14 @@ foo = 42
 foo += 10
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 52);
 )
@@ -533,15 +533,15 @@ bar = 100
 foo += bar
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(bar, 100);
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(bar, 100);
     CHECK_INTEGER(foo, 142);
@@ -553,15 +553,15 @@ bar = 100
 foo, bar += 12, 13
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bar, 100);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42 + 12);
     CHECK_INTEGER(bar, 100 + 13);
@@ -575,8 +575,8 @@ d = 321
 foo, bar += c, d
 )",
     BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 4);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 4);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bar, 100);
@@ -584,8 +584,8 @@ foo, bar += c, d
         CHECK_INTEGER(d, 321);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 4);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 4);
 
     CHECK_INTEGER(foo, 42 + 123);
     CHECK_INTEGER(bar, 100 + 321);
@@ -601,8 +601,8 @@ d = 321
 foo, bar += c, d, 100
 )",
     BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 4);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 4);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bar, 100);
@@ -610,8 +610,8 @@ foo, bar += c, d, 100
         CHECK_INTEGER(d, 321);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 4);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 4);
 
     CHECK_INTEGER(foo, 42 + 123);
     CHECK_INTEGER(bar, 100 + 321);
@@ -628,8 +628,8 @@ E = 0
 foo, bar, E += c, d
 )",
     BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 4);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 4);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bar, 100);
@@ -637,8 +637,8 @@ foo, bar, E += c, d
         CHECK_INTEGER(d, 321);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 5);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 5);
 
     CHECK_INTEGER(foo, 42 + 123);
     CHECK_INTEGER(bar, 100 + 321);
@@ -652,14 +652,14 @@ foo = 42
 foo -= 10
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 32);
 )
@@ -669,8 +669,8 @@ foo = 42
 foo, E -= 10
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     ),
@@ -682,15 +682,15 @@ a = 12
 foo -= a
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(a, 12);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 30);
     CHECK_INTEGER(a, 12);
@@ -702,15 +702,15 @@ b = 10
 foo, b -= 10, 3
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(b, 10);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42 - 10);
     CHECK_INTEGER(b, 10 - 3);
@@ -723,16 +723,16 @@ a = 12
 foo, b -= a, a
 )",
     BREAKPOINT_LINE(5,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 3);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 3);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(b, 34);
         CHECK_INTEGER(a, 12);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 3);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 3);
 
     CHECK_INTEGER(foo, 42 - 12);
     CHECK_INTEGER(b, 34 - 12);
@@ -746,16 +746,16 @@ a = 12
 foo, b -= a, a, a
 )",
     BREAKPOINT_LINE(5,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 3);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 3);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(b, 34);
         CHECK_INTEGER(a, 12);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 3);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 3);
 
     CHECK_INTEGER(foo, 42 - 12);
     CHECK_INTEGER(b, 34 - 12);
@@ -770,8 +770,8 @@ c = 23
 foo, b, c -= a, a
 )",
     BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 4);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 4);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(b, 34);
@@ -779,8 +779,8 @@ foo, b, c -= a, a
         CHECK_INTEGER(c, 23);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 4);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 4);
 
     CHECK_INTEGER(foo, 42 - 12);
     CHECK_INTEGER(b, 34 - 12);
@@ -793,14 +793,14 @@ foo = 42
 foo *= 10
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 420);
 )
@@ -811,15 +811,15 @@ bar = 23
 foo *= bar
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bar, 23);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42*23);
     CHECK_INTEGER(bar, 23);
@@ -830,14 +830,14 @@ foo = 42
 foo /= 2
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42/2);
 )
@@ -848,15 +848,15 @@ bb = 3
 foo /= bb
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(bb, 3);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42/3);
     CHECK_INTEGER(bb, 3);
@@ -868,8 +868,8 @@ foo %= 4
 nil
 )",
     BREAKPOINT_EXPR(4, 0, 3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42%4);
     )
@@ -882,15 +882,15 @@ q = 5
 foo %= q
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(q, 5);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42%5);
     CHECK_INTEGER(q, 5);
@@ -901,14 +901,14 @@ foo = 42
 foo <<= 3
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42<<3);
 )
@@ -919,15 +919,15 @@ test = 4
 foo <<= test
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(test, 4);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42<<4);
     CHECK_INTEGER(test, 4);
@@ -939,14 +939,14 @@ foo = 42
 foo >>= 2
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42>>2);
 )
@@ -957,15 +957,15 @@ T = 3
 foo >>= T
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(T, 3);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42>>3);
     CHECK_INTEGER(T, 3);
@@ -977,14 +977,14 @@ foo = 42
 foo &= 12
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42&12);
 )
@@ -995,15 +995,15 @@ A = 34
 foo &= A
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(A, 34);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42&34);
     CHECK_INTEGER(A, 34);
@@ -1015,14 +1015,14 @@ foo = 42
 foo |= 54
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42|54);
 )
@@ -1033,15 +1033,15 @@ F = 45
 foo |= F
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(F, 45);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42|45);
     CHECK_INTEGER(F, 45);
@@ -1053,14 +1053,14 @@ foo = 42
 foo ^= 40
 )",
     BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 1);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 1);
 
         CHECK_INTEGER(foo, 42);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 1);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 1);
 
     CHECK_INTEGER(foo, 42^40);
 )
@@ -1071,15 +1071,15 @@ G = 50
 foo ^= G
 )",
     BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->getOperands().size(), 0);
-        EXPECT_EQ(memory->getMemory()[0].size(), 2);
+        EXPECT_EQ(operands->count(), 0);
+        EXPECT_EQ(memory->count(0), 2);
 
         CHECK_INTEGER(foo, 42);
         CHECK_INTEGER(G, 50);
     )
     ,
-    EXPECT_EQ(operands->getOperands().size(), 0);
-    EXPECT_EQ(memory->getMemory()[0].size(), 2);
+    EXPECT_EQ(operands->count(), 0);
+    EXPECT_EQ(memory->count(0), 2);
 
     CHECK_INTEGER(foo, 42^50);
     CHECK_INTEGER(G, 50);

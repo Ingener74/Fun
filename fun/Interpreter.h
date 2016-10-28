@@ -51,10 +51,45 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    const std::vector<Poco::AutoPtr<Terminal>>& getOperands() const override;
-    std::vector<Poco::AutoPtr<Terminal>>& getOperands() override;
-    const std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() const override;
-    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() override;
+    // IOperand
+    virtual size_t count() const override;
+
+    virtual Terminal::Type type(size_t operand) const override;
+
+    virtual Poco::AutoPtr<Terminal> operand(size_t operand) const override;
+
+    virtual bool boolean(size_t operand) const override;
+
+    virtual long long int integer(size_t operand) const override;
+
+    virtual double real(size_t operand) const override;
+
+    virtual std::string str(size_t operand) const override;
+
+    // IMemory
+    virtual size_t levelCount() const override;
+    virtual size_t count(size_t memoryLevel) const override;
+
+    virtual bool has(const std::string& name) const override;
+    virtual bool has(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Terminal::Type type(const std::string& name) const override;
+    virtual Terminal::Type type(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Poco::AutoPtr<Terminal> variable(const std::string& name) const override;
+    virtual Poco::AutoPtr<Terminal> variable(size_t memoryLevel, const std::string& name) const override;
+
+    virtual bool boolean(const std::string& name) const override;
+    virtual bool boolean(size_t memoryLevel, const std::string& name) const override;
+
+    virtual long long int integer(const std::string& name) const override;
+    virtual long long int integer(size_t memoryLevel, const std::string& name) const override;
+
+    virtual double real(const std::string& name) const override;
+    virtual double real(size_t memoryLevel, const std::string& name) const override;
+
+    virtual std::string str(const std::string& name) const override;
+    virtual std::string str(size_t memoryLevel, const std::string& name) const override;
 
     Interpreter* setDebugger(Debugger* debugger);
 
@@ -64,15 +99,9 @@ private:
 //    };
 //    std::bitset<FlagsCount> flags;
 
-    bool load = false;
-    bool store = false;
-    bool break_flag = false;
-    bool continue_flag = false;
-    bool return_flag = false;
+    void iterate();
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
-
-    Debugger* debugger = nullptr;
 
     template<typename TStatement>
     TStatement* debug(TStatement *stmt) {
@@ -81,45 +110,35 @@ private:
         return stmt;
     }
 
+    Statement* next(Statement* stmt);
+
+    bool load = false;
+    bool store = false;
+    bool break_flag = false;
+    bool continue_flag = false;
+    bool return_flag = false;
+
+    Debugger* debugger = nullptr;
+
     class StackLevel: public Poco::RefCountedObject {
     public:
-        StackLevel(Statement* ip) :
-            ip(ip) {
+        StackLevel() {
         }
         virtual ~StackLevel() {
         }
 
-        virtual void iterate(Interpreter*);
-
         std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-        Statement* ip = nullptr;
-    };
-
-    class FunctionStackLevel: public StackLevel {
-    public:
-        FunctionStackLevel(Statement* ip): StackLevel(ip) {
-        }
-        virtual ~FunctionStackLevel() {
-        }
-
-        Statement* returnIp = nullptr;
-    };
-
-    class OperatorStackLevel: public StackLevel {
-    public:
-        OperatorStackLevel(Statement* ip): StackLevel(ip) {
-        }
-        virtual ~OperatorStackLevel() {
-        }
         Statement* breakIp = nullptr;
-        Statement* continueIps = nullptr;
-        Statement* catchIps = nullptr;
+        Statement* continueIp = nullptr;
+        Statement* catchIp = nullptr;
+        Statement* returnIp = nullptr;
+
+        Statement* nextIp = nullptr;
     };
 
     std::vector<Poco::AutoPtr<Terminal>> operands;
-//    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
-
     std::vector<Poco::AutoPtr<StackLevel>> stack;
+    Statement* ip = nullptr;
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {

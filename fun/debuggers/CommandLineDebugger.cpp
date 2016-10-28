@@ -121,8 +121,8 @@ int fun::CommandLineDebugger::stepOverCmd() {
 
 int fun::CommandLineDebugger::operandsCmd() {
     cout << "########### Operands ###########" << endl;
-    for (auto &i : _operands->getOperands())
-        cout << types[i->getType()] << ": " << i->toString() << endl;
+//    for (auto &i : _operands->getOperands())
+//        cout << types[i->getType()] << ": " << i->toString() << endl;
     cout << "################################" << endl;
 
     return 1;
@@ -130,19 +130,19 @@ int fun::CommandLineDebugger::operandsCmd() {
 
 int fun::CommandLineDebugger::memoryCmd() {
     cout << "########### Memory #############" << endl;
-    int indents = 0;
-    for (auto &scope: _memory->getMemory()) {
-        for (auto &var: scope) {
-            cout << [&indents] {
-                stringstream ss;
-                for (int n = 0; n < indents; ++n)
-                    ss << "  ";
-                return ss.str();
-            }() << types[var.second->getType()] << " " << var.first << " == " <<
-                 var.second->toString() << " (" << var.second->referenceCount() << ")" << endl;
-        }
-        indents++;
-    }
+//    int indents = 0;
+//    for (auto &scope: _memory->getMemory()) {
+//        for (auto &var: scope) {
+//            cout << [&indents] {
+//                stringstream ss;
+//                for (int n = 0; n < indents; ++n)
+//                    ss << "  ";
+//                return ss.str();
+//            }() << types[var.second->getType()] << " " << var.first << " == " <<
+//                 var.second->toString() << " (" << var.second->referenceCount() << ")" << endl;
+//        }
+//        indents++;
+//    }
     cout << "################################" << endl;
     return 1;
 }

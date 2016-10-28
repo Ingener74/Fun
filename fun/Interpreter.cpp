@@ -12,71 +12,89 @@ using namespace Poco;
 
 Interpreter::Interpreter(Debugger* debugger) :
         debugger(debugger) {
-//    variables.push_back(unordered_map<string, AutoPtr<Terminal>>{});
 }
 
 Interpreter::~Interpreter() {
 }
 
 void Interpreter::iterateStatements(Statement *stmts) {
-    stack.push_back(new StackLevel(stmts));
-    stack.back()->iterate(this);
+    stack.push_back(new StackLevel);
+    ip = stmts;
+    iterate();
 }
 
 void Interpreter::visit(Break* break_stmt) {
-    auto ops = operands.size();
-    break_flag = true;
-    fassertl(operands.size() == ops, break_stmt->loc, "operands balance broken after statement")
+//    auto ops = operands.size();
+
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt) {
+        auto breakIp = (*ipIt)->breakIp;
+        if (breakIp)
+            ip = breakIp;
+    }
+
+//    fassertl(operands.size() == ops, break_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Continue* continue_stmt) {
-    auto ops = operands.size();
-    continue_flag = true;
-    fassertl(operands.size() == ops, continue_stmt->loc, "operands balance broken after statement")
+//    auto ops = operands.size();
+
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt) {
+        auto continueIp = (*ipIt)->continueIp;
+        if (continueIp)
+            ip = continueIp;
+    }
+
+//    fassertl(operands.size() == ops, continue_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(For* for_stmt) {
-    auto ops = operands.size();
+//    auto ops = operands.size();
 
-    fassertl(for_stmt->initial, for_stmt->loc, "for must have initial expression")
-    load = true;
-    debug(for_stmt->initial)->accept(this);
-    load = false;
+    stack.push_back(new StackLevel);
+    ip = for_stmt->stmts;
+    stack.back()->continueIp = for_stmt->stmts;
+    stack.back()->breakIp = for_stmt->nextStatement;
+    stack.back()->nextIp = for_stmt->nextStatement;
 
-    while (true) {
-        fassertl(for_stmt->condition, for_stmt->loc, "for must have condition expression")
-        load = true;
-        debug(for_stmt->condition)->accept(this);
-        load = false;
+//    fassertl(for_stmt->initial, for_stmt->loc, "for must have initial expression")
+//    load = true;
+//    debug(for_stmt->initial)->accept(this);
+//    load = false;
+//
+//    while (true) {
+//        fassertl(for_stmt->condition, for_stmt->loc, "for must have condition expression")
+//        load = true;
+//        debug(for_stmt->condition)->accept(this);
+//        load = false;
+//
+//        if (operands.back()->toBoolean()) {
+//            operands.pop_back();
+//
+//            auto stmt = for_stmt->stmts;
+//
+//            while (stmt) {
+//                if (break_flag) break;
+//                if (continue_flag) break;
+//
+//                stmt = debug(stmt)->accept(this)->nextStatement;
+//            }
+//            if (continue_flag) {
+//                continue_flag = false;
+//                continue;
+//            }
+//            if (break_flag) {
+//                break_flag = false;
+//                break;
+//            }
+//            fassertl(for_stmt->increment, for_stmt->loc, "for must have increment expression")
+//            debug(for_stmt->increment)->accept(this);
+//        } else {
+//            operands.pop_back();
+//            break;
+//        }
+//    }
 
-        if (operands.back()->toBoolean()) {
-            operands.pop_back();
-
-            auto stmt = for_stmt->stmts;
-
-            while (stmt) {
-                if (break_flag) break;
-                if (continue_flag) break;
-
-                stmt = debug(stmt)->accept(this)->nextStatement;
-            }
-            if (continue_flag) {
-                continue_flag = false;
-                continue;
-            }
-            if (break_flag) {
-                break_flag = false;
-                break;
-            }
-            fassertl(for_stmt->increment, for_stmt->loc, "for must have increment expression")
-            debug(for_stmt->increment)->accept(this);
-        } else {
-            operands.pop_back();
-            break;
-        }
-    }
-
-    fassertl(operands.size() == ops, for_stmt->loc, "operands balance broken after statement")
+//    fassertl(operands.size() == ops, for_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Function *function) {
@@ -92,65 +110,72 @@ void Interpreter::visit(Function *function) {
 }
 
 void Interpreter::visit(Ifs *ifs_stmt) {
-    auto if_stmt = ifs_stmt->if_stmts;
-    while(if_stmt){
-        if_stmt = if_stmt->accept(this)->nextIf;
-        if(break_flag){
-            break_flag = false;
-            break;
-        }
-    }
+    stack.push_back(new StackLevel);
+    ip = ifs_stmt->if_stmts;
+    stack.back()->breakIp = ifs_stmt->nextStatement;
+
+//    auto if_stmt = ifs_stmt->if_stmts;
+//    while(if_stmt){
+//        if_stmt = if_stmt->accept(this)->nextIf;
+//        if(break_flag){
+//            break_flag = false;
+//            break;
+//        }
+//    }
 }
 
 void Interpreter::visit(If* if_stmt) {
-    auto ops = operands.size();
+    stack.push_back(new StackLevel);
+    ip = if_stmt->stmts;
 
-    if (if_stmt->cond){
-        load = true;
-        debug(if_stmt->cond)->accept(this);
-        load = false;
-
-        if (operands.back()->toBoolean()) {
-            operands.pop_back();
-
-            auto stmt = if_stmt->stmts;
-
-            while (stmt) {
-                if (break_flag) {
-                    break_flag = false;
-                    break;
-                }
-                if (continue_flag) {
-                    continue_flag = false;
-                    break;
-                }
-
-                stmt = debug(stmt)->accept(this)->nextStatement;
-            }
-
-            break_flag = true;
-        } else {
-            operands.pop_back();
-        }
-    } else {
-        auto stmt = if_stmt->stmts;
-
-        while (stmt) {
-            if (break_flag) {
-                break_flag = false;
-                break;
-            }
-            if (continue_flag) {
-                continue_flag = false;
-                break;
-            }
-
-            stmt = debug(stmt)->accept(this)->nextStatement;
-        }
-
-        break_flag = true;
-    }
-    fassertl(operands.size() == ops, if_stmt->loc, "operands balance broken after statement");
+//    auto ops = operands.size();
+//
+//    if (if_stmt->cond){
+//        load = true;
+//        debug(if_stmt->cond)->accept(this);
+//        load = false;
+//
+//        if (operands.back()->toBoolean()) {
+//            operands.pop_back();
+//
+//            auto stmt = if_stmt->stmts;
+//
+//            while (stmt) {
+//                if (break_flag) {
+//                    break_flag = false;
+//                    break;
+//                }
+//                if (continue_flag) {
+//                    continue_flag = false;
+//                    break;
+//                }
+//
+//                stmt = debug(stmt)->accept(this)->nextStatement;
+//            }
+//
+//            break_flag = true;
+//        } else {
+//            operands.pop_back();
+//        }
+//    } else {
+//        auto stmt = if_stmt->stmts;
+//
+//        while (stmt) {
+//            if (break_flag) {
+//                break_flag = false;
+//                break;
+//            }
+//            if (continue_flag) {
+//                continue_flag = false;
+//                break;
+//            }
+//
+//            stmt = debug(stmt)->accept(this)->nextStatement;
+//        }
+//
+//        break_flag = true;
+//    }
+//    fassertl(operands.size() == ops, if_stmt->loc, "operands balance broken after statement");
 }
 
 void Interpreter::visit(Import* import_stmt) {
@@ -184,35 +209,42 @@ void Interpreter::visit(Return *return_stmt) {
 }
 
 void Interpreter::visit(While* while_stmt) {
-    auto ops = operands.size();
-    while (true) {
-        load = true;
-        debug(while_stmt->cond)->accept(this);
-        load = false;
 
-        if (operands.back()->toBoolean()) {
-            operands.pop_back();
+    stack.push_back(new StackLevel);
+    ip = while_stmt->stmts;
+    stack.back()->continueIp = while_stmt->stmts;
+    stack.back()->breakIp = while_stmt->nextStatement;
+    stack.back()->nextIp = while_stmt->nextStatement;
 
-            auto stmt = while_stmt->stmts;
-            while (stmt) {
-                if (break_flag) break;
-                if (continue_flag) break;
-                stmt = debug(stmt)->accept(this)->nextStatement;
-            }
-            if (continue_flag) {
-                continue_flag = false;
-                continue;
-            }
-            if (break_flag) {
-                break_flag = false;
-                break;
-            }
-        } else {
-            operands.pop_back();
-            break;
-        }
-    }
-    fassertl(operands.size() == ops, while_stmt->loc, "operands balance broken after statement")
+//    auto ops = operands.size();
+//    while (true) {
+//        load = true;
+//        debug(while_stmt->cond)->accept(this);
+//        load = false;
+//
+//        if (operands.back()->toBoolean()) {
+//            operands.pop_back();
+//
+//            auto stmt = while_stmt->stmts;
+//            while (stmt) {
+//                if (break_flag) break;
+//                if (continue_flag) break;
+//                stmt = debug(stmt)->accept(this)->nextStatement;
+//            }
+//            if (continue_flag) {
+//                continue_flag = false;
+//                continue;
+//            }
+//            if (break_flag) {
+//                break_flag = false;
+//                break;
+//            }
+//        } else {
+//            operands.pop_back();
+//            break;
+//        }
+//    }
+//    fassertl(operands.size() == ops, while_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Class* class_stmt) {
@@ -604,25 +636,159 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
     return nullptr;
 }
 
-const vector<AutoPtr<Terminal>>& Interpreter::getOperands() const {
-    return operands;
+size_t Interpreter::count() const {
+    return operands.size();
 }
 
-vector<AutoPtr<Terminal> >& Interpreter::getOperands() {
-    return operands;
+Terminal::Type Interpreter::type(size_t operand) const {
+    return operands.at(operand)->getType();
 }
 
-const vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() const {
-    return stack.back()->variables;
+AutoPtr<Terminal> Interpreter::operand(size_t operand) const {
+    return operands.at(operand);
 }
 
-vector<unordered_map<string, AutoPtr<Terminal>>>& Interpreter::getMemory() {
-    return stack.back()->variables;
+bool Interpreter::boolean(size_t operand) const {
+    return operands.at(operand)->toBoolean();
 }
 
-void Interpreter::StackLevel::iterate(Interpreter* i) {
+long long int Interpreter::integer(size_t operand) const {
+    return operands.at(operand)->toInteger();
+}
+
+double Interpreter::real(size_t operand) const {
+    return operands.at(operand)->toReal();
+}
+
+string Interpreter::str(size_t operand) const {
+    return operands.at(operand)->toString();
+}
+
+size_t Interpreter::levelCount() const {
+    return stack.size();
+}
+
+size_t Interpreter::count(size_t memoryLevel) const {
+    return stack.at(memoryLevel)->variables.size();
+}
+
+bool Interpreter::has(const string& name) const {
+    for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
+        if ((*it)->variables.find(name) != (*it)->variables.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Interpreter::has(size_t memoryLevel, const string& name) const {
+    if (stack.at(memoryLevel)->variables.find(name) != stack.at(memoryLevel)->variables.end()) {
+        return true;
+    }
+    return false;
+}
+
+Terminal::Type Interpreter::type(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return Terminal::Type::Unknown;
+    return var->getType();
+}
+
+Terminal::Type Interpreter::type(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return Terminal::Type::Unknown;
+    return var->getType();
+}
+
+Poco::AutoPtr<Terminal> Interpreter::variable(const string& name) const {
+    for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
+        auto varIt = (*it)->variables.find(name);
+        if (varIt != (*it)->variables.end()) {
+            return varIt->second;
+        }
+    }
+    return {};
+}
+
+Poco::AutoPtr<Terminal> Interpreter::variable(size_t memoryLevel, const string& name) const {
+    auto varIt = stack.at(memoryLevel)->variables.find(name);
+    if (varIt != stack.at(memoryLevel)->variables.end()) {
+        return varIt->second;
+    }
+    return {};
+}
+
+bool Interpreter::boolean(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toBoolean();
+}
+
+bool Interpreter::boolean(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toBoolean();
+}
+
+long long int Interpreter::integer(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toInteger();
+}
+
+long long int Interpreter::integer(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toInteger();
+}
+
+double Interpreter::real(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toReal();
+}
+
+double Interpreter::real(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toReal();
+}
+
+string Interpreter::str(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return {};
+    return var->toString();
+}
+
+string Interpreter::str(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return {};
+    return var->toString();
+}
+
+void Interpreter::iterate() {
     while (ip)
-        ip = i->debug(ip)->accept(i)->nextStatement;
+        ip = next(debug(ip)->accept(this)->nextStatement);
+}
+
+Statement* Interpreter::next(Statement* stmt) {
+    if (stmt) {
+        return stmt->nextStatement;
+    } else {
+        auto stmt = stack.back()->nextIp;
+        stack.pop_back();
+        return stmt;
+    }
 }
 
 }
