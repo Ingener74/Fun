@@ -36,6 +36,7 @@ if(NOT EXISTS ${SYSROOT})
             URL                 https://github.com/google/googletest/archive/master.zip
             CMAKE_ARGS          -DCMAKE_INSTALL_PREFIX=${3RDPARTY_INSTALL}
                                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                                 -Dgtest_force_shared_crt=ON
         )
     elseif(EMSCRIPTEN)
     elseif(ANDROID)
