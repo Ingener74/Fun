@@ -98,12 +98,7 @@ private:
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
-    template<typename TStatement>
-    TStatement* debug(TStatement *stmt) {
-        if (debugger)
-            debugger->onBeforeStep(stmt);
-        return stmt;
-    }
+    template<typename T> T* debug(T* stmt);
 
     Statement* next(Statement* stmt);
 
@@ -113,14 +108,12 @@ private:
     bool continue_flag = false;
     bool return_flag = false;
 
-    Debugger* debugger = nullptr;
+    Debugger* _debugger = nullptr;
 
     class StackLevel: public Poco::RefCountedObject {
     public:
-        StackLevel() {
-        }
-        virtual ~StackLevel() {
-        }
+        StackLevel() = default;
+        virtual ~StackLevel() = default;
 
         std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
         Statement* breakIp = nullptr;
@@ -139,8 +132,15 @@ private:
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {
-    this->debugger = debugger;
+    _debugger = debugger;
     return this;
+}
+
+template<typename T>
+inline T* Interpreter::debug(T* stmt) {
+    if (_debugger)
+        _debugger->onBeforeStep(stmt);
+    return stmt;
 }
 
 }

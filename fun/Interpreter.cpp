@@ -11,7 +11,7 @@ using namespace std;
 using namespace Poco;
 
 Interpreter::Interpreter(Debugger* debugger) :
-        debugger(debugger) {
+        _debugger(debugger) {
 }
 
 Interpreter::~Interpreter() {
