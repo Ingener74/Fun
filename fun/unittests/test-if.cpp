@@ -3,6 +3,11 @@
 using namespace std;
 using namespace fun;
 
+#define CHECK_INTEGER(level, name, val)                           \
+    { auto name = memory->variable(level, #name).cast<Integer>(); \
+    ASSERT_FALSE(name.isNull());                                  \
+    EXPECT_EQ(name->value, val); }
+
 PARSE_ERR(If, 0, R"(
 if
 )", ParserError)
@@ -62,12 +67,37 @@ EVAL(If, 9, R"(
 a = 1
 if true:
 	a = 2
+	nil
 end
 )",
-	BREAKPOINT_LINE(4,
-        EXPECT_EQ(memory->levelCount(), 2);
+	BREAKPOINT_LINE(5,
+        EXPECT_EQ(memory->levelCount(), 3);
 		EXPECT_EQ(memory->count(0), 1);
-		EXPECT_EQ(memory->count(1), 1);
+		EXPECT_EQ(memory->count(2), 1);
+
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(2, a, 2)
 	)
 	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	CHECK_INTEGER(0, a, 1)
 )
+
+// EVAL(If, 9, R"(
+// a = 1
+// if true:
+// 	a = 2
+// 	nil
+// end
+// )",
+// 	BREAKPOINT_LINE(5,
+//         EXPECT_EQ(memory->levelCount(), 3);
+// 		EXPECT_EQ(memory->count(0), 1);
+// 		EXPECT_EQ(memory->count(2), 1);
+// 	)
+// 	,
+// 	EXPECT_EQ(memory->levelCount(), 1);
+// 	EXPECT_EQ(memory->count(0), 1);
+// )
+

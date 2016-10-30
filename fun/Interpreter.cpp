@@ -24,77 +24,23 @@ void Interpreter::iterateStatements(Statement *stmts) {
 }
 
 void Interpreter::visit(Break* break_stmt) {
-//    auto ops = operands.size();
-
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt) {
-        auto breakIp = (*ipIt)->breakIp;
-        if (breakIp)
-            ip = breakIp;
-    }
-
-//    fassertl(operands.size() == ops, break_stmt->loc, "operands balance broken after statement")
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+        if ((*ipIt)->breakIp)
+            ip = (*ipIt)->breakIp;
 }
 
 void Interpreter::visit(Continue* continue_stmt) {
-//    auto ops = operands.size();
-
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt) {
-        auto continueIp = (*ipIt)->continueIp;
-        if (continueIp)
-            ip = continueIp;
-    }
-
-//    fassertl(operands.size() == ops, continue_stmt->loc, "operands balance broken after statement")
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+        if ((*ipIt)->continueIp)
+            ip = (*ipIt)->continueIp;
 }
 
 void Interpreter::visit(For* for_stmt) {
-//    auto ops = operands.size();
-
     stack.push_back(new StackLevel);
     ip = for_stmt->stmts;
     stack.back()->continueIp = for_stmt->stmts;
     stack.back()->breakIp = for_stmt->nextStatement;
     stack.back()->nextIp = for_stmt->nextStatement;
-
-//    fassertl(for_stmt->initial, for_stmt->loc, "for must have initial expression")
-//    load = true;
-//    debug(for_stmt->initial)->accept(this);
-//    load = false;
-//
-//    while (true) {
-//        fassertl(for_stmt->condition, for_stmt->loc, "for must have condition expression")
-//        load = true;
-//        debug(for_stmt->condition)->accept(this);
-//        load = false;
-//
-//        if (operands.back()->toBoolean()) {
-//            operands.pop_back();
-//
-//            auto stmt = for_stmt->stmts;
-//
-//            while (stmt) {
-//                if (break_flag) break;
-//                if (continue_flag) break;
-//
-//                stmt = debug(stmt)->accept(this)->nextStatement;
-//            }
-//            if (continue_flag) {
-//                continue_flag = false;
-//                continue;
-//            }
-//            if (break_flag) {
-//                break_flag = false;
-//                break;
-//            }
-//            fassertl(for_stmt->increment, for_stmt->loc, "for must have increment expression")
-//            debug(for_stmt->increment)->accept(this);
-//        } else {
-//            operands.pop_back();
-//            break;
-//        }
-//    }
-
-//    fassertl(operands.size() == ops, for_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Function *function) {
@@ -112,70 +58,38 @@ void Interpreter::visit(Function *function) {
 void Interpreter::visit(Ifs *ifs_stmt) {
     stack.push_back(new StackLevel);
     ip = ifs_stmt->if_stmts;
-    stack.back()->breakIp = ifs_stmt->nextStatement;
-
-//    auto if_stmt = ifs_stmt->if_stmts;
-//    while(if_stmt){
-//        if_stmt = if_stmt->accept(this)->nextIf;
-//        if(break_flag){
-//            break_flag = false;
-//            break;
-//        }
-//    }
+    stack.back()->ifsEndIp = ifs_stmt->nextStatement;
 }
 
 void Interpreter::visit(If* if_stmt) {
     stack.push_back(new StackLevel);
-    ip = if_stmt->stmts;
 
-//    auto ops = operands.size();
-//
-//    if (if_stmt->cond){
-//        load = true;
-//        debug(if_stmt->cond)->accept(this);
-//        load = false;
-//
-//        if (operands.back()->toBoolean()) {
-//            operands.pop_back();
-//
-//            auto stmt = if_stmt->stmts;
-//
-//            while (stmt) {
-//                if (break_flag) {
-//                    break_flag = false;
-//                    break;
-//                }
-//                if (continue_flag) {
-//                    continue_flag = false;
-//                    break;
-//                }
-//
-//                stmt = debug(stmt)->accept(this)->nextStatement;
-//            }
-//
-//            break_flag = true;
-//        } else {
-//            operands.pop_back();
-//        }
-//    } else {
-//        auto stmt = if_stmt->stmts;
-//
-//        while (stmt) {
-//            if (break_flag) {
-//                break_flag = false;
-//                break;
-//            }
-//            if (continue_flag) {
-//                continue_flag = false;
-//                break;
-//            }
-//
-//            stmt = debug(stmt)->accept(this)->nextStatement;
-//        }
-//
-//        break_flag = true;
-//    }
-//    fassertl(operands.size() == ops, if_stmt->loc, "operands balance broken after statement");
+    if (if_stmt->cond) {
+
+        size_t operands_size = operands.size();
+
+        load = true;
+        debug(if_stmt->cond)->accept(this);
+        load = false;
+
+        size_t operands_diff = operands.size() - operands_size;
+
+        if (operands_diff) {
+            if (operands.at(operands_size)->toBoolean()) {
+                ip = if_stmt->stmts;
+            } else {
+                ip = if_stmt->nextIf;
+            }
+
+            for (size_t i = 0; i < operands_diff; ++i)
+                operands.pop_back();
+
+        } else {
+            ip = if_stmt->nextIf;
+        }
+    } else {
+        ip = if_stmt->stmts;
+    }
 }
 
 void Interpreter::visit(Import* import_stmt) {
@@ -204,56 +118,38 @@ void Interpreter::visit(Return *return_stmt) {
         expr = debug(expr)->accept(this)->nextExpression;
         load = false;
     }
-    return_flag = true;
-//    fassert(operands.empty(), "operands not empty after statement") // return is expression maybe
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+        if ((*ipIt)->returnIp)
+            ip = (*ipIt)->returnIp;
 }
 
 void Interpreter::visit(While* while_stmt) {
-
     stack.push_back(new StackLevel);
     ip = while_stmt->stmts;
     stack.back()->continueIp = while_stmt->stmts;
     stack.back()->breakIp = while_stmt->nextStatement;
     stack.back()->nextIp = while_stmt->nextStatement;
-
-//    auto ops = operands.size();
-//    while (true) {
-//        load = true;
-//        debug(while_stmt->cond)->accept(this);
-//        load = false;
-//
-//        if (operands.back()->toBoolean()) {
-//            operands.pop_back();
-//
-//            auto stmt = while_stmt->stmts;
-//            while (stmt) {
-//                if (break_flag) break;
-//                if (continue_flag) break;
-//                stmt = debug(stmt)->accept(this)->nextStatement;
-//            }
-//            if (continue_flag) {
-//                continue_flag = false;
-//                continue;
-//            }
-//            if (break_flag) {
-//                break_flag = false;
-//                break;
-//            }
-//        } else {
-//            operands.pop_back();
-//            break;
-//        }
-//    }
-//    fassertl(operands.size() == ops, while_stmt->loc, "operands balance broken after statement")
 }
 
 void Interpreter::visit(Class* class_stmt) {
 }
 
 void Interpreter::visit(Exception* exception_stmt) {
+    stack.push_back(new StackLevel);
+    ip = exception_stmt->tryStmts;
+    stack.back()->catchIp = exception_stmt->catchStmts;
 }
 
 void Interpreter::visit(Throw* throw_stmt) {
+    auto expr = throw_stmt->expression;
+    while (expr) {
+        load = true;
+        expr = debug(expr)->accept(this)->nextExpression;
+        load = false;
+    }
+    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+        if ((*ipIt)->catchIp)
+            ip = (*ipIt)->catchIp;
 }
 
 void Interpreter::visit(Assign* assign) {
@@ -353,7 +249,8 @@ void Interpreter::visit(Assign* assign) {
         }
     } else {
         // assign maybe statement
-        fassertl(operands.empty(), assign->loc, "operands not empty after statement")
+//        fassertl(operands.empty(), assign->loc, "operands not empty after statement")
+        fassertl((operands.size() - balance) == 0, assign->loc, "operands balance broken after statement")
     }
 }
 
@@ -702,7 +599,7 @@ Terminal::Type Interpreter::type(size_t memoryLevel, const string& name) const {
     return var->getType();
 }
 
-Poco::AutoPtr<Terminal> Interpreter::variable(const string& name) const {
+AutoPtr<Terminal> Interpreter::variable(const string& name) const {
     for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
         auto varIt = (*it)->variables.find(name);
         if (varIt != (*it)->variables.end()) {
@@ -712,7 +609,7 @@ Poco::AutoPtr<Terminal> Interpreter::variable(const string& name) const {
     return {};
 }
 
-Poco::AutoPtr<Terminal> Interpreter::variable(size_t memoryLevel, const string& name) const {
+AutoPtr<Terminal> Interpreter::variable(size_t memoryLevel, const string& name) const {
     auto varIt = stack.at(memoryLevel)->variables.find(name);
     if (varIt != stack.at(memoryLevel)->variables.end()) {
         return varIt->second;
@@ -778,16 +675,35 @@ string Interpreter::str(size_t memoryLevel, const string& name) const {
 
 void Interpreter::iterate() {
     while (ip)
-        ip = next(debug(ip)->accept(this)->nextStatement);
+        ip = next(debug(ip)->accept(this));
 }
 
 Statement* Interpreter::next(Statement* stmt) {
-    if (stmt) {
-        return stmt->nextStatement;
+    if (ip == stmt) {
+        if (stmt) {
+            if(stmt->nextStatement)
+                return stmt->nextStatement;
+            else{
+                if (auto if_stmt = dynamic_cast<If*>(stmt)) {
+                    stack.pop_back(); // if pop
+                    auto end_ifs = stack.back()->ifsEndIp;
+                    stack.pop_back(); // ifs pop
+                    return end_ifs;
+                }
+                return stmt->nextStatement;
+            }
+        } else {
+            if (stack.size() > 1) {
+                stack.pop_back();
+                auto stmt = stack.back()->nextIp;
+                return stmt;
+            } else {
+                auto stmt = stack.back()->nextIp;
+                return stmt;
+            }
+        }
     } else {
-        auto stmt = stack.back()->nextIp;
-        stack.pop_back();
-        return stmt;
+        return ip;
     }
 }
 

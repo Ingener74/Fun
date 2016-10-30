@@ -9,7 +9,7 @@
 #undef YY_DECL
 #define YY_DECL int Lexer::yylex()
 
-#include <Parser.hpp>
+#include "Parser.hpp"
 
 class Lexer: public yyFlexLexer {
 public:

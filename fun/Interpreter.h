@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <mutex>
 
-#include <Visitor.h>
+#include "Visitor.h"
 #include "AST.h"
 #include "Debugger.h"
 #include "IOperands.h"
@@ -94,11 +94,6 @@ public:
     Interpreter* setDebugger(Debugger* debugger);
 
 private:
-//    enum Flag {
-//        Load, Store, FlagsCount
-//    };
-//    std::bitset<FlagsCount> flags;
-
     void iterate();
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
@@ -132,6 +127,8 @@ private:
         Statement* continueIp = nullptr;
         Statement* catchIp = nullptr;
         Statement* returnIp = nullptr;
+        Statement* nextIfIp = nullptr;
+        Statement* ifsEndIp = nullptr;
 
         Statement* nextIp = nullptr;
     };

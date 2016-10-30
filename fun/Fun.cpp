@@ -24,7 +24,7 @@ AutoPtr<Pot> Fun::parseString(const string& source) {
 
 AutoPtr<Pot> Fun::parseStream(istream& source) {
     AutoPtr<Pot> pot(new Pot);
-    Lexer lexer("", source);
+    Lexer lexer(_filename, source);
     Parser parser(lexer, pot);
     if (parser.parse())
         throw FunError("Warning: parser.parse() not 0");
@@ -32,9 +32,10 @@ AutoPtr<Pot> Fun::parseStream(istream& source) {
 }
 
 AutoPtr<Pot> Fun::parseFile(const string& filename) {
-    ifstream file(filename);
+    _filename = filename;
+    ifstream file(_filename);
     if (!file.is_open())
-        throw FunError(string("can't open file ") + filename);
+        throw FunError(string("can't open file ") + _filename);
     return parseStream(file);
 }
 

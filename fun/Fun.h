@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Poco/AutoPtr.h>
-#include <Lexer.h>
-#include <AST.h>
-#include <Printer.h>
-#include <Interpreter.h>
-#include <Compiler.h>
-#include <Utils.h>
-#include <Debugger.h>
+#include "Lexer.h"
+#include "AST.h"
+#include "Printer.h"
+#include "Interpreter.h"
+#include "Compiler.h"
+#include "Utils.h"
+#include "Debugger.h"
 
 namespace fun {
 
@@ -20,9 +20,9 @@ public:
         NoDebugger, NetDebugger, CommandLineDebugger
     };
 
-    static Poco::AutoPtr<Pot> parseString(const std::string& source);
-    static Poco::AutoPtr<Pot> parseStream(std::istream& source);
-    static Poco::AutoPtr<Pot> parseFile(const std::string& filename);
+    Poco::AutoPtr<Pot> parseString(const std::string& source);
+    Poco::AutoPtr<Pot> parseStream(std::istream& source);
+    Poco::AutoPtr<Pot> parseFile(const std::string& filename);
 
     void evalString(const std::string& script);
     void evalStream(std::istream& script);
@@ -34,6 +34,7 @@ public:
     Poco::AutoPtr<Debugger> getDebugger();
 
 private:
+    std::string _filename;
     Poco::AutoPtr<Debugger> _debugger;
     Poco::AutoPtr<Visitor> _visitor;
 };

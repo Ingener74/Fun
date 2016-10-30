@@ -6,8 +6,6 @@
 #include <gmock/gmock.h>
 #include <gmock/gmock-actions.h>
 
-#include <Poco/Thread.h>
-
 #include <Fun.h>
 #include "MockDebugger.h"
 
@@ -15,8 +13,9 @@
     TEST(Parse, CLASS##_##N)                                                   \
     {                                                                          \
         {                                                                      \
+            Fun fun;                                                           \
             Poco::AutoPtr<Pot> pot;                                            \
-            EXPECT_NO_THROW(pot = Fun::parseString(SCRIPT););                  \
+            EXPECT_NO_THROW(pot = fun.parseString(SCRIPT););                   \
         }                                                                      \
         ASSERT_EQ(Statement::counter(), 0);                                    \
         Statement::resetCounter();                                             \
@@ -26,8 +25,9 @@
     TEST(Parse, CLASS##_##N)                                                   \
     {                                                                          \
         {                                                                      \
+            Fun fun;                                                           \
             Poco::AutoPtr<Pot> pot;                                            \
-            EXPECT_THROW(pot = Fun::parseString(SCRIPT), ERROR_CLASS);         \
+            EXPECT_THROW(pot = fun.parseString(SCRIPT), ERROR_CLASS);          \
         }                                                                      \
         ASSERT_EQ(Statement::counter(), 0);                                    \
         Statement::resetCounter();                                             \
@@ -37,8 +37,9 @@
     TEST(Parse, CLASS##_##N)                                                   \
     {                                                                          \
         {                                                                      \
+            Fun fun;                                                           \
             Poco::AutoPtr<Pot> pot;                                            \
-            EXPECT_NO_THROW(pot = Fun::parseString(SCRIPT););                  \
+            EXPECT_NO_THROW(pot = fun.parseString(SCRIPT););                   \
             auto instance = dynamic_cast<CLASS*>(pot->root());                 \
             ASSERT_NE(instance, nullptr);                                      \
             ASSERT_EQ(instance->value, VALUE);                                 \

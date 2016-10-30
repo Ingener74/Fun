@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdexcept>
-#include <location.hh>
+#include "location.hh"
 
 namespace fun {
 
