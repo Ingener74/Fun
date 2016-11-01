@@ -37,6 +37,7 @@ Statement::Statement(const location& loc) :
 Statement::~Statement(){
     stmtCounter--;
     removeRefs(nextStatement);
+
 }
 
 int Statement::counter() {
@@ -52,7 +53,6 @@ ACCEPT(Break, )
 ACCEPT(Class, )
 
 Class::~Class() {
-    removeRefs(name, derived, stmts);
 }
 
 ACCEPT(Continue, )
@@ -60,31 +60,26 @@ ACCEPT(Continue, )
 ACCEPT(Exception, )
 
 Exception::~Exception(){
-    removeRefs(tryStmts, errorClasses, errorObject, catchStmts);
 }
 
 ACCEPT(For, )
 
 For::~For(){
-    removeRefs(initial, condition, increment, stmts);
 }
 
 ACCEPT(Function, )
 
 Function::~Function(){
-    removeRefs(name, args, stmts, nextFunction);
 }
 
 ACCEPT(Ifs, )
 
 Ifs::~Ifs() {
-    removeRefs(if_stmts);
 }
 
 ACCEPT(If, )
 
 If::~If(){
-    removeRefs(cond, stmts, nextIf);
 }
 
 ACCEPT(Import, {
@@ -92,7 +87,6 @@ ACCEPT(Import, {
 })
 
 Import::~Import(){
-    removeRefs(id);
 }
 
 ACCEPT(Print, {
@@ -100,19 +94,16 @@ ACCEPT(Print, {
 })
 
 Print::~Print(){
-    removeRefs(expression);
 }
 
 ACCEPT(Return, )
 
 Return::~Return(){
-    removeRefs(expression);
 }
 
 ACCEPT(Throw, )
 
 Throw::~Throw(){
-    removeRefs(expression);
 }
 
 ACCEPT(While, {
@@ -120,7 +111,6 @@ ACCEPT(While, {
 })
 
 While::~While(){
-    removeRefs(cond, stmts);
 }
 
 void Expression::apply(Expression* expression, Visitor* v) {
@@ -138,7 +128,7 @@ ACCEPT(Assign, {
 })
 
 Assign::~Assign(){
-    removeRefs(ids, exprs, nextAssign);
+    removeRefs(nextAssign);
 }
 
 void Assign::apply(Assign* assign, Visitor* v) {
@@ -152,13 +142,11 @@ ACCEPT(BinaryOp, {
 })
 
 BinaryOp::~BinaryOp(){
-    removeRefs(lhs, rhs);
 }
 
 ACCEPT(Dot, )
 
 Dot::~Dot() {
-    removeRefs(lhs, rhs);
 }
 
 ACCEPT(Call, {
@@ -166,13 +154,11 @@ ACCEPT(Call, {
 })
 
 Call::~Call(){
-    removeRefs(callable, arguments);
 }
 
 ACCEPT(Dictionary, )
 
 Dictionary::~Dictionary(){
-    removeRefs(assign);
 }
 
 ACCEPT(Id, )
@@ -186,7 +172,6 @@ ACCEPT(Index, {
 })
 
 Index::~Index(){
-    removeRefs(indexable, arg);
 }
 
 //ACCEPT(ForExpression, {
@@ -195,7 +180,6 @@ Index::~Index(){
 ACCEPT(RoundBrackets, )
 
 RoundBrackets::~RoundBrackets(){
-    removeRefs(expr);
 }
 
 Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {

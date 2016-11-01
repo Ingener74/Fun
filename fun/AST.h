@@ -73,12 +73,11 @@ private:
 class Statement : public Poco::RefCountedObject {
 public:
     Statement(const location& loc);
-
-//    template<typename ... Args>
-//    Statement(const location& loc, Args...&& args){
-//        m_members = std::make_tuple(Poco::AutoPtr<Args>(args, true)...);
-//    }
-//    std::tuple<Args...> m_members
+    template<typename ... Ts>
+    Statement(const location& loc, Ts*... tail) :
+            Statement(loc) {
+        addRefs(tail...);
+    }
 
     virtual ~Statement();
 
@@ -91,11 +90,15 @@ public:
     static int counter();
     static void resetCounter();
 protected:
+
     template<typename T>
-    static T *addRef(T *arg) {
-        if (arg)
-            arg->duplicate();
-        return arg;
+    void addRefs(T *arg) {
+        _members.emplace_back(arg, true);
+    }
+    template<typename T, typename ... Ts>
+    void addRefs(T *head, Ts* ... tail) {
+        addRefs(head);
+        addRefs(tail...);
     }
 
     template<typename T>
@@ -109,6 +112,7 @@ protected:
             t->release();
         removeRefs(ts...);
     }
+    std::vector<Poco::AutoPtr<Statement>> _members;
     static int stmtCounter;
 };
 
@@ -128,7 +132,7 @@ class Function;
 class Class: public Statement {
 public:
     Class(const location& loc, Id* name, Id* derived, Statement* stmts) :
-            Statement(loc), name(addRef(name)), derived(addRef(derived)), stmts(addRef(stmts)) {
+            Statement(loc, name, derived, stmts), name(name), derived(derived), stmts(stmts) {
     }
     virtual ~Class();
 
@@ -153,8 +157,8 @@ class Exception: public Statement {
 public:
     Exception(const location& loc, Statement* tryStmts = nullptr, Id* errorClasses = nullptr, Id* errorObject = nullptr,
             Statement* catchStmts = nullptr) :
-            Statement(loc), tryStmts(addRef(tryStmts)), errorClasses(addRef(errorClasses)),
-            errorObject(addRef(errorObject)), catchStmts(addRef(catchStmts)) {
+            Statement(loc, tryStmts, errorClasses, errorObject, catchStmts), tryStmts(tryStmts), errorClasses(
+                    errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
     }
     virtual ~Exception();
 
@@ -170,10 +174,10 @@ class Expression;
 
 class For: public Statement {
 public:
-    For(const location& loc, Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment = nullptr,
-            Statement* stmts = nullptr) :
-                Statement(loc), initial(addRef(initial)), condition(addRef(condition)),
-                increment(addRef(increment)), stmts(addRef(stmts)) {
+    For(const location& loc, Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment =
+            nullptr, Statement* stmts = nullptr) :
+            Statement(loc, initial, condition, increment, stmts), initial(initial), condition(condition), increment(
+                    increment), stmts(stmts) {
     }
     virtual ~For();
 
@@ -186,7 +190,7 @@ public:
 class If: public Statement {
 public:
     If(const location& loc, Expression* cond, Statement* stmts = nullptr) :
-            Statement(loc), cond(addRef(cond)), stmts(addRef(stmts)) {
+            Statement(loc, cond, stmts), cond(cond), stmts(stmts) {
     }
     virtual ~If();
 
@@ -200,7 +204,7 @@ public:
 
 class Ifs: public Statement {
 public:
-    Ifs(const location& loc, If* if_stmts): Statement(loc), if_stmts(addRef(if_stmts)){}
+    Ifs(const location& loc, If* if_stmts): Statement(loc, if_stmts), if_stmts(if_stmts){}
     virtual ~Ifs();
 
     virtual Ifs* accept(Visitor*);
@@ -211,7 +215,7 @@ public:
 class Import: public Statement {
 public:
     Import(const location& loc, Id* library) :
-            Statement(loc), id(addRef(library)) {
+            Statement(loc, library), id(library) {
     }
     virtual ~Import();
 
@@ -223,7 +227,7 @@ public:
 class Print: public Statement {
 public:
     Print(const location& loc, Expression* expr) :
-            Statement(loc), expression(addRef(expr)) {
+            Statement(loc, expr), expression(expr) {
     }
     virtual ~Print();
 
@@ -235,7 +239,7 @@ public:
 class Return: public Statement {
 public:
     Return(const location& loc, Expression* expr = nullptr) :
-            Statement(loc), expression(addRef(expr)) {
+            Statement(loc, expr), expression(expr) {
     }
     virtual ~Return();
 
@@ -247,7 +251,7 @@ public:
 class Throw: public Statement {
 public:
     Throw(const location& loc, Expression* exression = nullptr) :
-            Statement(loc), expression(addRef(exression)) {
+            Statement(loc, exression), expression(exression) {
     }
     virtual ~Throw();
 
@@ -259,7 +263,7 @@ public:
 class While: public Statement {
 public:
     While(const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
-            Statement(loc), cond(addRef(cond)), stmts(addRef(stmts)) {
+            Statement(loc, cond, stmts), cond(cond), stmts(stmts) {
     }
     virtual ~While();
 
@@ -274,6 +278,10 @@ public:
     Expression(const location& loc) :
             Statement(loc) {
     }
+    template<typename ... Ts>
+    Expression(const location& loc, Ts*... members) :
+            Statement(loc, members...) {
+    }
     virtual ~Expression();
 
     virtual Expression* accept(Visitor*) = 0;
@@ -285,7 +293,7 @@ public:
 class Assign: public Expression {
 public:
     Assign(const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::NOP) :
-            Expression(loc), ids(addRef(ids)), exprs(addRef(exprs)), type(type) {
+            Expression(loc, ids, exprs), ids(ids), exprs(exprs), type(type) {
     }
     virtual ~Assign();
 
@@ -302,7 +310,7 @@ public:
 class BinaryOp: public Expression {
 public:
     BinaryOp(const location& loc, BinaryOperation op, Expression* lhs, Expression* rhs) :
-        Expression(loc), m_operation(op), lhs(addRef(lhs)), rhs(addRef(rhs)) {
+        Expression(loc, lhs, rhs), m_operation(op), lhs(lhs), rhs(rhs) {
     }
     virtual ~BinaryOp();
 
@@ -314,7 +322,7 @@ public:
 
 class Dot : public Expression {
 public:
-    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc), lhs(addRef(lhs)), rhs(addRef(rhs)) {}
+    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc, lhs, rhs), lhs(lhs), rhs(rhs) {}
 
     virtual ~Dot();
 
@@ -326,7 +334,7 @@ public:
 class Call: public Expression {
 public:
     Call(const location& loc, Expression* callable, Expression* arg = nullptr) :
-        Expression(loc), callable(addRef(callable)), arguments(addRef(arg)) {
+        Expression(loc, callable, arg), callable(callable), arguments(arg) {
     }
     virtual ~Call();
 
@@ -339,7 +347,7 @@ public:
 class Dictionary: public Expression {
 public:
     Dictionary(const location& loc, Assign* assign) :
-        Expression(loc), assign(addRef(assign)) {
+        Expression(loc, assign), assign(assign) {
     }
     virtual ~Dictionary();
 
@@ -365,7 +373,7 @@ public:
 class Index: public Expression {
 public:
     Index(const location& loc, Expression* indexable, Expression* arg) :
-        Expression(loc), indexable(addRef(indexable)), arg(addRef(arg)) {
+        Expression(loc, indexable, arg), indexable(indexable), arg(arg) {
     }
     virtual ~Index();
 
@@ -378,7 +386,7 @@ public:
 class RoundBrackets: public Expression {
 public:
     RoundBrackets(const location& loc, Expression* expr) :
-        Expression(loc), expr(addRef(expr)) {
+        Expression(loc, expr), expr(expr) {
     }
     virtual ~RoundBrackets();
 
@@ -397,6 +405,10 @@ public:
 
     Terminal(const location& loc) :
             Expression(loc) {
+    }
+    template<typename ... Ts>
+    Terminal(const location& loc, Ts*... members) :
+            Expression(loc, members...) {
     }
     virtual ~Terminal() = default;
 
@@ -418,7 +430,7 @@ public:
 class Function: public Terminal {
 public:
     Function(const location& loc, Id* id, Id* args = nullptr, Statement* scope = nullptr) :
-            Terminal(loc), name(addRef(id)), args(addRef(args)), stmts(addRef(scope)) {
+            Terminal(loc, id, args, scope), name(id), args(args), stmts(scope) {
     }
     virtual ~Function();
 
