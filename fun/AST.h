@@ -44,7 +44,8 @@ public:
 
     Pot() {
     }
-    virtual ~Pot();
+    virtual ~Pot() {
+    }
 
     void setRoot(Statement* root);
 
@@ -134,7 +135,8 @@ public:
     Class(const location& loc, Id* name, Id* derived, Statement* stmts) :
             Statement(loc, name, derived, stmts), name(name), derived(derived), stmts(stmts) {
     }
-    virtual ~Class();
+    virtual ~Class() {
+    }
 
     virtual Class* accept(Visitor*);
 
@@ -160,7 +162,8 @@ public:
             Statement(loc, tryStmts, errorClasses, errorObject, catchStmts), tryStmts(tryStmts), errorClasses(
                     errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
     }
-    virtual ~Exception();
+    virtual ~Exception() {
+    }
 
     virtual Exception* accept(Visitor*);
 
@@ -179,7 +182,8 @@ public:
             Statement(loc, initial, condition, increment, stmts), initial(initial), condition(condition), increment(
                     increment), stmts(stmts) {
     }
-    virtual ~For();
+    virtual ~For() {
+    }
 
     virtual For* accept(Visitor*);
 
@@ -205,7 +209,7 @@ public:
 class Ifs: public Statement {
 public:
     Ifs(const location& loc, If* if_stmts): Statement(loc, if_stmts), if_stmts(if_stmts){}
-    virtual ~Ifs();
+    virtual ~Ifs() = default;
 
     virtual Ifs* accept(Visitor*);
 
@@ -217,7 +221,7 @@ public:
     Import(const location& loc, Id* library) :
             Statement(loc, library), id(library) {
     }
-    virtual ~Import();
+    virtual ~Import() = default;
 
     virtual Import* accept(Visitor*);
 
@@ -229,7 +233,7 @@ public:
     Print(const location& loc, Expression* expr) :
             Statement(loc, expr), expression(expr) {
     }
-    virtual ~Print();
+    virtual ~Print() = default;
 
     virtual Print* accept(Visitor*);
 
@@ -241,7 +245,7 @@ public:
     Return(const location& loc, Expression* expr = nullptr) :
             Statement(loc, expr), expression(expr) {
     }
-    virtual ~Return();
+    virtual ~Return() = default;
 
     virtual Return* accept(Visitor*);
 
@@ -253,7 +257,7 @@ public:
     Throw(const location& loc, Expression* exression = nullptr) :
             Statement(loc, exression), expression(exression) {
     }
-    virtual ~Throw();
+    virtual ~Throw() = default;
 
     virtual Throw* accept(Visitor*);
 
@@ -265,7 +269,7 @@ public:
     While(const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
             Statement(loc, cond, stmts), cond(cond), stmts(stmts) {
     }
-    virtual ~While();
+    virtual ~While() = default;
 
     virtual While* accept(Visitor*);
 
@@ -312,7 +316,7 @@ public:
     BinaryOp(const location& loc, BinaryOperation op, Expression* lhs, Expression* rhs) :
         Expression(loc, lhs, rhs), m_operation(op), lhs(lhs), rhs(rhs) {
     }
-    virtual ~BinaryOp();
+    virtual ~BinaryOp() = default;
 
     virtual BinaryOp* accept(Visitor*);
 
@@ -324,7 +328,7 @@ class Dot : public Expression {
 public:
     Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc, lhs, rhs), lhs(lhs), rhs(rhs) {}
 
-    virtual ~Dot();
+    virtual ~Dot() = default;
 
     virtual Dot *accept(Visitor *);
 
@@ -336,7 +340,7 @@ public:
     Call(const location& loc, Expression* callable, Expression* arg = nullptr) :
         Expression(loc, callable, arg), callable(callable), arguments(arg) {
     }
-    virtual ~Call();
+    virtual ~Call() = default;
 
     virtual Call* accept(Visitor*);
 
@@ -349,7 +353,7 @@ public:
     Dictionary(const location& loc, Assign* assign) :
         Expression(loc, assign), assign(assign) {
     }
-    virtual ~Dictionary();
+    virtual ~Dictionary() = default;
 
     virtual Dictionary* accept(Visitor*);
 
@@ -375,7 +379,7 @@ public:
     Index(const location& loc, Expression* indexable, Expression* arg) :
         Expression(loc, indexable, arg), indexable(indexable), arg(arg) {
     }
-    virtual ~Index();
+    virtual ~Index() = default;
 
     virtual Index* accept(Visitor*);
 
@@ -388,7 +392,7 @@ public:
     RoundBrackets(const location& loc, Expression* expr) :
         Expression(loc, expr), expr(expr) {
     }
-    virtual ~RoundBrackets();
+    virtual ~RoundBrackets() = default;
 
     virtual RoundBrackets* accept(Visitor*);
 
@@ -432,7 +436,7 @@ public:
     Function(const location& loc, Id* id, Id* args = nullptr, Statement* scope = nullptr) :
             Terminal(loc, id, args, scope), name(id), args(args), stmts(scope) {
     }
-    virtual ~Function();
+    virtual ~Function() = default;
 
     virtual Function* accept(Visitor*);
 

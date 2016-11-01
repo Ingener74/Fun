@@ -20,9 +20,6 @@ void Pot::setRoot(Statement* root) {
     _root.assign(root, true);
 }
 
-Pot::~Pot() {
-}
-
 void Pot::accept(Visitor* v) {
     v->iterateStatements(_root);
 }
@@ -52,66 +49,37 @@ ACCEPT(Break, )
 
 ACCEPT(Class, )
 
-Class::~Class() {
-}
-
 ACCEPT(Continue, )
 
 ACCEPT(Exception, )
 
-Exception::~Exception(){
-}
-
 ACCEPT(For, )
-
-For::~For(){
-}
 
 ACCEPT(Function, )
 
-Function::~Function(){
-}
-
 ACCEPT(Ifs, )
-
-Ifs::~Ifs() {
-}
 
 ACCEPT(If, )
 
 If::~If(){
+    removeRefs(nextIf);
 }
 
 ACCEPT(Import, {
     fassert(id, "Import must have an id");
 })
 
-Import::~Import(){
-}
-
 ACCEPT(Print, {
     fassert(expression, "Print must have the expressions")
 })
 
-Print::~Print(){
-}
-
 ACCEPT(Return, )
 
-Return::~Return(){
-}
-
 ACCEPT(Throw, )
-
-Throw::~Throw(){
-}
 
 ACCEPT(While, {
     fassert(cond, "While must have the condition expression");
 })
-
-While::~While(){
-}
 
 void Expression::apply(Expression* expression, Visitor* v) {
     while (expression)
@@ -141,25 +109,13 @@ ACCEPT(BinaryOp, {
     fassert(rhs, "Binary operation must have right side expression")
 })
 
-BinaryOp::~BinaryOp(){
-}
-
 ACCEPT(Dot, )
-
-Dot::~Dot() {
-}
 
 ACCEPT(Call, {
     fassert(callable, "Call expression must have name")
 })
 
-Call::~Call(){
-}
-
 ACCEPT(Dictionary, )
-
-Dictionary::~Dictionary(){
-}
 
 ACCEPT(Id, )
 
@@ -171,16 +127,10 @@ ACCEPT(Index, {
     fassert(indexable, "Index expression must have name")
 })
 
-Index::~Index(){
-}
-
 //ACCEPT(ForExpression, {
 //})
 
 ACCEPT(RoundBrackets, )
-
-RoundBrackets::~RoundBrackets(){
-}
 
 Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {
     fassert(lhs == Nil || lhs == Boolean || lhs == Integer || lhs == Real || lhs == String, "unsupported type");
