@@ -411,6 +411,7 @@ end
 
 test(1, 2)
 
+doHardWork(fun() print "work done" end)
 doHardWork(->print "work done";)
 
 result = nil
@@ -439,7 +440,4 @@ fun test()
 	ret "foo", "bar"
 end
 a, b, c, d = 10, test(), 42
-
-
-
 

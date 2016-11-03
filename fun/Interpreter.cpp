@@ -12,13 +12,13 @@ using namespace Poco;
 
 Interpreter::Interpreter(Debugger* debugger) :
         _debugger(debugger) {
+    stack.push_back(new StackFrame);
 }
 
 Interpreter::~Interpreter() {
 }
 
 void Interpreter::iterateStatements(Statement *stmts) {
-    stack.push_back(new StackLevel);
     ip = stmts;
     iterate();
 }
@@ -36,7 +36,7 @@ void Interpreter::visit(Continue* continue_stmt) {
 }
 
 void Interpreter::visit(For* for_stmt) {
-    stack.push_back(new StackLevel);
+    stack.push_back(new StackFrame);
     ip = for_stmt->stmts;
     stack.back()->continueIp = for_stmt->stmts;
     stack.back()->breakIp = for_stmt->nextStatement;
@@ -56,13 +56,13 @@ void Interpreter::visit(Function *function) {
 }
 
 void Interpreter::visit(Ifs *ifs_stmt) {
-    stack.push_back(new StackLevel);
+    stack.push_back(new StackFrame);
     ip = ifs_stmt->if_stmts;
     stack.back()->ifsEndIp = ifs_stmt->nextStatement;
 }
 
 void Interpreter::visit(If* if_stmt) {
-    stack.push_back(new StackLevel);
+    stack.push_back(new StackFrame);
 
     if (if_stmt->cond) {
 
@@ -124,7 +124,7 @@ void Interpreter::visit(Return *return_stmt) {
 }
 
 void Interpreter::visit(While* while_stmt) {
-    stack.push_back(new StackLevel);
+    stack.push_back(new StackFrame);
     ip = while_stmt->stmts;
     stack.back()->continueIp = while_stmt->stmts;
     stack.back()->breakIp = while_stmt->nextStatement;
@@ -135,7 +135,7 @@ void Interpreter::visit(Class* class_stmt) {
 }
 
 void Interpreter::visit(Exception* exception_stmt) {
-    stack.push_back(new StackLevel);
+    stack.push_back(new StackFrame);
     ip = exception_stmt->tryStmts;
     stack.back()->catchIp = exception_stmt->catchStmts;
 }

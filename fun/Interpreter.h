@@ -110,10 +110,10 @@ private:
 
     Debugger* _debugger = nullptr;
 
-    class StackLevel: public Poco::RefCountedObject {
+    class StackFrame: public Poco::RefCountedObject {
     public:
-        StackLevel() = default;
-        virtual ~StackLevel() = default;
+        StackFrame() = default;
+        virtual ~StackFrame() = default;
 
         std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
         Statement* breakIp = nullptr;
@@ -127,7 +127,7 @@ private:
     };
 
     std::vector<Poco::AutoPtr<Terminal>> operands;
-    std::vector<Poco::AutoPtr<StackLevel>> stack;
+    std::vector<Poco::AutoPtr<StackFrame>> stack;
     Statement* ip = nullptr;
 };
 
