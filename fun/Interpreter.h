@@ -120,8 +120,6 @@ private:
         Statement* continueIp = nullptr;
         Statement* catchIp = nullptr;
         Statement* returnIp = nullptr;
-        Statement* nextIfIp = nullptr;
-        Statement* ifsEndIp = nullptr;
 
         Statement* nextIp = nullptr;
     };

@@ -71,12 +71,12 @@ if true:
 end
 )",
 	BREAKPOINT_LINE(5,
-        EXPECT_EQ(memory->levelCount(), 3);
+        EXPECT_EQ(memory->levelCount(), 2);
 		EXPECT_EQ(memory->count(0), 1);
-		EXPECT_EQ(memory->count(2), 1);
+		EXPECT_EQ(memory->count(1), 1);
 
 		CHECK_INTEGER(0, a, 1)
-		CHECK_INTEGER(2, a, 2)
+		CHECK_INTEGER(1, a, 2)
 	)
 	,
 	EXPECT_EQ(memory->levelCount(), 1);
