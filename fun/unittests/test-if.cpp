@@ -84,20 +84,27 @@ end
 	CHECK_INTEGER(0, a, 1)
 )
 
-// EVAL(If, 9, R"(
-// a = 1
-// if true:
-// 	a = 2
-// 	nil
-// end
-// )",
-// 	BREAKPOINT_LINE(5,
-//         EXPECT_EQ(memory->levelCount(), 3);
-// 		EXPECT_EQ(memory->count(0), 1);
-// 		EXPECT_EQ(memory->count(2), 1);
-// 	)
-// 	,
-// 	EXPECT_EQ(memory->levelCount(), 1);
-// 	EXPECT_EQ(memory->count(0), 1);
-// )
+EVAL(If, 10, R"(
+a = 1
+if false:
+	a = 2
+	nil
+else
+	a = 3
+	nil
+end
+)",
+	BREAKPOINT_LINE(7,
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
+		
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(1, a, 3)
+	)
+	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	CHECK_INTEGER(0, a, 1)
+)
 

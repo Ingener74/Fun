@@ -58,7 +58,6 @@ void Interpreter::visit(Function *function) {
 void Interpreter::visit(Ifs *ifs_stmt) {
     stack.push_back(new StackFrame);
     ip = ifs_stmt->if_stmts;
-//    stack.back()->ifsEndIp = ifs_stmt->nextStatement;
 }
 
 void Interpreter::visit(If* if_stmt) {
@@ -679,19 +678,8 @@ void Interpreter::iterate() {
 
 Statement* Interpreter::next(Statement* stmt) {
     if (ip == stmt) {
-        if (stmt) {
-            if(stmt->nextStatement){
-                return stmt->nextStatement;
-            }else{
-                if (stack.size() > 1) {
-                    stack.pop_back();
-                    auto stmt = stack.back()->nextIp;
-                    return stmt;
-                } else {
-                    auto stmt = stack.back()->nextIp;
-                    return stmt;
-                }
-            }
+        if (stmt && stmt->nextStatement) {
+            return stmt->nextStatement;
         } else {
             if (stack.size() > 1) {
                 stack.pop_back();

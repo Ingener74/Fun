@@ -29,7 +29,16 @@ else()
     add_definitions(-std=c++11)
 endif()
 
-set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
+set(SYSROOT_LOCATION "3rdparty" CACHE STRING "Select a system root location")
+set_property(CACHE SYSROOT_LOCATION PROPERTY STRINGS "3rdparty" "binary_dir")
+
+if(SYSROOT_LOCATION STREQUAL "3rdparty")
+    set(SYSROOT ${CMAKE_SOURCE_DIR}/3rdparty/sysroot-${BUILD_PLATFORM})
+elseif(SYSROOT_LOCATION STREQUAL "binary_dir")
+    set(SYSROOT ${CMAKE_BINARY_DIR}/sysroot-${BUILD_PLATFORM})
+else()
+    message(FATAL_ERROR "invalid system root location choise")
+endif()
 
 set(3RDPARTY_INSTALL ${SYSROOT})
 
