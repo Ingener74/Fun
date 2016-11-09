@@ -1,4 +1,3 @@
-#include <iostream>
 #include "test.h"
 
 using namespace std;
@@ -95,7 +94,7 @@ else
 	nil
 end
 )",
-	BREAKPOINT_LINE(7,
+	BREAKPOINT_LINE(8,
         EXPECT_EQ(memory->levelCount(), 2);
 		EXPECT_EQ(memory->count(0), 1);
 		EXPECT_EQ(memory->count(1), 1);
@@ -106,6 +105,32 @@ end
 	,
 	EXPECT_EQ(memory->levelCount(), 1);
 	EXPECT_EQ(memory->count(0), 1);
-	CHECK_INTEGER(0, a, 3)
+	
+	CHECK_INTEGER(0, a, 1)
+)
+
+EVAL(If, 11, R"(
+a = 1
+if false:
+	a = 2
+	nil
+else
+	a = 3
+	nil
+end
+)",
+	BREAKPOINT_LINE(8,
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
+		
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(1, a, 3)
+	)
+	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	
+	CHECK_INTEGER(0, a, 1)
 )
 
