@@ -681,14 +681,9 @@ Statement* Interpreter::next(Statement* stmt) {
         if (stmt && stmt->nextStatement) {
             return stmt->nextStatement;
         } else {
-            if (stack.size() > 1) {
+            if (stack.size() > 1)
                 stack.pop_back();
-                auto stmt = stack.back()->nextIp;
-                return stmt;
-            } else {
-                auto stmt = stack.back()->nextIp;
-                return stmt;
-            }
+            return stack.back()->nextIp;
         }
     } else {
         return ip;

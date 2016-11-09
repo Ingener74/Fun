@@ -105,6 +105,6 @@ end
 	,
 	EXPECT_EQ(memory->levelCount(), 1);
 	EXPECT_EQ(memory->count(0), 1);
-	CHECK_INTEGER(0, a, 1)
+	CHECK_INTEGER(0, a, 3)
 )
 
