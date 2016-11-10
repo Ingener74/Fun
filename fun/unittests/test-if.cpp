@@ -114,8 +114,11 @@ a = 1
 if false:
 	a = 2
 	nil
-else
+elif true:
 	a = 3
+	nil
+else
+	a = 4
 	nil
 end
 )",
@@ -126,6 +129,93 @@ end
 		
 		CHECK_INTEGER(0, a, 1)
 		CHECK_INTEGER(1, a, 3)
+	)
+	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	
+	CHECK_INTEGER(0, a, 1)
+)
+
+EVAL(If, 12, R"(
+a = 1
+if false:
+	a = 2
+	nil
+elif false:
+	a = 3
+	nil
+else
+	a = 4
+	nil
+end
+)",
+	BREAKPOINT_LINE(11,
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
+		
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(1, a, 4)
+	)
+	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	
+	CHECK_INTEGER(0, a, 1)
+)
+
+EVAL(If, 13, R"(
+a = 1
+if false:
+	a = 2
+	nil
+elif false:
+	a = 3
+	nil
+elif true:
+	a = 4
+	nil
+else
+	a = 5
+	nil
+end
+)",
+	BREAKPOINT_LINE(11,
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
+		
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(1, a, 4)
+	)
+	,
+	EXPECT_EQ(memory->levelCount(), 1);
+	EXPECT_EQ(memory->count(0), 1);
+	
+	CHECK_INTEGER(0, a, 1)
+)
+
+EVAL(If, 14, R"(
+a = 1
+if false:
+	a = 2
+elif false:
+	a = 3
+elif false:
+	a = 4
+else
+	a = 5
+	nil
+end
+)",
+	BREAKPOINT_LINE(11,
+        EXPECT_EQ(memory->levelCount(), 2);
+		EXPECT_EQ(memory->count(0), 1);
+		EXPECT_EQ(memory->count(1), 1);
+		
+		CHECK_INTEGER(0, a, 1)
+		CHECK_INTEGER(1, a, 5)
 	)
 	,
 	EXPECT_EQ(memory->levelCount(), 1);
