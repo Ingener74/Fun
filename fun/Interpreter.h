@@ -110,6 +110,18 @@ private:
 
     Debugger* _debugger = nullptr;
 
+    class AddFrame: public Statement {
+    public:
+    };
+
+    class RemoveFrame: public Statement {
+    public:
+    };
+
+    class Jmp: public Statement {
+    public:
+    };
+
     class StackFrame: public Poco::RefCountedObject {
     public:
         StackFrame() = default;

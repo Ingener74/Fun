@@ -123,6 +123,23 @@ void Interpreter::visit(Return *return_stmt) {
 
 void Interpreter::visit(While* while_stmt) {
     stack.push_back(new StackFrame);
+
+    size_t operands_size = operands.size();
+
+    load = true;
+    debug(while_stmt->cond)->accept(this);
+    load = false;
+
+    size_t operands_diff = operands.size() - operands_size;
+
+    if (operands_diff) {
+        if (operands.at(operands_size)->toBoolean()) {
+            ip = if_stmt->stmts;
+        } else {
+            ip = if_stmt->nextIf;
+        }
+    }
+
     ip = while_stmt->stmts;
     stack.back()->continueIp = while_stmt->stmts;
     stack.back()->breakIp = while_stmt->nextStatement;

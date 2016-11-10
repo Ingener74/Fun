@@ -101,4 +101,15 @@
         })                                                                     \
     );
 
+#define BREAKPOINT_LINE_REPEAT(line, times, body)                              \
+    dbg->setBreakpoint(Breakpoint(line));                                      \
+    EXPECT_CALL(*dbg, onCatchBreakpoint(Breakpoint(line))).                    \
+        Times(times).                                                          \
+        WillRepeatedly(testing::InvokeWithoutArgs([&] {                      \
+            dbg->handleBreakpoint([&](IOperands* operands, IMemory* memory) {   \
+                body                                                           \
+            });                                                                \
+        })                                                                     \
+    );
+
 
