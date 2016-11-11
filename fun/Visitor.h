@@ -45,6 +45,11 @@ public:
     virtual void visit(class Nil*){}
     virtual void visit(class Real*){}
     virtual void visit(class String*){}
+
+    virtual void visit(class AddFrame*){}
+    virtual void visit(class RemoveFrame*){}
+    virtual void visit(class Jump*){}
+    virtual void visit(class ConditionJump*){}
 };
 
 }

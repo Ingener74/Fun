@@ -1,14 +1,16 @@
 #pragma once
 
-#include "Declarations.h"
 #include "Visitor.h"
+#include "Declarations.h"
 
 namespace fun {
 
-class Compiler: public Visitor {
+class StatementCompiler: public Visitor {
 public:
-    Compiler();
-    virtual ~Compiler();
+    StatementCompiler();
+    virtual ~StatementCompiler();
+
+    virtual void iterateStatements(class Statement*){}
 
     virtual void visit(Statement*);
     virtual void visit(Break*);
@@ -47,10 +49,10 @@ public:
     virtual void visit(Jump*);
     virtual void visit(ConditionJump*);
 
-    const ByteCode& getProgram() const;
+    const Program& getProgram() const;
 
 private:
-    ByteCode _program;
+    Program _program;
 };
 
 }

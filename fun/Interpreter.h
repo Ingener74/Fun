@@ -51,6 +51,11 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
+    virtual void visit(AddFrame*);
+    virtual void visit(RemoveFrame*);
+    virtual void visit(Jump*);
+    virtual void visit(ConditionJump*);
+
     // IOperand
     virtual size_t count() const override;
 
@@ -94,33 +99,18 @@ public:
     Interpreter* setDebugger(Debugger* debugger);
 
 private:
-    void iterate();
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
     template<typename T> T* debug(T* stmt);
 
-    Statement* next(Statement* stmt);
+//    void iterate();
+//    Statement* next(Statement* stmt);
 
     bool load = false;
     bool store = false;
-    bool break_flag = false;
-    bool continue_flag = false;
-    bool return_flag = false;
 
     Debugger* _debugger = nullptr;
-
-    class AddFrame: public Statement {
-    public:
-    };
-
-    class RemoveFrame: public Statement {
-    public:
-    };
-
-    class Jmp: public Statement {
-    public:
-    };
 
     class StackFrame: public Poco::RefCountedObject {
     public:
@@ -128,17 +118,15 @@ private:
         virtual ~StackFrame() = default;
 
         std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-        Statement* breakIp = nullptr;
-        Statement* continueIp = nullptr;
-        Statement* catchIp = nullptr;
-        Statement* returnIp = nullptr;
 
-        Statement* nextIp = nullptr;
+        InstructionPointer ip;
     };
 
     std::vector<Poco::AutoPtr<Terminal>> operands;
     std::vector<Poco::AutoPtr<StackFrame>> stack;
-    Statement* ip = nullptr;
+
+    Program program;
+    InstructionPointer ip;
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {

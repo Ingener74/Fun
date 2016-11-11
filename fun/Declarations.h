@@ -2,6 +2,12 @@
 
 #include <vector>
 
-using Program = std::vector<unsigned char>;
+class Statement;
+
+using Program = std::vector<Statement*>;
+using InstructionPointer = Program::iterator;
+
+using ByteCode = std::vector<unsigned char>;
+using ByteCodeInstructionPointer = ByteCode::iterator;
 
 

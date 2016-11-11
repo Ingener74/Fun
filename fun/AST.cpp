@@ -26,9 +26,13 @@ void Pot::accept(Visitor* v) {
 
 int Statement::stmtCounter = 0;
 
-Statement::Statement(const location& loc) :
-        loc(loc) {
+Statement::Statement() {
     stmtCounter++;
+}
+
+Statement::Statement(const location& loc) :
+        Statement() {
+    this->loc = loc;
 }
 
 Statement::~Statement(){
@@ -176,5 +180,13 @@ bool Real::isTrue(double val) {
 bool String::isTrue(const std::string& str) {
     return str != "false" && str != "nil" && !str.empty();
 }
+
+ACCEPT(AddFrame, )
+
+ACCEPT(RemoveFrame, )
+
+ACCEPT(Jump, )
+
+ACCEPT(ConditionJump, )
 
 }

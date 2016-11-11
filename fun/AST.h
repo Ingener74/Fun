@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
-#include <location.hh>
-
 #include <Poco/RefCountedObject.h>
 #include <Poco/AutoPtr.h>
+
+#include "location.hh"
+#include "Declarations.h"
 
 namespace fun {
 
@@ -73,7 +73,10 @@ private:
 
 class Statement : public Poco::RefCountedObject {
 public:
+    Statement();
+
     Statement(const location& loc);
+
     template<typename ... Ts>
     Statement(const location& loc, Ts*... tail) :
             Statement(loc) {
@@ -573,4 +576,44 @@ public:
     static bool isTrue(const std::string&);
 };
 
+// Low Level instructions
+
+class AddFrame: public Statement {
+public:
+    AddFrame() = default;
+    virtual ~AddFrame() = default;
+
+    virtual AddFrame* accept(Visitor* v);
+};
+
+class RemoveFrame: public Statement {
+public:
+    RemoveFrame() = default;
+    virtual ~RemoveFrame() = default;
+
+    virtual RemoveFrame* accept(Visitor* v);
+};
+
+class Jump: public Statement {
+public:
+    Jump(InstructionPointer ip): ip(ip){}
+    virtual ~Jump() = default;
+
+    virtual Jump* accept(Visitor* v);
+
+    InstructionPointer ip;
+};
+
+class ConditionJump: public Statement {
+public:
+    ConditionJump(InstructionPointer trueIp, InstructionPointer falseIp): trueIp(trueIp), falseIp(falseIp){}
+    virtual ~ConditionJump() = default;
+
+    virtual ConditionJump* accept(Visitor* v);
+
+    InstructionPointer trueIp;
+    InstructionPointer falseIp;
+};
+
 }
+

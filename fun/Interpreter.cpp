@@ -19,28 +19,15 @@ Interpreter::~Interpreter() {
 }
 
 void Interpreter::iterateStatements(Statement *stmts) {
-    ip = stmts;
-    iterate();
 }
 
 void Interpreter::visit(Break* break_stmt) {
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
-        if ((*ipIt)->breakIp)
-            ip = (*ipIt)->breakIp;
 }
 
 void Interpreter::visit(Continue* continue_stmt) {
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
-        if ((*ipIt)->continueIp)
-            ip = (*ipIt)->continueIp;
 }
 
 void Interpreter::visit(For* for_stmt) {
-    stack.push_back(new StackFrame);
-    ip = for_stmt->stmts;
-    stack.back()->continueIp = for_stmt->stmts;
-    stack.back()->breakIp = for_stmt->nextStatement;
-    stack.back()->nextIp = for_stmt->nextStatement;
 }
 
 void Interpreter::visit(Function *function) {
@@ -56,38 +43,36 @@ void Interpreter::visit(Function *function) {
 }
 
 void Interpreter::visit(Ifs *ifs_stmt) {
-    stack.push_back(new StackFrame);
-    ip = ifs_stmt->if_stmts;
 }
 
 void Interpreter::visit(If* if_stmt) {
-
-    if (if_stmt->cond) {
-
-        size_t operands_size = operands.size();
-
-        load = true;
-        debug(if_stmt->cond)->accept(this);
-        load = false;
-
-        size_t operands_diff = operands.size() - operands_size;
-
-        if (operands_diff) {
-            if (operands.at(operands_size)->toBoolean()) {
-                ip = if_stmt->stmts;
-            } else {
-                ip = if_stmt->nextIf;
-            }
-
-            for (size_t i = 0; i < operands_diff; ++i)
-                operands.pop_back();
-
-        } else {
-            ip = if_stmt->nextIf;
-        }
-    } else {
-        ip = if_stmt->stmts;
-    }
+//
+//    if (if_stmt->cond) {
+//
+//        size_t operands_size = operands.size();
+//
+//        load = true;
+//        debug(if_stmt->cond)->accept(this);
+//        load = false;
+//
+//        size_t operands_diff = operands.size() - operands_size;
+//
+//        if (operands_diff) {
+//            if (operands.at(operands_size)->toBoolean()) {
+//                ip = if_stmt->stmts;
+//            } else {
+//                ip = if_stmt->nextIf;
+//            }
+//
+//            for (size_t i = 0; i < operands_diff; ++i)
+//                operands.pop_back();
+//
+//        } else {
+//            ip = if_stmt->nextIf;
+//        }
+//    } else {
+//        ip = if_stmt->stmts;
+//    }
 }
 
 void Interpreter::visit(Import* import_stmt) {
@@ -110,61 +95,61 @@ void Interpreter::visit(Print* print) {
 }
 
 void Interpreter::visit(Return *return_stmt) {
-    auto expr = return_stmt->expression;
-    while (expr) {
-        load = true;
-        expr = debug(expr)->accept(this)->nextExpression;
-        load = false;
-    }
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
-        if ((*ipIt)->returnIp)
-            ip = (*ipIt)->returnIp;
+//    auto expr = return_stmt->expression;
+//    while (expr) {
+//        load = true;
+//        expr = debug(expr)->accept(this)->nextExpression;
+//        load = false;
+//    }
+//    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+//        if ((*ipIt)->returnIp)
+//            ip = (*ipIt)->returnIp;
 }
 
 void Interpreter::visit(While* while_stmt) {
-    stack.push_back(new StackFrame);
-
-    size_t operands_size = operands.size();
-
-    load = true;
-    debug(while_stmt->cond)->accept(this);
-    load = false;
-
-    size_t operands_diff = operands.size() - operands_size;
-
-    if (operands_diff) {
-        if (operands.at(operands_size)->toBoolean()) {
-            ip = if_stmt->stmts;
-        } else {
-            ip = if_stmt->nextIf;
-        }
-    }
-
-    ip = while_stmt->stmts;
-    stack.back()->continueIp = while_stmt->stmts;
-    stack.back()->breakIp = while_stmt->nextStatement;
-    stack.back()->nextIp = while_stmt->nextStatement;
+//    stack.push_back(new StackFrame);
+//
+//    size_t operands_size = operands.size();
+//
+//    load = true;
+//    debug(while_stmt->cond)->accept(this);
+//    load = false;
+//
+//    size_t operands_diff = operands.size() - operands_size;
+//
+//    if (operands_diff) {
+//        if (operands.at(operands_size)->toBoolean()) {
+//            ip = if_stmt->stmts;
+//        } else {
+//            ip = if_stmt->nextIf;
+//        }
+//    }
+//
+//    ip = while_stmt->stmts;
+//    stack.back()->continueIp = while_stmt->stmts;
+//    stack.back()->breakIp = while_stmt->nextStatement;
+//    stack.back()->nextIp = while_stmt->nextStatement;
 }
 
 void Interpreter::visit(Class* class_stmt) {
 }
 
 void Interpreter::visit(Exception* exception_stmt) {
-    stack.push_back(new StackFrame);
-    ip = exception_stmt->tryStmts;
-    stack.back()->catchIp = exception_stmt->catchStmts;
+//    stack.push_back(new StackFrame);
+//    ip = exception_stmt->tryStmts;
+//    stack.back()->catchIp = exception_stmt->catchStmts;
 }
 
 void Interpreter::visit(Throw* throw_stmt) {
-    auto expr = throw_stmt->expression;
-    while (expr) {
-        load = true;
-        expr = debug(expr)->accept(this)->nextExpression;
-        load = false;
-    }
-    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
-        if ((*ipIt)->catchIp)
-            ip = (*ipIt)->catchIp;
+//    auto expr = throw_stmt->expression;
+//    while (expr) {
+//        load = true;
+//        expr = debug(expr)->accept(this)->nextExpression;
+//        load = false;
+//    }
+//    for (auto ipIt = stack.rbegin(); ipIt != stack.rend(); ++ipIt)
+//        if ((*ipIt)->catchIp)
+//            ip = (*ipIt)->catchIp;
 }
 
 void Interpreter::visit(Assign* assign) {
@@ -331,10 +316,10 @@ void Interpreter::visit(Call* call) {
 
     while (stmt) {
         stmt = debug(stmt)->accept(this)->nextStatement;
-        if (return_flag) {
-            return_flag = false;
-            break;
-        }
+//        if (return_flag) {
+//            return_flag = false;
+//            break;
+//        }
     }
 }
 
@@ -420,6 +405,15 @@ void Interpreter::visit(String *str) {
         fassertl(!operands.empty(), str->loc, "operands empty after expression")
     }
     fassertl(!store, str->loc, "you can't assign to value")
+}
+
+void Interpreter::visit(AddFrame *addframe) {
+}
+void Interpreter::visit(RemoveFrame *removeframe) {
+}
+void Interpreter::visit(Jump *jump) {
+}
+void Interpreter::visit(ConditionJump *conditionjump) {
 }
 
 Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
@@ -686,23 +680,23 @@ string Interpreter::str(size_t memoryLevel, const string& name) const {
     return var->toString();
 }
 
-void Interpreter::iterate() {
-    while (ip)
-        ip = next(debug(ip)->accept(this));
-}
-
-Statement* Interpreter::next(Statement* stmt) {
-    if (ip == stmt) {
-        if (stmt && stmt->nextStatement) {
-            return stmt->nextStatement;
-        } else {
-            if (stack.size() > 1)
-                stack.pop_back();
-            return stack.back()->nextIp;
-        }
-    } else {
-        return ip;
-    }
-}
+//void Interpreter::iterate() {
+//    while (ip)
+//        ip = next(debug(ip)->accept(this));
+//}
+//
+//Statement* Interpreter::next(Statement* stmt) {
+//    if (ip == stmt) {
+//        if (stmt && stmt->nextStatement) {
+//            return stmt->nextStatement;
+//        } else {
+//            if (stack.size() > 1)
+//                stack.pop_back();
+//            return stack.back()->nextIp;
+//        }
+//    } else {
+//        return ip;
+//    }
+//}
 
 }

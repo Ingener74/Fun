@@ -17,8 +17,8 @@
             Poco::AutoPtr<Pot> pot;                                            \
             EXPECT_NO_THROW(pot = fun.parseString(SCRIPT););                   \
         }                                                                      \
-        ASSERT_EQ(Statement::counter(), 0);                                    \
-        Statement::resetCounter();                                             \
+        ASSERT_EQ(fun::Statement::counter(), 0);                               \
+        fun::Statement::resetCounter();                                        \
     }
 
 #define PARSE_ERR(CLASS, N, SCRIPT, ERROR_CLASS)                               \
@@ -29,8 +29,8 @@
             Poco::AutoPtr<Pot> pot;                                            \
             EXPECT_THROW(pot = fun.parseString(SCRIPT), ERROR_CLASS);          \
         }                                                                      \
-        ASSERT_EQ(Statement::counter(), 0);                                    \
-        Statement::resetCounter();                                             \
+        ASSERT_EQ(fun::Statement::counter(), 0);                               \
+        fun::Statement::resetCounter();                                        \
     }
 
 #define PARSE_TERM(CLASS, N, SCRIPT, VALUE)                                    \
@@ -44,8 +44,8 @@
             ASSERT_NE(instance, nullptr);                                      \
             ASSERT_EQ(instance->value, VALUE);                                 \
         }                                                                      \
-        ASSERT_EQ(Statement::counter(), 0);                                    \
-        Statement::resetCounter();                                             \
+        ASSERT_EQ(fun::Statement::counter(), 0);                               \
+        fun::Statement::resetCounter();                                        \
     }
 
 
@@ -61,8 +61,8 @@
             });                                                                \
             ASSERT_NO_THROW(f.evalString(SCRIPT); );                           \
         }                                                                      \
-        ASSERT_EQ(Statement::counter(), 0);                                    \
-        Statement::resetCounter();                                             \
+        ASSERT_EQ(fun::Statement::counter(), 0);                               \
+        fun::Statement::resetCounter();                                        \
     }
 
 #define EVAL_ERR(CLASS, N, SCRIPT, BODY, ERROR) TEST(Interpret, CLASS##_##N)   \
@@ -77,8 +77,8 @@
             });                                                                \
             EXPECT_THROW(f.evalString(SCRIPT);, InterpretError);               \
         }                                                                      \
-        ASSERT_EQ(Statement::counter(), 0);                                    \
-        Statement::resetCounter();                                             \
+        ASSERT_EQ(fun::Statement::counter(), 0);                               \
+        fun::Statement::resetCounter();                                        \
     }
 
 #define BREAKPOINT_EXPR(line, scol, ecol, body)                                \
