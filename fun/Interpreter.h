@@ -112,13 +112,8 @@ private:
 
     Debugger* _debugger = nullptr;
 
-    class StackFrame: public Poco::RefCountedObject {
-    public:
-        StackFrame() = default;
-        virtual ~StackFrame() = default;
-
+    struct StackFrame: public Poco::RefCountedObject {
         std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-
         InstructionPointer ip;
     };
 
