@@ -37,19 +37,19 @@ private:
 
     class Finalizer {
     public:
-        Finalizer(const std::function<void()> finally): _finally(finally) {}
+        Finalizer(const std::function<void()> finally): _f(finally) {}
         virtual ~Finalizer() {
             final();
         }
 
         void final() {
-            if(_finally)
-                _finally();
-            _finally = {};
+            if(_f)
+                _f();
+            _f = {};
         }
 
     private:
-        std::function<void()> _finally;
+        std::function<void()> _f;
     };
 
     Poco::AutoPtr<Visitor> _visitor;

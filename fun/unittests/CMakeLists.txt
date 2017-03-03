@@ -52,6 +52,11 @@ if(MINGW OR MSYS)
     target_link_libraries(fun_unittests fun_backend pthread ${GTEST_LIBRARIES} ${POCO_LIBRARIES})
 
     add_test(Tests fun_unittests)
+elseif(MSVC)
+    add_executable(fun_unittests ${fun_unittests_SOURCES})
+    target_link_libraries(fun_unittests fun_backend ${GTEST_LIBRARIES} ${POCO_LIBRARIES})
+
+    add_test(Tests fun_unittests)
 elseif(EMSCRIPTEN)
 elseif(ANDROID)
 elseif(APPLE)

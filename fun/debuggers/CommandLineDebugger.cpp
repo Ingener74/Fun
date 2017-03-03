@@ -1,5 +1,6 @@
 #include <map>
 #include <sstream>
+#include <functional>
 #include <Poco/Thread.h>
 
 #include "AST.h"

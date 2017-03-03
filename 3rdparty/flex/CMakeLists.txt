@@ -10,7 +10,7 @@ if(NOT EXISTS ${SYSROOT})
     elseif(APPLE)
         ExternalProject_Add(
             ${EXT_FLEX}
-            URL                 http://downloads.sourceforge.net/project/flex/flex-2.6.0.tar.gz
+            URL                 https://github.com/westes/flex/archive/v2.6.3.zip
             CONFIGURE_COMMAND   ""
             BUILD_COMMAND       ${CMAKE_BINARY_DIR}/build_ext_flex.sh
             INSTALL_COMMAND     ""
@@ -20,7 +20,7 @@ if(NOT EXISTS ${SYSROOT})
     else()
         ExternalProject_Add(
             ${EXT_FLEX}
-            URL                 http://downloads.sourceforge.net/project/flex/flex-2.6.0.tar.gz
+            URL                 https://github.com/westes/flex/archive/v2.6.3.zip
             CONFIGURE_COMMAND   ""
             BUILD_COMMAND       ${CMAKE_BINARY_DIR}/build_ext_flex.sh
             INSTALL_COMMAND     ""
