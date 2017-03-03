@@ -7,7 +7,7 @@ class Statement;
 using Program = std::vector<Statement*>;
 using InstructionPointer = Program::iterator;
 
-using ByteCode = std::vector<unsigned char>;
-using ByteCodeInstructionPointer = ByteCode::iterator;
+using ByteCodeProgram = std::vector<unsigned char>;
+using ByteCodeInstructionPointer = ByteCodeProgram::iterator;
 
 

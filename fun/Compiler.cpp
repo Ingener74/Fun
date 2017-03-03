@@ -107,7 +107,7 @@ void Compiler::visit(Jump* jump_){
 void Compiler::visit(ConditionJump* conditionjump_){
 }
 
-const ByteCode& fun::Compiler::getProgram() const {
+const ByteCodeProgram& fun::Compiler::getProgram() const {
     return _program;
 }
 

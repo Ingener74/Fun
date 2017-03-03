@@ -47,10 +47,10 @@ public:
     virtual void visit(Jump*);
     virtual void visit(ConditionJump*);
 
-    const ByteCode& getProgram() const;
+    const ByteCodeProgram& getProgram() const;
 
 private:
-    ByteCode _program;
+    ByteCodeProgram _program;
 };
 
 }

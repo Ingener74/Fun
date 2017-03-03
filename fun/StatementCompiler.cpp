@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "StatementCompiler.h"
 
 namespace fun {
@@ -54,6 +56,7 @@ void StatementCompiler::visit(Expression* expression_){
 }
 
 void StatementCompiler::visit(Assign* assign_){
+    _program.push_back(assign_);
 }
 
 void StatementCompiler::visit(BinaryOp* binaryop_){

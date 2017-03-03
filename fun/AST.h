@@ -112,8 +112,7 @@ protected:
     }
     template<typename T, typename ... Ts>
     static void removeRefs(T* t, Ts*... ts) {
-        if (t)
-            t->release();
+        removeRefs(t);
         removeRefs(ts...);
     }
     std::vector<Poco::AutoPtr<Statement>> _members;

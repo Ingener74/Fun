@@ -20,18 +20,23 @@ public:
     virtual void run() override;
 
 private:
-    int resumeCmd();
-    int stepIntoCmd();
-    int stepOverCmd();
-    int operandsCmd();
-    int memoryCmd();
-    int quitCmd();
-    int listCmd();
+    int resumeCmd(const std::vector<std::string>& tokens);
+    int stepIntoCmd(const std::vector<std::string>& tokens);
+    int stepOverCmd(const std::vector<std::string>& tokens);
+    int operandsCmd(const std::vector<std::string>& tokens);
+    int memoryCmd(const std::vector<std::string>& tokens);
+    int quitCmd(const std::vector<std::string>& tokens);
+    int listCmd(const std::vector<std::string>& tokens);
     int breakpointCmd(const std::vector<std::string>&);
 
 private:
     Poco::AutoPtr<Visitor> _visitor;
     Poco::AutoPtr<Pot> _pot;
+
+    using Command = int (CommandLineDebugger::*)(const std::vector<std::string>&);
+    using Commands = std::unordered_map<std::string, Command>;
+
+    Commands _commands;
 };
 
 }
