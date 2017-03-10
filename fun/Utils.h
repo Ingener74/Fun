@@ -39,4 +39,28 @@ public:
     virtual ~Utils() = default;
 };
 
+template<typename T>
+class VectorView {
+public:
+    VectorView() :
+            _data(nullptr), _size(0) {
+    }
+    VectorView(const std::vector<T>& v) :
+            _data(v.data()), _size(v.size()) {
+    }
+
+    bool checkInside(T* t) {
+        return !_data && _data <= t && t < (_data + _size);
+    }
+
+private:
+    const T* _data = nullptr;
+    size_t _size = 0;
+};
+
+template<typename T>
+VectorView<T> make_vector_view(const std::vector<T>& v) {
+    return VectorView<T>(v);
+}
+
 }

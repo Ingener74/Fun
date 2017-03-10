@@ -10,6 +10,8 @@ public:
     Compiler();
     virtual ~Compiler();
 
+    virtual void iterateStatements(Statement*);
+
     virtual void visit(Statement*);
     virtual void visit(Break*);
     virtual void visit(Continue*);
@@ -50,7 +52,21 @@ public:
     const ByteCodeProgram& getProgram() const;
 
 private:
+    static const int PROGRAM_SIZE_INCREMENT = 4096;
+
+    void write(void* data, size_t size);
+
+    template<typename T>
+    void write(const T& data);
+    void writeString(const std::string& str);
+
     ByteCodeProgram _program;
+    uint8_t* _programPtr = nullptr;
 };
+
+template<typename T>
+inline void Compiler::write(const T& data) {
+    write(const_cast<void*>(static_cast<const void*>(&data)), sizeof(data));
+}
 
 }

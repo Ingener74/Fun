@@ -10,7 +10,7 @@ public:
     StatementCompiler();
     virtual ~StatementCompiler();
 
-    virtual void iterateStatements(class Statement*){}
+    virtual void iterateStatements(Statement*);
 
     virtual void visit(Statement*);
     virtual void visit(Break*);
@@ -53,6 +53,9 @@ public:
 
 private:
     Program _program;
+
+
 };
 
 }
+

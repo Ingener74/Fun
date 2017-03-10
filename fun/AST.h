@@ -403,7 +403,7 @@ public:
 
 class Terminal: public Expression {
 public:
-    enum Type {
+    enum Type : uint8_t {
         Unknown,
         Nil, Boolean, Integer, Real, String,
         Object, Function, Dictionary, List
