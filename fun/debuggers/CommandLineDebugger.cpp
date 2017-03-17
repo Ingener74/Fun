@@ -13,14 +13,14 @@ namespace fun {
 using namespace std;
 using namespace Poco;
 
-map<Terminal::Type, string> types {
-    {Terminal::Type::Boolean,   "Boolean"},
-    {Terminal::Type::String,    "String"},
-    {Terminal::Type::Integer,   "Integer"},
-    {Terminal::Type::Real,      "Real"},
-    {Terminal::Type::Nil,       "Nil"},
-    {Terminal::Type::Function,  "Function"},
-    {Terminal::Type::Object,    "Object"},
+map<Type, string> types {
+    {Type::Boolean,   "Boolean"},
+    {Type::String,    "String"},
+    {Type::Integer,   "Integer"},
+    {Type::Real,      "Real"},
+    {Type::Nil,       "Nil"},
+    {Type::Function,  "Function"},
+    {Type::Object,    "Object"},
 };
 
 CommandLineDebugger::CommandLineDebugger()

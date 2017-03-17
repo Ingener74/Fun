@@ -136,13 +136,13 @@ ACCEPT(Index, {
 
 ACCEPT(RoundBrackets, )
 
-Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {
-    fassert(lhs == Nil || lhs == Boolean || lhs == Integer || lhs == Real || lhs == String, "unsupported type");
-    fassert(rhs == Nil || rhs == Boolean || rhs == Integer || rhs == Real || rhs == String, "unsupported type");
+Type Terminal::getSeniorBinaryOpType(Type lhs, Type rhs) {
+    fassert(lhs == Type::Nil || lhs == Type::Boolean || lhs == Type::Integer || lhs == Type::Real || lhs == Type::String, "unsupported type");
+    fassert(rhs == Type::Nil || rhs == Type::Boolean || rhs == Type::Integer || rhs == Type::Real || rhs == Type::String, "unsupported type");
     return std::max<Type>(lhs, rhs);
 }
 
-Terminal::Type Terminal::getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs) {
+Type Terminal::getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs) {
     return getSeniorBinaryOpType(lhs->getType(), rhs->getType());
 }
 

@@ -10,7 +10,7 @@ public:
 
     virtual size_t count() const = 0;
 
-    virtual Terminal::Type type(size_t operand) const = 0;
+    virtual Type type(size_t operand) const = 0;
 
     virtual Poco::AutoPtr<Terminal> operand(size_t operand) const = 0;
 

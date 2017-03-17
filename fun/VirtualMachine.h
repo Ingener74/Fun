@@ -1,46 +1,21 @@
 #pragma once
 
 #include <cstdint>
+#include <bitset>
+#include <Poco/AutoPtr.h>
 #include "Utils.h"
 #include "Declarations.h"
 
 namespace fun {
 
-struct Instruction {
-    enum class OperationCode : uint8_t {
-        Push,
-        Pop,
-
-        Load,
-        Save,
-
-        Jump,
-        Test,
-        JumpIfTrue,
-        JumpIfNotTrue,
-
-        Print, // Temporary
-
-        BinaryOperation,
-        UnaryOperation,
-
-        Count,
-    };
-
-    OperationCode opCode;
-};
-
-struct Load: public Instruction {
-};
+class Terminal;
 
 class VirtualMachine {
 public:
     VirtualMachine();
     virtual ~VirtualMachine();
 
-    void run(ByteCodeProgram& program);
-
-    void fetch();
+    void run(const ByteCodeProgram& program);
 
     void push();
     void pop();
@@ -58,8 +33,26 @@ public:
     void binaryOperation();
     void unaryOperation();
 
+    void setFlag();
+    void clearFlag();
+
 private:
+    void read(void* data, size_t size);
+    template<typename T>
+    void read(T& t);
+    void read(std::string& str, uint32_t size);
+
+    std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+
+    ByteCodeProgram _program;
     uint8_t* _instructionPointer = nullptr;
+
+    std::vector<Poco::AutoPtr<Terminal>> _operands;
 };
+
+template<typename T>
+inline void VirtualMachine::read(T& t) {
+    read(&t, sizeof(t));
+}
 
 }

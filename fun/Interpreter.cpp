@@ -290,7 +290,7 @@ void Interpreter::visit(Call* call) {
      * Get callable object
      */
     fassertl(operands.size() > 0, call->loc, "callable not found");
-    fassertl(operands.back()->getType() == Terminal::Function, call->loc, "must be callable");
+    fassertl(operands.back()->getType() == Type::Function, call->loc, "must be callable");
     auto function = operands.back().cast<Function>();
     operands.pop_back();
 
@@ -419,7 +419,7 @@ void Interpreter::visit(ConditionJump *conditionjump) {
 Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
     auto seniorType = Terminal::getSeniorBinaryOpType(a, b);
     switch (seniorType) {
-    case Terminal::Integer: {
+    case Type::Integer: {
 
         auto lhs = a->toInteger();
         auto rhs = b->toInteger();
@@ -451,7 +451,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         }
         break;
     }
-    case Terminal::Real: {
+    case Type::Real: {
         auto lhs = a->toReal();
         auto rhs = b->toReal();
 
@@ -475,7 +475,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         }
         break;
     }
-    case Terminal::String: {
+    case Type::String: {
         auto lhs = a->toString();
         auto rhs = b->toString();
 
@@ -500,7 +500,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         }
         break;
     }
-    case Terminal::Boolean:{
+    case Type::Boolean:{
         auto lhs = a->toBoolean();
         auto rhs = b->toBoolean();
 
@@ -521,7 +521,7 @@ Terminal* Interpreter::operate(Terminal* a, BinaryOperation op, Terminal* b) {
         }
         break;
     }
-    case Terminal::Nil: {
+    case Type::Nil: {
         switch (op) {
         case BinaryOperation::LOGIC_AND: { return new Boolean(false); }
         case BinaryOperation::LOGIC_OR: { return new Boolean(false); }
@@ -544,7 +544,7 @@ size_t Interpreter::count() const {
     return operands.size();
 }
 
-Terminal::Type Interpreter::type(size_t operand) const {
+Type Interpreter::type(size_t operand) const {
     return operands.at(operand)->getType();
 }
 
@@ -592,17 +592,17 @@ bool Interpreter::has(size_t memoryLevel, const string& name) const {
     return false;
 }
 
-Terminal::Type Interpreter::type(const string& name) const {
+Type Interpreter::type(const string& name) const {
     auto var = variable(name);
     if (var.isNull())
-        return Terminal::Type::Unknown;
+        return Type::Count;
     return var->getType();
 }
 
-Terminal::Type Interpreter::type(size_t memoryLevel, const string& name) const {
+Type Interpreter::type(size_t memoryLevel, const string& name) const {
     auto var = variable(memoryLevel, name);
     if (var.isNull())
-        return Terminal::Type::Unknown;
+        return Type::Count;
     return var->getType();
 }
 

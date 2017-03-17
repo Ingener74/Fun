@@ -59,7 +59,7 @@ public:
     // IOperand
     virtual size_t count() const override;
 
-    virtual Terminal::Type type(size_t operand) const override;
+    virtual Type type(size_t operand) const override;
 
     virtual Poco::AutoPtr<Terminal> operand(size_t operand) const override;
 
@@ -78,8 +78,8 @@ public:
     virtual bool has(const std::string& name) const override;
     virtual bool has(size_t memoryLevel, const std::string& name) const override;
 
-    virtual Terminal::Type type(const std::string& name) const override;
-    virtual Terminal::Type type(size_t memoryLevel, const std::string& name) const override;
+    virtual Type type(const std::string& name) const override;
+    virtual Type type(size_t memoryLevel, const std::string& name) const override;
 
     virtual Poco::AutoPtr<Terminal> variable(const std::string& name) const override;
     virtual Poco::AutoPtr<Terminal> variable(size_t memoryLevel, const std::string& name) const override;

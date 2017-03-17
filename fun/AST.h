@@ -12,32 +12,6 @@ class Visitor;
 class Statement;
 class Expression;
 
-enum class BinaryOperation{
-    NOP,
-
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    MOD,
-
-    BINARY_OR,
-    BINARY_AND,
-    BINARY_XOR,
-    LOGIC_OR,
-    LOGIC_AND,
-
-    LSHIFT,
-    RSHIFT,
-
-    LESS,
-    MORE,
-    LESS_EQUAL,
-    MORE_EQUAL,
-    EQUAL,
-    NOT_EQUAL,
-};
-
 class Pot: public Poco::RefCountedObject {
 public:
     using Ptr = Poco::AutoPtr<Pot>;
@@ -403,12 +377,6 @@ public:
 
 class Terminal: public Expression {
 public:
-    enum Type : uint8_t {
-        Unknown,
-        Nil, Boolean, Integer, Real, String,
-        Object, Function, Dictionary, List
-    };
-
     Terminal(const location& loc) :
             Expression(loc) {
     }
@@ -421,7 +389,7 @@ public:
     virtual Terminal* accept(Visitor*) = 0;
 
     virtual Type getType() const {
-        return Unknown;
+        return Type::Count;
     }
 
     virtual std::string toString() const { return ""; }
@@ -443,7 +411,7 @@ public:
     virtual Function* accept(Visitor*);
 
     virtual Type getType() const {
-        return Terminal::Function;
+        return Type::Function;
     }
 
     Id* name = nullptr;
@@ -466,7 +434,7 @@ public:
     virtual Boolean* accept(Visitor*);
 
     virtual Type getType() const {
-        return Terminal::Boolean;
+        return Type::Boolean;
     }
 
     bool value;
@@ -490,7 +458,7 @@ public:
     virtual Integer* accept(Visitor* visitor);
 
     virtual Type getType() const {
-        return Terminal::Integer;
+        return Type::Integer;
     }
 
     long long value;
@@ -514,7 +482,7 @@ public:
     virtual Nil* accept(Visitor*);
 
     virtual Type getType() const {
-        return Terminal::Nil;
+        return Type::Nil;
     }
 
     virtual std::string toString() const { return "nil"; }
@@ -536,7 +504,7 @@ public:
     virtual Real* accept(Visitor* v);
 
     virtual Type getType() const {
-        return Terminal::Real;
+        return Type::Real;
     }
 
     double value;
@@ -562,7 +530,7 @@ public:
     virtual String* accept(Visitor* v);
 
     virtual Type getType() const {
-        return Terminal::String;
+        return Type::String;
     }
 
     std::string value;

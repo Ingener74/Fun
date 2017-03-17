@@ -2,6 +2,7 @@
 #include "debuggers/EmptyDebugger.h"
 #include "debuggers/CommandLineDebugger.h"
 #include "debuggers/TcpSocketDebugger.h"
+#include "Compiler.h"
 #include "Fun.h"
 
 namespace fun {
@@ -10,7 +11,8 @@ using namespace std;
 using namespace Poco;
 
 Fun::Fun() {
-    _visitor = new Interpreter;
+//    _visitor = new Interpreter;
+    _visitor = new Compiler;
 }
 
 Fun::~Fun() {
@@ -52,8 +54,10 @@ void Fun::evalFile(const string& filename) {
 }
 
 void Fun::evalAst(AutoPtr<Pot> pot) {
-    _visitor.cast<Interpreter>()->setDebugger(_debugger);
-    _debugger->listen(_visitor, pot);
+//    _visitor.cast<Interpreter>()->setDebugger(_debugger);
+    pot->accept(_visitor);
+//    _debugger->listen(_visitor, pot);
+    _virtualMachine.run(_visitor.cast<Compiler>()->getProgram());
 }
 
 Fun& Fun::setDebugger(DebuggerType debugger) {

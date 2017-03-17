@@ -44,18 +44,16 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    virtual void visit(AddFrame*);
-    virtual void visit(RemoveFrame*);
-    virtual void visit(Jump*);
-    virtual void visit(ConditionJump*);
-
     const ByteCodeProgram& getProgram() const;
 
 private:
     static const int PROGRAM_SIZE_INCREMENT = 4096;
 
-    void write(void* data, size_t size);
+    void checkOffsetAndResizeProgram(ptrdiff_t offset);
+    void checkPointerAndResizeProgram(void* ptr);
 
+    void write(void* to, void* data, size_t size);
+    void write(void* data, size_t size);
     template<typename T>
     void write(const T& data);
     void writeString(const std::string& str);

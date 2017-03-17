@@ -14,8 +14,8 @@ public:
     virtual bool has(const std::string& name) const = 0;
     virtual bool has(size_t memoryLevel, const std::string& name) const = 0;
 
-    virtual Terminal::Type type(const std::string& name) const = 0;
-    virtual Terminal::Type type(size_t memoryLevel, const std::string& name) const = 0;
+    virtual Type type(const std::string& name) const = 0;
+    virtual Type type(size_t memoryLevel, const std::string& name) const = 0;
 
     virtual Poco::AutoPtr<Terminal> variable(const std::string& name) const = 0;
     virtual Poco::AutoPtr<Terminal> variable(size_t memoryLevel, const std::string& name) const = 0;

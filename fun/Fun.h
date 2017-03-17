@@ -8,6 +8,7 @@
 #include "Compiler.h"
 #include "Utils.h"
 #include "Debugger.h"
+#include "VirtualMachine.h"
 
 namespace fun {
 
@@ -37,6 +38,7 @@ private:
     std::string _filename;
     Poco::AutoPtr<Debugger> _debugger;
     Poco::AutoPtr<Visitor> _visitor;
+    VirtualMachine _virtualMachine;
 };
 
 }
