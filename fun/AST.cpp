@@ -181,12 +181,4 @@ bool String::isTrue(const std::string& str) {
     return str != "false" && str != "nil" && !str.empty();
 }
 
-ACCEPT(AddFrame, )
-
-ACCEPT(RemoveFrame, )
-
-ACCEPT(Jump, )
-
-ACCEPT(ConditionJump, )
-
 }

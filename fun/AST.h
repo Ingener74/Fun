@@ -272,7 +272,7 @@ public:
 
 class Assign: public Expression {
 public:
-    Assign(const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::NOP) :
+    Assign(const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::Assign) :
             Expression(loc, ids, exprs), ids(ids), exprs(exprs), type(type) {
     }
     virtual ~Assign();
@@ -541,45 +541,6 @@ public:
     virtual double toReal() const { return value.size(); }
 
     static bool isTrue(const std::string&);
-};
-
-// Low Level instructions
-
-class AddFrame: public Statement {
-public:
-    AddFrame() = default;
-    virtual ~AddFrame() = default;
-
-    virtual AddFrame* accept(Visitor* v);
-};
-
-class RemoveFrame: public Statement {
-public:
-    RemoveFrame() = default;
-    virtual ~RemoveFrame() = default;
-
-    virtual RemoveFrame* accept(Visitor* v);
-};
-
-class Jump: public Statement {
-public:
-    Jump(InstructionPointer ip): ip(ip){}
-    virtual ~Jump() = default;
-
-    virtual Jump* accept(Visitor* v);
-
-    InstructionPointer ip;
-};
-
-class ConditionJump: public Statement {
-public:
-    ConditionJump(InstructionPointer trueIp, InstructionPointer falseIp): trueIp(trueIp), falseIp(falseIp){}
-    virtual ~ConditionJump() = default;
-
-    virtual ConditionJump* accept(Visitor* v);
-
-    InstructionPointer trueIp;
-    InstructionPointer falseIp;
 };
 
 }

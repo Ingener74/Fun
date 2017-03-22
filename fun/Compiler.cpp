@@ -13,11 +13,14 @@ Compiler::~Compiler() {
 
 void Compiler::iterateStatements(Statement* statement_) {
     statement_->accept(this);
+    write(OpCode::SetFlag);
+    write(Flag::Stop);
     size_t realProgramSize = _programPtr - _program.data();
     _program.resize(realProgramSize);
 }
 
 void Compiler::visit(Statement* statement_){
+    fassert(false, "invalid statement");
 }
 
 void Compiler::visit(Break* break_){
@@ -60,6 +63,7 @@ void Compiler::visit(Throw* throw_){
 }
 
 void Compiler::visit(Expression* expression_){
+    fassert(false, "invalid statement");
 }
 
 void Compiler::visit(Assign* assign_){
@@ -77,6 +81,9 @@ void Compiler::visit(BinaryOp* binaryop_){
 
     write(OpCode::BinaryOperation);
     write(binaryop_->m_operation);
+
+//    write(OpCode::Pop);
+//    write(OpCode::Pop);
 }
 
 void Compiler::visit(Dot* dot_){
@@ -89,6 +96,9 @@ void Compiler::visit(Dictionary* dictionary_){
 }
 
 void Compiler::visit(Id* id_){
+    write(OpCode::Memory);
+    write(uint32_t(id_->value.size()));
+    writeString(id_->value);
 }
 
 void Compiler::visit(Index* index_){
@@ -98,6 +108,7 @@ void Compiler::visit(RoundBrackets* roundbrackets_){
 }
 
 void Compiler::visit(Terminal* terminal_){
+    fassert(false, "invalid statement");
 }
 
 void Compiler::visit(Boolean* boolean_){
@@ -126,7 +137,6 @@ void Compiler::visit(Real* real_){
 void Compiler::visit(String* string_){
     write(OpCode::Push);
     write(Type::String);
-    write(uint32_t(string_->value.size()));
     writeString(string_->value);
 }
 
@@ -168,7 +178,8 @@ void Compiler::write(void* data, size_t size) {
 }
 
 void Compiler::writeString(const std::string& str) {
-    write(const_cast<char*>(str.data()), str.size() + 1);
+    write(uint32_t(str.size()));
+    write(const_cast<char*>(str.data()), str.size());
 }
 
 }

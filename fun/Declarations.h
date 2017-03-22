@@ -14,37 +14,38 @@ enum class Type : uint8_t {
     Function,
     Dictionary,
     List,
+
     Count,
 };
 
 enum class BinaryOperation : uint8_t {
-    NOP,
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    MOD,
-    BINARY_OR,
-    BINARY_AND,
-    BINARY_XOR,
-    LOGIC_OR,
-    LOGIC_AND,
-    LSHIFT,
-    RSHIFT,
-    LESS,
-    MORE,
-    LESS_EQUAL,
-    MORE_EQUAL,
-    EQUAL,
-    NOT_EQUAL,
+    Assign,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    BinaryOr,
+    BinaryAnd,
+    BinaryXor,
+    LogicOr,
+    LogicAnd,
+    LShift,
+    RShift,
+    Less,
+    More,
+    LessEqual,
+    MoreEqual,
+    Equal,
+    NotEqual,
+
     Count,
 };
 
 enum class OpCode : uint8_t {
     Push,
     Pop,
-    Load,
-    Save,
+    Memory,
     Jump,
     Test,
     JumpIfTrue,
@@ -54,6 +55,8 @@ enum class OpCode : uint8_t {
     UnaryOperation,
     SetFlag,
     ClearFlag,
+    Nop,
+
     Count,
 };
 
@@ -62,6 +65,7 @@ enum class Flag : uint8_t {
     Store,
     True,
     Stop,
+
     Count,
 };
 

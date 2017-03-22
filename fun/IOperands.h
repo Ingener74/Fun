@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Declarations.h"
+
 namespace fun {
 
 class Terminal;

@@ -51,11 +51,6 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    virtual void visit(AddFrame*);
-    virtual void visit(RemoveFrame*);
-    virtual void visit(Jump*);
-    virtual void visit(ConditionJump*);
-
     // IOperand
     virtual size_t count() const override;
 
