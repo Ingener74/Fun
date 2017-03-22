@@ -56,7 +56,7 @@ private:
     void write(void* data, size_t size);
     template<typename T>
     void write(const T& data);
-    void writeString(const std::string& str);
+    void write(const std::string& str);
 
     ByteCodeProgram _program;
     uint8_t* _programPtr = nullptr;

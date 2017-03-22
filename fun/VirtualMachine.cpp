@@ -62,6 +62,8 @@ void VirtualMachine::push() {
         read(value);
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new Integer(value));
+        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+//            fassert(false, "can't ")
         }
         break;
     }
@@ -96,6 +98,13 @@ void VirtualMachine::pop() {
 }
 
 void VirtualMachine::memory() {
+    string id;
+    read(id);
+    if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+
+    } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+
+    }
 }
 
 void VirtualMachine::jump() {
@@ -167,7 +176,7 @@ double VirtualMachine::real(size_t operand) const {
     return _operands.at(operand)->toReal();
 }
 
-std::string VirtualMachine::str(size_t operand) const {
+string VirtualMachine::str(size_t operand) const {
     return _operands.at(operand)->toString();
 }
 
@@ -176,14 +185,14 @@ void VirtualMachine::read(void* data, size_t size) {
     _instructionPointer += size;
 }
 
-void VirtualMachine::read(std::string& str) {
+void VirtualMachine::read(string& str) {
     uint32_t size = 0;
     read(size);
-    std::vector<char> buffer;
+    vector<char> buffer;
     buffer.resize(size + 1);
     memset(buffer.data(), 0, sizeof(size + 1));
     read(buffer.data(), size);
-    str = std::string(buffer.data());
+    str = string(buffer.data());
 }
 
 Terminal* VirtualMachine::operate(Terminal* a, BinaryOperation op, Terminal* b) {

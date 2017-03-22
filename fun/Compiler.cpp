@@ -97,8 +97,7 @@ void Compiler::visit(Dictionary* dictionary_){
 
 void Compiler::visit(Id* id_){
     write(OpCode::Memory);
-    write(uint32_t(id_->value.size()));
-    writeString(id_->value);
+    write(id_->value);
 }
 
 void Compiler::visit(Index* index_){
@@ -137,7 +136,7 @@ void Compiler::visit(Real* real_){
 void Compiler::visit(String* string_){
     write(OpCode::Push);
     write(Type::String);
-    writeString(string_->value);
+    write(string_->value);
 }
 
 const ByteCodeProgram& fun::Compiler::getProgram() const {
@@ -177,7 +176,7 @@ void Compiler::write(void* data, size_t size) {
     _programPtr += size;
 }
 
-void Compiler::writeString(const std::string& str) {
+void Compiler::write(const std::string& str) {
     write(uint32_t(str.size()));
     write(const_cast<char*>(str.data()), str.size());
 }
