@@ -4,6 +4,11 @@
 
 class Statement;
 
+enum class BuildType: uint8_t {
+    Release,
+    Debug,
+};
+
 enum class Type : uint8_t {
     Nil,
     Boolean,
@@ -69,9 +74,11 @@ enum class Flag : uint8_t {
     Count,
 };
 
-using Program = std::vector<Statement*>;
-using InstructionPointer = Program::iterator;
+typedef std::vector<Statement*>     Program;
+typedef Program::iterator           InstructionPointer;
 
-using ByteCodeProgram = std::vector<unsigned char>;
-using ByteCodeInstructionPointer = ByteCodeProgram::iterator;
+typedef std::vector<unsigned char>  ByteCodeProgram;
+typedef ByteCodeProgram::iterator   ByteCodeInstructionPointer;
+
+typedef uint64_t                    StatementId;
 

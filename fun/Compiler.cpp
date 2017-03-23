@@ -12,6 +12,8 @@ Compiler::~Compiler() {
 }
 
 void Compiler::iterateStatements(Statement* statement_) {
+//    write(BuildType::Release);
+
     statement_->accept(this);
     write(OpCode::SetFlag);
     write(Flag::Stop);

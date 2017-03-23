@@ -26,12 +26,13 @@ void Pot::accept(Visitor* v) {
 
 int Statement::stmtCounter = 0;
 
-Statement::Statement() {
+Statement::Statement(StatementId statementId) :
+        statementId(statementId) {
     stmtCounter++;
 }
 
-Statement::Statement(const location& loc) :
-        Statement() {
+Statement::Statement(StatementId statementId, const location& loc) :
+        Statement(statementId) {
     this->loc = loc;
 }
 

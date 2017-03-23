@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <bitset>
+#include <unordered_map>
 #include <Poco/AutoPtr.h>
+#include <Poco/RefCountedObject.h>
 #include "Utils.h"
 #include "IOperands.h"
 #include "Declarations.h"
@@ -10,13 +12,14 @@
 namespace fun {
 
 class Terminal;
+class Pot;
 
 class VirtualMachine: public IOperands {
 public:
     VirtualMachine();
     virtual ~VirtualMachine();
 
-    void run(const ByteCodeProgram& program);
+    void run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot);
 
     void push();
     void pop();
@@ -59,10 +62,27 @@ private:
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
+    struct StackFrame: public Poco::RefCountedObject {
+        std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
+        InstructionPointer ip;
+    };
+
+    struct ThreadContext: public Poco::RefCountedObject {
+        std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+        std::vector<Poco::AutoPtr<StackFrame>> _memory;
+        std::vector<Poco::AutoPtr<Terminal>> _operands;
+        uint8_t* _ip = nullptr;
+    };
+
+    std::vector<Poco::AutoPtr<ThreadContext>> _threadsData;
+
     std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+    std::vector<Poco::AutoPtr<StackFrame>> _memory;
     std::vector<Poco::AutoPtr<Terminal>> _operands;
+
     ByteCodeProgram _program;
     uint8_t* _instructionPointer = nullptr;
+    Poco::AutoPtr<Pot> _pot;
 };
 
 template<typename T>

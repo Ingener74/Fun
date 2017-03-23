@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <Poco/RefCountedObject.h>
 #include <Poco/AutoPtr.h>
 
@@ -33,27 +35,38 @@ public:
 
     template<typename T, typename ... Args>
     T *add(Args &&... args) {
-        auto res = new T(std::forward<Args>(args)...);
-        _statements.push_back(res);
+        statementId++;
+        auto res = new T(statementId, std::forward<Args>(args)...);
+        _statements.insert(std::make_pair(statementId, res));
         return res;
     }
 
     void accept(Visitor*);
 
+    template<typename T>
+    T* getStatement(StatementId statementId) {
+        auto stmt = _statements.find(statementId);
+        if (stmt == _statements.end()) {
+            return nullptr;
+        }
+        return stmt->second.cast<T*>();
+    }
+
 private:
     Poco::AutoPtr<Statement> _root;
-    std::vector<Poco::AutoPtr<Statement>> _statements;
+    std::map<StatementId, Poco::AutoPtr<Statement>> _statements;
+    StatementId statementId = 0;
 };
 
 class Statement : public Poco::RefCountedObject {
 public:
-    Statement();
+    Statement(StatementId statementId);
 
-    Statement(const location& loc);
+    Statement(StatementId statementId, const location& loc);
 
     template<typename ... Ts>
-    Statement(const location& loc, Ts*... tail) :
-            Statement(loc) {
+    Statement(StatementId statementId, const location& loc, Ts*... tail) :
+            Statement(statementId) {
         addRefs(tail...);
     }
 
@@ -64,6 +77,7 @@ public:
     Statement* nextStatement = nullptr;
     Expression* lastExpression = nullptr;
     location loc;
+    StatementId statementId;
 
     static int counter();
     static void resetCounter();
@@ -95,8 +109,8 @@ protected:
 
 class Break: public Statement {
 public:
-    Break(const location& loc) :
-            Statement(loc) {
+    Break(StatementId statementId, const location& loc) :
+            Statement(statementId, loc) {
     }
     virtual ~Break() = default;
 
@@ -108,8 +122,8 @@ class Function;
 
 class Class: public Statement {
 public:
-    Class(const location& loc, Id* name, Id* derived, Statement* stmts) :
-            Statement(loc, name, derived, stmts), name(name), derived(derived), stmts(stmts) {
+    Class(StatementId statementId, const location& loc, Id* name, Id* derived, Statement* stmts) :
+            Statement(statementId, loc, name, derived, stmts), name(name), derived(derived), stmts(stmts) {
     }
     virtual ~Class() {
     }
@@ -123,8 +137,8 @@ public:
 
 class Continue: public Statement {
 public:
-    Continue(const location& loc) :
-            Statement(loc) {
+    Continue(StatementId statementId, const location& loc) :
+            Statement(statementId, loc) {
     }
     virtual ~Continue() = default;
 
@@ -133,9 +147,9 @@ public:
 
 class Exception: public Statement {
 public:
-    Exception(const location& loc, Statement* tryStmts = nullptr, Id* errorClasses = nullptr, Id* errorObject = nullptr,
+    Exception(StatementId statementId, const location& loc, Statement* tryStmts = nullptr, Id* errorClasses = nullptr, Id* errorObject = nullptr,
             Statement* catchStmts = nullptr) :
-            Statement(loc, tryStmts, errorClasses, errorObject, catchStmts), tryStmts(tryStmts), errorClasses(
+            Statement(statementId, loc, tryStmts, errorClasses, errorObject, catchStmts), tryStmts(tryStmts), errorClasses(
                     errorClasses), errorObject(errorObject), catchStmts(catchStmts) {
     }
     virtual ~Exception() {
@@ -153,9 +167,9 @@ class Expression;
 
 class For: public Statement {
 public:
-    For(const location& loc, Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment =
+    For(StatementId statementId, const location& loc, Expression* initial = nullptr, Expression* condition = nullptr, Expression* increment =
             nullptr, Statement* stmts = nullptr) :
-            Statement(loc, initial, condition, increment, stmts), initial(initial), condition(condition), increment(
+            Statement(statementId, loc, initial, condition, increment, stmts), initial(initial), condition(condition), increment(
                     increment), stmts(stmts) {
     }
     virtual ~For() {
@@ -169,8 +183,8 @@ public:
 
 class If: public Statement {
 public:
-    If(const location& loc, Expression* cond, Statement* stmts = nullptr) :
-            Statement(loc, cond, stmts), cond(cond), stmts(stmts) {
+    If(StatementId statementId, const location& loc, Expression* cond, Statement* stmts = nullptr) :
+            Statement(statementId, loc, cond, stmts), cond(cond), stmts(stmts) {
     }
     virtual ~If();
 
@@ -184,7 +198,7 @@ public:
 
 class Ifs: public Statement {
 public:
-    Ifs(const location& loc, If* if_stmts): Statement(loc, if_stmts), if_stmts(if_stmts){}
+    Ifs(StatementId statementId, const location& loc, If* if_stmts): Statement(statementId, loc, if_stmts), if_stmts(if_stmts){}
     virtual ~Ifs() = default;
 
     virtual Ifs* accept(Visitor*);
@@ -194,8 +208,8 @@ public:
 
 class Import: public Statement {
 public:
-    Import(const location& loc, Id* library) :
-            Statement(loc, library), id(library) {
+    Import(StatementId statementId, const location& loc, Id* library) :
+            Statement(statementId, loc, library), id(library) {
     }
     virtual ~Import() = default;
 
@@ -206,8 +220,8 @@ public:
 
 class Print: public Statement {
 public:
-    Print(const location& loc, Expression* expr) :
-            Statement(loc, expr), expression(expr) {
+    Print(StatementId statementId, const location& loc, Expression* expr) :
+            Statement(statementId, loc, expr), expression(expr) {
     }
     virtual ~Print() = default;
 
@@ -218,8 +232,8 @@ public:
 
 class Return: public Statement {
 public:
-    Return(const location& loc, Expression* expr = nullptr) :
-            Statement(loc, expr), expression(expr) {
+    Return(StatementId statementId, const location& loc, Expression* expr = nullptr) :
+            Statement(statementId, loc, expr), expression(expr) {
     }
     virtual ~Return() = default;
 
@@ -230,8 +244,8 @@ public:
 
 class Throw: public Statement {
 public:
-    Throw(const location& loc, Expression* exression = nullptr) :
-            Statement(loc, exression), expression(exression) {
+    Throw(StatementId statementId, const location& loc, Expression* exression = nullptr) :
+            Statement(statementId, loc, exression), expression(exression) {
     }
     virtual ~Throw() = default;
 
@@ -242,8 +256,8 @@ public:
 
 class While: public Statement {
 public:
-    While(const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
-            Statement(loc, cond, stmts), cond(cond), stmts(stmts) {
+    While(StatementId statementId, const location& loc, Expression* cond = nullptr, Statement* stmts = nullptr) :
+            Statement(statementId, loc, cond, stmts), cond(cond), stmts(stmts) {
     }
     virtual ~While() = default;
 
@@ -255,12 +269,12 @@ public:
 
 class Expression: public Statement {
 public:
-    Expression(const location& loc) :
-            Statement(loc) {
+    Expression(StatementId statementId, const location& loc) :
+            Statement(statementId, loc) {
     }
     template<typename ... Ts>
-    Expression(const location& loc, Ts*... members) :
-            Statement(loc, members...) {
+    Expression(StatementId statementId, const location& loc, Ts*... members) :
+            Statement(statementId, loc, members...) {
     }
     virtual ~Expression();
 
@@ -272,8 +286,8 @@ public:
 
 class Assign: public Expression {
 public:
-    Assign(const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::Assign) :
-            Expression(loc, ids, exprs), ids(ids), exprs(exprs), type(type) {
+    Assign(StatementId statementId, const location& loc, Expression* ids, Expression* exprs, BinaryOperation type = BinaryOperation::Assign) :
+            Expression(statementId, loc, ids, exprs), ids(ids), exprs(exprs), type(type) {
     }
     virtual ~Assign();
 
@@ -289,8 +303,8 @@ public:
 
 class BinaryOp: public Expression {
 public:
-    BinaryOp(const location& loc, BinaryOperation op, Expression* lhs, Expression* rhs) :
-        Expression(loc, lhs, rhs), m_operation(op), lhs(lhs), rhs(rhs) {
+    BinaryOp(StatementId statementId, const location& loc, BinaryOperation op, Expression* lhs, Expression* rhs) :
+        Expression(statementId, loc, lhs, rhs), m_operation(op), lhs(lhs), rhs(rhs) {
     }
     virtual ~BinaryOp() = default;
 
@@ -302,7 +316,7 @@ public:
 
 class Dot : public Expression {
 public:
-    Dot(const location &loc, Expression *lhs, Expression *rhs) : Expression(loc, lhs, rhs), lhs(lhs), rhs(rhs) {}
+    Dot(StatementId statementId, const location &loc, Expression *lhs, Expression *rhs) : Expression(statementId, loc, lhs, rhs), lhs(lhs), rhs(rhs) {}
 
     virtual ~Dot() = default;
 
@@ -313,8 +327,8 @@ public:
 
 class Call: public Expression {
 public:
-    Call(const location& loc, Expression* callable, Expression* arg = nullptr) :
-        Expression(loc, callable, arg), callable(callable), arguments(arg) {
+    Call(StatementId statementId, const location& loc, Expression* callable, Expression* arg = nullptr) :
+        Expression(statementId, loc, callable, arg), callable(callable), arguments(arg) {
     }
     virtual ~Call() = default;
 
@@ -326,8 +340,8 @@ public:
 
 class Dictionary: public Expression {
 public:
-    Dictionary(const location& loc, Assign* assign) :
-        Expression(loc, assign), assign(assign) {
+    Dictionary(StatementId statementId, const location& loc, Assign* assign) :
+        Expression(statementId, loc, assign), assign(assign) {
     }
     virtual ~Dictionary() = default;
 
@@ -338,8 +352,8 @@ public:
 
 class Id: public Expression {
 public:
-    Id(const location& loc, const std::string& value) :
-        Expression(loc), value(value) {
+    Id(StatementId statementId, const location& loc, const std::string& value) :
+        Expression(statementId, loc), value(value) {
     }
     virtual ~Id();
 
@@ -352,8 +366,8 @@ public:
 
 class Index: public Expression {
 public:
-    Index(const location& loc, Expression* indexable, Expression* arg) :
-        Expression(loc, indexable, arg), indexable(indexable), arg(arg) {
+    Index(StatementId statementId, const location& loc, Expression* indexable, Expression* arg) :
+        Expression(statementId, loc, indexable, arg), indexable(indexable), arg(arg) {
     }
     virtual ~Index() = default;
 
@@ -365,8 +379,8 @@ public:
 
 class RoundBrackets: public Expression {
 public:
-    RoundBrackets(const location& loc, Expression* expr) :
-        Expression(loc, expr), expr(expr) {
+    RoundBrackets(StatementId statementId, const location& loc, Expression* expr) :
+        Expression(statementId, loc, expr), expr(expr) {
     }
     virtual ~RoundBrackets() = default;
 
@@ -377,12 +391,12 @@ public:
 
 class Terminal: public Expression {
 public:
-    Terminal(const location& loc) :
-            Expression(loc) {
+    Terminal(StatementId statementId, const location& loc) :
+            Expression(statementId, loc) {
     }
     template<typename ... Ts>
-    Terminal(const location& loc, Ts*... members) :
-            Expression(loc, members...) {
+    Terminal(StatementId statementId, const location& loc, Ts*... members) :
+            Expression(statementId, loc, members...) {
     }
     virtual ~Terminal() = default;
 
@@ -403,8 +417,8 @@ public:
 
 class Function: public Terminal {
 public:
-    Function(const location& loc, Id* id, Id* args = nullptr, Statement* scope = nullptr) :
-            Terminal(loc, id, args, scope), name(id), args(args), stmts(scope) {
+    Function(StatementId statementId, const location& loc, Id* id, Id* args = nullptr, Statement* scope = nullptr) :
+            Terminal(statementId, loc, id, args, scope), name(id), args(args), stmts(scope) {
     }
     virtual ~Function() = default;
 
@@ -423,11 +437,11 @@ public:
 
 class Boolean: public Terminal {
 public:
-    Boolean(const location& loc, bool value) :
-            Terminal(loc), value(value) {
+    Boolean(StatementId statementId, const location& loc, bool value) :
+            Terminal(statementId, loc), value(value) {
     }
     Boolean(bool value) :
-            Terminal(location { nullptr, 0, 0 }), value(value) {
+            Terminal(0, location { nullptr, 0, 0 }), value(value) {
     }
     virtual ~Boolean() = default;
 
@@ -447,11 +461,11 @@ public:
 
 class Integer: public Terminal {
 public:
-    Integer(const location& loc, long long value) :
-            Terminal(loc), value(value) {
+    Integer(StatementId statementId, const location& loc, long long value) :
+            Terminal(statementId, loc), value(value) {
     }
     Integer(long long value) :
-            Terminal(location{nullptr, 0, 0}), value(value) {
+            Terminal(0, location{nullptr, 0, 0}), value(value) {
     }
     virtual ~Integer() = default;
 
@@ -471,11 +485,11 @@ public:
 
 class Nil: public Terminal {
 public:
-    Nil(const location& loc) :
-            Terminal(loc) {
+    Nil(StatementId statementId, const location& loc) :
+            Terminal(statementId, loc) {
     }
     Nil() :
-            Terminal(location { nullptr, 0, 0 }) {
+            Terminal(0, location { nullptr, 0, 0 }) {
     }
     virtual ~Nil() = default;
 
@@ -493,11 +507,11 @@ public:
 
 class Real: public Terminal {
 public:
-    Real(const location& loc, double value) :
-            Terminal(loc), value(value) {
+    Real(StatementId statementId, const location& loc, double value) :
+            Terminal(statementId, loc), value(value) {
     }
     Real(double value) :
-            Terminal(location { nullptr, 0, 0 }), value(value) {
+            Terminal(0, location { nullptr, 0, 0 }), value(value) {
     }
     virtual ~Real() = default;
 
@@ -519,11 +533,11 @@ public:
 
 class String: public Terminal {
 public:
-    String(const location& loc, const std::string& value) :
-            Terminal(loc), value(value) {
+    String(StatementId statementId, const location& loc, const std::string& value) :
+            Terminal(statementId, loc), value(value) {
     }
     String(const std::string& value) :
-            Terminal(location { nullptr, 0, 0 }), value(value) {
+            Terminal(0, location { nullptr, 0, 0 }), value(value) {
     }
     virtual ~String() = default;
 

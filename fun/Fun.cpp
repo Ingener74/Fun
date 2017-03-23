@@ -57,7 +57,7 @@ void Fun::evalAst(AutoPtr<Pot> pot) {
 //    _visitor.cast<Interpreter>()->setDebugger(_debugger);
     pot->accept(_visitor);
 //    _debugger->listen(_visitor, pot);
-    _virtualMachine.run(_visitor.cast<Compiler>()->getProgram());
+    _virtualMachine.run(_visitor.cast<Compiler>()->getProgram(), pot);
 }
 
 Fun& Fun::setDebugger(DebuggerType debugger) {

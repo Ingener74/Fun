@@ -14,8 +14,9 @@ VirtualMachine::VirtualMachine()
 VirtualMachine::~VirtualMachine() {
 }
 
-void VirtualMachine::run(const ByteCodeProgram& program) {
+void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot) {
     _program = program;
+    _pot = pot;
     _instructionPointer = _program.data();
     while (!_flags.test(static_cast<uint8_t>(Flag::Stop))) {
         OpCode opCode;
@@ -54,6 +55,8 @@ void VirtualMachine::push() {
         read(value);
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new Boolean(value));
+        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+            fassert(false, "can't store to terminal");
         }
         break;
     }
@@ -63,7 +66,7 @@ void VirtualMachine::push() {
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new Integer(value));
         } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
-//            fassert(false, "can't ")
+            fassert(false, "can't store to terminal");
         }
         break;
     }
@@ -72,6 +75,8 @@ void VirtualMachine::push() {
         read(value);
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new Real(value));
+        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+            fassert(false, "can't store to terminal");
         }
         break;
     }
@@ -80,6 +85,8 @@ void VirtualMachine::push() {
         read(value);
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new String(value));
+        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+            fassert(false, "can't store to terminal");
         }
         break;
     }
