@@ -52,7 +52,6 @@ enum class OpCode : uint8_t {
     Pop,
     Memory,
     Jump,
-    Test,
     JumpIfTrue,
     JumpIfNotTrue,
     Print, // Temporary

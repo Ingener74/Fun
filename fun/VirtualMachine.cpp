@@ -27,7 +27,6 @@ void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot
             case OpCode::Pop:              pop();             break;
             case OpCode::Memory:           memory();          break;
             case OpCode::Jump:             jump();            break;
-            case OpCode::Test:             test();            break;
             case OpCode::JumpIfTrue:       jumpIfTrue();      break;
             case OpCode::JumpIfNotTrue:    jumpIfNotTrue();   break;
             case OpCode::Print:            print();           break;
@@ -47,6 +46,8 @@ void VirtualMachine::push() {
     case Type::Nil: {
         if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
             _operands.push_back(new Nil);
+        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+            fassert(false, "can't store to terminal");
         }
         break;
     }
@@ -108,16 +109,31 @@ void VirtualMachine::memory() {
     string id;
     read(id);
     if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
-
+        for (auto stackFrameIt = _memory.rbegin(); stackFrameIt != _memory.rend(); ++stackFrameIt) {
+            auto variableIt = (*stackFrameIt)->variables.find(id);
+            if (variableIt != (*stackFrameIt)->variables.end()) {
+                _operands.push_back(variableIt->second);
+                return;
+            }
+        }
+        fassert(false, "undefined variable " + id);
     } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
-
+        fassert(_operands.size(), "have no operands");
+        auto& vars = _memory.back()->variables;
+        auto variableIt = vars.find(id);
+        if (variableIt == vars.end()) {
+            auto insertResult = vars.insert( { id, _operands.back() });
+            if (!insertResult.second) {
+                fassert(false, "can't create variable " + id);
+            }
+        } else {
+            variableIt->second.assign(_operands.back());
+        }
+        _operands.pop_back();
     }
 }
 
 void VirtualMachine::jump() {
-}
-
-void VirtualMachine::test() {
 }
 
 void VirtualMachine::jumpIfTrue() {
@@ -185,6 +201,118 @@ double VirtualMachine::real(size_t operand) const {
 
 string VirtualMachine::str(size_t operand) const {
     return _operands.at(operand)->toString();
+}
+
+size_t VirtualMachine::levelCount() const {
+    return _memory.size();
+}
+
+size_t VirtualMachine::count(size_t memoryLevel) const {
+    return _memory.at(memoryLevel)->variables.size();
+}
+
+bool VirtualMachine::has(const string& name) const {
+    for (auto it = _memory.rbegin(); it != _memory.rend(); ++it) {
+        if ((*it)->variables.find(name) != (*it)->variables.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool VirtualMachine::has(size_t memoryLevel, const string& name) const {
+    if (_memory.at(memoryLevel)->variables.find(name) != _memory.at(memoryLevel)->variables.end()) {
+        return true;
+    }
+    return false;
+}
+
+Type VirtualMachine::type(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return Type::Count;
+    return var->getType();
+}
+
+Type VirtualMachine::type(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return Type::Count;
+    return var->getType();
+}
+
+AutoPtr<Terminal> VirtualMachine::variable(const string& name) const {
+    for (auto it = _memory.rbegin(); it != _memory.rend(); ++it) {
+        auto varIt = (*it)->variables.find(name);
+        if (varIt != (*it)->variables.end()) {
+            return varIt->second;
+        }
+    }
+    return {};
+}
+
+AutoPtr<Terminal> VirtualMachine::variable(size_t memoryLevel, const string& name) const {
+    auto varIt = _memory.at(memoryLevel)->variables.find(name);
+    if (varIt != _memory.at(memoryLevel)->variables.end()) {
+        return varIt->second;
+    }
+    return {};
+}
+
+bool VirtualMachine::boolean(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toBoolean();
+}
+
+bool VirtualMachine::boolean(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toBoolean();
+}
+
+long long int VirtualMachine::integer(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toInteger();
+}
+
+long long int VirtualMachine::integer(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toInteger();
+}
+
+double VirtualMachine::real(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return false;
+    return var->toReal();
+}
+
+double VirtualMachine::real(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return false;
+    return var->toReal();
+}
+
+string VirtualMachine::str(const string& name) const {
+    auto var = variable(name);
+    if (var.isNull())
+        return {};
+    return var->toString();
+}
+
+string VirtualMachine::str(size_t memoryLevel, const string& name) const {
+    auto var = variable(memoryLevel, name);
+    if (var.isNull())
+        return {};
+    return var->toString();
 }
 
 void VirtualMachine::read(void* data, size_t size) {

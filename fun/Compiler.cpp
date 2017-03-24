@@ -26,42 +26,55 @@ void Compiler::visit(Statement* statement_){
 }
 
 void Compiler::visit(Break* break_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Continue* continue_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Class* class_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(For* for_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Function* function_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Ifs* ifs_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(If* if_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Import* import_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Print* print_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Return* return_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(While* while_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Exception* exception_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Throw* throw_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(Expression* expression_){
@@ -69,6 +82,7 @@ void Compiler::visit(Expression* expression_){
 }
 
 void Compiler::visit(Assign* assign_){
+    fassert(false, "not yet implemented");
 }
 
 void Compiler::visit(BinaryOp* binaryop_){
@@ -83,9 +97,6 @@ void Compiler::visit(BinaryOp* binaryop_){
 
     write(OpCode::BinaryOperation);
     write(binaryop_->m_operation);
-
-//    write(OpCode::Pop);
-//    write(OpCode::Pop);
 }
 
 void Compiler::visit(Dot* dot_){
@@ -106,6 +117,7 @@ void Compiler::visit(Index* index_){
 }
 
 void Compiler::visit(RoundBrackets* roundbrackets_){
+    roundbrackets_->accept(this);
 }
 
 void Compiler::visit(Terminal* terminal_){
@@ -145,35 +157,25 @@ const ByteCodeProgram& fun::Compiler::getProgram() const {
     return _program;
 }
 
-void Compiler::checkOffsetAndResizeProgram(ptrdiff_t offset) {
-    if (_program.empty()) {
-        _program.resize(PROGRAM_SIZE_INCREMENT);
-    }
-    ptrdiff_t oldOffset = 0;
-    if (_programPtr) {
-        oldOffset = _programPtr - _program.data();
-    }
-    while (offset > _program.size()) {
+void Compiler::checkOffsetAndResizeProgram(ptrdiff_t offset, size_t size) {
+    ptrdiff_t oldOffset = _programPtr - _program.data();
+    while ((offset + size) > _program.size()) {
         _program.resize(_program.size() + PROGRAM_SIZE_INCREMENT);
     }
-    if (_programPtr) {
-        _programPtr = _program.data() + oldOffset;
-    } else {
-        _programPtr = _program.data();
-    }
+    _programPtr = _program.data() + oldOffset;
 }
 
-void Compiler::checkPointerAndResizeProgram(void* ptr) {
-    checkOffsetAndResizeProgram(static_cast<uint8_t*>(ptr) - _program.data());
+void Compiler::checkPointerAndResizeProgram(void* ptr, size_t size) {
+    checkOffsetAndResizeProgram(static_cast<uint8_t*>(ptr) - _program.data(), size);
 }
 
 void Compiler::write(void* to, void* data, size_t size) {
-    checkPointerAndResizeProgram(to);
+    checkPointerAndResizeProgram(to, size);
     memcpy(to, data, size);
 }
 
 void Compiler::write(void* data, size_t size) {
-    checkPointerAndResizeProgram(_programPtr);
+    checkPointerAndResizeProgram(_programPtr, size);
     write(_programPtr, data, size);
     _programPtr += size;
 }

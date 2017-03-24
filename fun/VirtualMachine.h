@@ -7,6 +7,7 @@
 #include <Poco/RefCountedObject.h>
 #include "Utils.h"
 #include "IOperands.h"
+#include "IMemory.h"
 #include "Declarations.h"
 
 namespace fun {
@@ -14,7 +15,7 @@ namespace fun {
 class Terminal;
 class Pot;
 
-class VirtualMachine: public IOperands {
+class VirtualMachine: public IOperands, public IMemory {
 public:
     VirtualMachine();
     virtual ~VirtualMachine();
@@ -27,7 +28,6 @@ public:
     void memory();
 
     void jump();
-    void test();
     void jumpIfTrue();
     void jumpIfNotTrue();
 
@@ -41,18 +41,37 @@ public:
 
     // IOperands
     virtual size_t count() const override;
-
     virtual Type type(size_t operand) const override;
-
     virtual Poco::AutoPtr<Terminal> operand(size_t operand) const override;
-
     virtual bool boolean(size_t operand) const override;
-
     virtual long long int integer(size_t operand) const override;
-
     virtual double real(size_t operand) const override;
-
     virtual std::string str(size_t operand) const override;
+
+    // IMemory
+    virtual size_t levelCount() const override;
+    virtual size_t count(size_t memoryLevel) const override;
+
+    virtual bool has(const std::string& name) const override;
+    virtual bool has(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Type type(const std::string& name) const override;
+    virtual Type type(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Poco::AutoPtr<Terminal> variable(const std::string& name) const override;
+    virtual Poco::AutoPtr<Terminal> variable(size_t memoryLevel, const std::string& name) const override;
+
+    virtual bool boolean(const std::string& name) const override;
+    virtual bool boolean(size_t memoryLevel, const std::string& name) const override;
+
+    virtual long long int integer(const std::string& name) const override;
+    virtual long long int integer(size_t memoryLevel, const std::string& name) const override;
+
+    virtual double real(const std::string& name) const override;
+    virtual double real(size_t memoryLevel, const std::string& name) const override;
+
+    virtual std::string str(const std::string& name) const override;
+    virtual std::string str(size_t memoryLevel, const std::string& name) const override;
 
 private:
     void read(void* data, size_t size);

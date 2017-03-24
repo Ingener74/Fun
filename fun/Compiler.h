@@ -49,8 +49,8 @@ public:
 private:
     static const int PROGRAM_SIZE_INCREMENT = 4096;
 
-    void checkOffsetAndResizeProgram(ptrdiff_t offset);
-    void checkPointerAndResizeProgram(void* ptr);
+    void checkOffsetAndResizeProgram(ptrdiff_t offset, size_t size);
+    void checkPointerAndResizeProgram(void* ptr, size_t size);
 
     void write(void* to, void* data, size_t size);
     void write(void* data, size_t size);
