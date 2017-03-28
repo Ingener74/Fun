@@ -14,7 +14,8 @@ VirtualMachine::VirtualMachine()
 VirtualMachine::~VirtualMachine() {
 }
 
-void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot) {
+void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot, Debugger* debugger) {
+    _debugger = debugger;
     _program = program;
     _pot = pot;
     _instructionPointer = _program.data();
@@ -34,6 +35,8 @@ void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot
             case OpCode::UnaryOperation:   unaryOperation();  break;
             case OpCode::SetFlag:          setFlag();         break;
             case OpCode::ClearFlag:        clearFlag();       break;
+            case OpCode::Begin:            begin();           break;
+            case OpCode::End:              end();             break;
         }
     }
 }
@@ -110,8 +113,8 @@ void VirtualMachine::memory() {
     read(id);
     if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
         for (auto stackFrameIt = _memory.rbegin(); stackFrameIt != _memory.rend(); ++stackFrameIt) {
-            auto variableIt = (*stackFrameIt)->variables.find(id);
-            if (variableIt != (*stackFrameIt)->variables.end()) {
+            auto variableIt = (*stackFrameIt)->_variables.find(id);
+            if (variableIt != (*stackFrameIt)->_variables.end()) {
                 _operands.push_back(variableIt->second);
                 return;
             }
@@ -119,7 +122,7 @@ void VirtualMachine::memory() {
         fassert(false, "undefined variable " + id);
     } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
         fassert(_operands.size(), "have no operands");
-        auto& vars = _memory.back()->variables;
+        auto& vars = _memory.back()->_variables;
         auto variableIt = vars.find(id);
         if (variableIt == vars.end()) {
             auto insertResult = vars.insert( { id, _operands.back() });
@@ -146,7 +149,7 @@ void VirtualMachine::print() {
 }
 
 void VirtualMachine::binaryOperation() {
-    BinaryOperation binOp = BinaryOperation::Assign;
+    BinaryOperation binOp = BinaryOperation::Count;
     read(binOp);
     fassert(binOp > BinaryOperation::Assign && binOp < BinaryOperation::Count, "invalid binary operation");
     fassert(_operands.size() >= 2, "not enogth operands");
@@ -174,6 +177,13 @@ void VirtualMachine::clearFlag() {
     _flags.reset(static_cast<uint8_t>(flag));
 }
 
+void VirtualMachine::begin() {
+    _memory.push_back(new StackFrame());
+}
+
+void VirtualMachine::end() {
+    _memory.pop_back();
+}
 
 size_t VirtualMachine::count() const {
     return _operands.size();
@@ -208,12 +218,12 @@ size_t VirtualMachine::levelCount() const {
 }
 
 size_t VirtualMachine::count(size_t memoryLevel) const {
-    return _memory.at(memoryLevel)->variables.size();
+    return _memory.at(memoryLevel)->_variables.size();
 }
 
 bool VirtualMachine::has(const string& name) const {
     for (auto it = _memory.rbegin(); it != _memory.rend(); ++it) {
-        if ((*it)->variables.find(name) != (*it)->variables.end()) {
+        if ((*it)->_variables.find(name) != (*it)->_variables.end()) {
             return true;
         }
     }
@@ -221,7 +231,7 @@ bool VirtualMachine::has(const string& name) const {
 }
 
 bool VirtualMachine::has(size_t memoryLevel, const string& name) const {
-    if (_memory.at(memoryLevel)->variables.find(name) != _memory.at(memoryLevel)->variables.end()) {
+    if (_memory.at(memoryLevel)->_variables.find(name) != _memory.at(memoryLevel)->_variables.end()) {
         return true;
     }
     return false;
@@ -243,8 +253,8 @@ Type VirtualMachine::type(size_t memoryLevel, const string& name) const {
 
 AutoPtr<Terminal> VirtualMachine::variable(const string& name) const {
     for (auto it = _memory.rbegin(); it != _memory.rend(); ++it) {
-        auto varIt = (*it)->variables.find(name);
-        if (varIt != (*it)->variables.end()) {
+        auto varIt = (*it)->_variables.find(name);
+        if (varIt != (*it)->_variables.end()) {
             return varIt->second;
         }
     }
@@ -252,8 +262,8 @@ AutoPtr<Terminal> VirtualMachine::variable(const string& name) const {
 }
 
 AutoPtr<Terminal> VirtualMachine::variable(size_t memoryLevel, const string& name) const {
-    auto varIt = _memory.at(memoryLevel)->variables.find(name);
-    if (varIt != _memory.at(memoryLevel)->variables.end()) {
+    auto varIt = _memory.at(memoryLevel)->_variables.find(name);
+    if (varIt != _memory.at(memoryLevel)->_variables.end()) {
         return varIt->second;
     }
     return {};

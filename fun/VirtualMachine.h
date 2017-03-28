@@ -14,13 +14,14 @@ namespace fun {
 
 class Terminal;
 class Pot;
+class Debugger;
 
 class VirtualMachine: public IOperands, public IMemory {
 public:
     VirtualMachine();
     virtual ~VirtualMachine();
 
-    void run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot);
+    void run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot, Debugger* debugger);
 
     void push();
     void pop();
@@ -38,6 +39,9 @@ public:
 
     void setFlag();
     void clearFlag();
+
+    void begin();
+    void end();
 
     // IOperands
     virtual size_t count() const override;
@@ -82,8 +86,7 @@ private:
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
     struct StackFrame: public Poco::RefCountedObject {
-        std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-        InstructionPointer ip;
+        std::unordered_map<std::string, Poco::AutoPtr<Terminal>> _variables;
     };
 
     struct ThreadContext: public Poco::RefCountedObject {
@@ -102,6 +105,7 @@ private:
     ByteCodeProgram _program;
     uint8_t* _instructionPointer = nullptr;
     Poco::AutoPtr<Pot> _pot;
+    Debugger* _debugger = nullptr;
 };
 
 template<typename T>

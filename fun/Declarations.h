@@ -4,9 +4,11 @@
 
 class Statement;
 
-enum class BuildType: uint8_t {
+enum class BuildType : uint8_t {
     Release,
     Debug,
+
+    Count,
 };
 
 enum class Type : uint8_t {
@@ -60,6 +62,9 @@ enum class OpCode : uint8_t {
     SetFlag,
     ClearFlag,
     Nop,
+
+    Begin,
+    End,
 
     Count,
 };

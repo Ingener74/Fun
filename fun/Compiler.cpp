@@ -12,11 +12,19 @@ Compiler::~Compiler() {
 }
 
 void Compiler::iterateStatements(Statement* statement_) {
+//    std::string sourceFileSha256Hash;
+//    write(sourceFileSha256Hash);
 //    write(BuildType::Release);
 
+    write(OpCode::Begin);
+
     statement_->accept(this);
+
+    write(OpCode::End);
+
     write(OpCode::SetFlag);
     write(Flag::Stop);
+
     size_t realProgramSize = _programPtr - _program.data();
     _program.resize(realProgramSize);
 }
@@ -82,7 +90,26 @@ void Compiler::visit(Expression* expression_){
 }
 
 void Compiler::visit(Assign* assign_){
-    fassert(false, "not yet implemented");
+    write(OpCode::SetFlag);
+    write(Flag::Load);
+
+    auto expr = assign_->exprs;
+    while (expr)
+        expr = expr->accept(this)->nextExpression;
+
+    write(OpCode::ClearFlag);
+    write(Flag::Load);
+
+    write(OpCode::SetFlag);
+    write(Flag::Store);
+
+    int i = 0;
+    auto id = assign_->ids;
+    while (i++, id)
+        id = id->accept(this)->nextExpression;
+
+    write(OpCode::ClearFlag);
+    write(Flag::Store);
 }
 
 void Compiler::visit(BinaryOp* binaryop_){
@@ -158,11 +185,11 @@ const ByteCodeProgram& fun::Compiler::getProgram() const {
 }
 
 void Compiler::checkOffsetAndResizeProgram(ptrdiff_t offset, size_t size) {
-    ptrdiff_t oldOffset = _programPtr - _program.data();
     while ((offset + size) > _program.size()) {
+        ptrdiff_t oldOffset = _programPtr - _program.data();
         _program.resize(_program.size() + PROGRAM_SIZE_INCREMENT);
+        _programPtr = _program.data() + oldOffset;
     }
-    _programPtr = _program.data() + oldOffset;
 }
 
 void Compiler::checkPointerAndResizeProgram(void* ptr, size_t size) {
