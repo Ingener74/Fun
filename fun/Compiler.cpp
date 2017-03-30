@@ -23,158 +23,166 @@ void Compiler::iterateStatements(Statement* statement_) {
     write(OpCode::End);
 
     write(OpCode::SetFlag);
-    write(Flag::Stop);
+    write(FlagStop);
 
     size_t realProgramSize = _programPtr - _program.data();
     _program.resize(realProgramSize);
 }
 
-void Compiler::visit(Statement* statement_){
+void Compiler::visit(Statement* statement_) {
     fassert(false, "invalid statement");
 }
 
-void Compiler::visit(Break* break_){
+void Compiler::visit(Break* break_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Continue* continue_){
+void Compiler::visit(Continue* continue_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Class* class_){
+void Compiler::visit(Class* class_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(For* for_){
+void Compiler::visit(For* for_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Function* function_){
+void Compiler::visit(Function* function_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Ifs* ifs_){
+void Compiler::visit(Ifs* ifs_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(If* if_){
+void Compiler::visit(If* if_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Import* import_){
+void Compiler::visit(Import* import_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Print* print_){
+void Compiler::visit(Print* print_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Return* return_){
+void Compiler::visit(Return* return_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(While* while_){
+void Compiler::visit(While* while_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Exception* exception_){
+void Compiler::visit(Exception* exception_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Throw* throw_){
+void Compiler::visit(Throw* throw_) {
     fassert(false, "not yet implemented");
 }
 
-void Compiler::visit(Expression* expression_){
+void Compiler::visit(Expression* expression_) {
     fassert(false, "invalid statement");
 }
 
-void Compiler::visit(Assign* assign_){
-    write(OpCode::SetFlag);
-    write(Flag::Load);
-
+void Compiler::visit(Assign* assign_) {
     auto expr = assign_->exprs;
-    while (expr)
+    auto id = assign_->ids;
+
+    while (expr || id) {
+        write(OpCode::SetFlag);
+        write(FlagLoad);
+
         expr = expr->accept(this)->nextExpression;
 
-    write(OpCode::ClearFlag);
-    write(Flag::Load);
+        write(OpCode::ClearFlag);
+        write(FlagLoad);
 
-    write(OpCode::SetFlag);
-    write(Flag::Store);
+        write(OpCode::SetFlag);
+        write(FlagStore);
 
-    int i = 0;
-    auto id = assign_->ids;
-    while (i++, id)
         id = id->accept(this)->nextExpression;
 
-    write(OpCode::ClearFlag);
-    write(Flag::Store);
+        write(OpCode::ClearFlag);
+        write(FlagStore);
+    }
+    if (expr) {
+        while (expr)
+            expr = expr->accept(this)->nextExpression;
+    }
+    if (id) {
+        while (id)
+            id = id->accept(this)->nextExpression;
+    }
 }
 
-void Compiler::visit(BinaryOp* binaryop_){
+void Compiler::visit(BinaryOp* binaryop_) {
     write(OpCode::SetFlag);
-    write(Flag::Load);
+    write(FlagLoad);
 
     binaryop_->lhs->accept(this);
     binaryop_->rhs->accept(this);
 
     write(OpCode::ClearFlag);
-    write(Flag::Load);
+    write(FlagLoad);
 
     write(OpCode::BinaryOperation);
     write(binaryop_->m_operation);
 }
 
-void Compiler::visit(Dot* dot_){
+void Compiler::visit(Dot* dot_) {
 }
 
-void Compiler::visit(Call* call_){
+void Compiler::visit(Call* call_) {
 }
 
-void Compiler::visit(Dictionary* dictionary_){
+void Compiler::visit(Dictionary* dictionary_) {
 }
 
-void Compiler::visit(Id* id_){
+void Compiler::visit(Id* id_) {
     write(OpCode::Memory);
     write(id_->value);
 }
 
-void Compiler::visit(Index* index_){
+void Compiler::visit(Index* index_) {
 }
 
-void Compiler::visit(RoundBrackets* roundbrackets_){
+void Compiler::visit(RoundBrackets* roundbrackets_) {
     roundbrackets_->accept(this);
 }
 
-void Compiler::visit(Terminal* terminal_){
+void Compiler::visit(Terminal* terminal_) {
     fassert(false, "invalid statement");
 }
 
-void Compiler::visit(Boolean* boolean_){
+void Compiler::visit(Boolean* boolean_) {
     write(OpCode::Push);
     write(Type::Boolean);
     write(boolean_->value);
 }
 
-void Compiler::visit(Integer* integer_){
+void Compiler::visit(Integer* integer_) {
     write(OpCode::Push);
     write(Type::Integer);
     write(integer_->value);
 }
 
-void Compiler::visit(Nil* nil_){
+void Compiler::visit(Nil* nil_) {
     write(OpCode::Push);
     write(Type::Nil);
 }
 
-void Compiler::visit(Real* real_){
+void Compiler::visit(Real* real_) {
     write(OpCode::Push);
     write(Type::Real);
     write(real_->value);
 }
 
-void Compiler::visit(String* string_){
+void Compiler::visit(String* string_) {
     write(OpCode::Push);
     write(Type::String);
     write(string_->value);

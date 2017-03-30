@@ -32,7 +32,7 @@ PARSE(Assign, 4, R"(
 foo = 42)");
 
 EVAL(Assign, 5, R"(foo = 42)",,
-    EXPECT_EQ(fun::Statement::counter(), 3);
+    EXPECT_EQ(fun::Statement::counter(), 3 + 1);
 
     EXPECT_EQ(operands->count(), 0);
     EXPECT_EQ(memory->count(0), 1);
@@ -41,7 +41,7 @@ EVAL(Assign, 5, R"(foo = 42)",,
 )
 
 EVAL(Assign, 6, R"(foo = bar = 42)",,
-    EXPECT_EQ(fun::Statement::counter(), 5);
+    EXPECT_EQ(fun::Statement::counter(), 5 + 1);
 
     EXPECT_EQ(operands->count(), 0);
     EXPECT_EQ(memory->count(0), 2);
@@ -51,7 +51,7 @@ EVAL(Assign, 6, R"(foo = bar = 42)",,
 )
 
 EVAL(Assign, 7, R"(foo = bar = quz = A = B = C = 42)",,
-    EXPECT_EQ(fun::Statement::counter(), 6 + 5 + 2);
+    EXPECT_EQ(fun::Statement::counter(), 6 + 5 + 2 + 1);
 
     EXPECT_EQ(operands->count(), 0);
     EXPECT_EQ(memory->count(0), 6);
@@ -66,7 +66,7 @@ EVAL(Assign, 7, R"(foo = bar = quz = A = B = C = 42)",,
 )
 
 EVAL(Assign, 8, R"(foo, bar = A, B = 42, 345)",,
-    EXPECT_EQ(fun::Statement::counter(), 6 + 2);
+    EXPECT_EQ(fun::Statement::counter(), 6 + 2 + 2);
 
     EXPECT_EQ(operands->count(), 0);
     EXPECT_EQ(memory->count(0), 4);

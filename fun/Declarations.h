@@ -62,20 +62,21 @@ enum class OpCode : uint8_t {
     SetFlag,
     ClearFlag,
     Nop,
-
     Begin,
     End,
+
+    SaveNumberOfOperands,
+    InvertOperands,
 
     Count,
 };
 
-enum class Flag : uint8_t {
-    Load,
-    Store,
-    True,
-    Stop,
+enum Flag : uint8_t {
+    FlagLoad,
+    FlagStore,
+    FlagStop,
 
-    Count,
+    FlagCount,
 };
 
 typedef std::vector<Statement*>     Program;

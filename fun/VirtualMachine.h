@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <bitset>
 #include <unordered_map>
+#include <array>
 #include <Poco/AutoPtr.h>
 #include <Poco/RefCountedObject.h>
 #include "Utils.h"
@@ -90,7 +91,7 @@ private:
     };
 
     struct ThreadContext: public Poco::RefCountedObject {
-        std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+//        std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
         std::vector<Poco::AutoPtr<StackFrame>> _memory;
         std::vector<Poco::AutoPtr<Terminal>> _operands;
         uint8_t* _ip = nullptr;
@@ -98,9 +99,12 @@ private:
 
     std::vector<Poco::AutoPtr<ThreadContext>> _threadsData;
 
-    std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+//    std::bitset<static_cast<uint8_t>(Flag::Count)> _flags;
+
+    std::array<int, FlagCount> _flags;
     std::vector<Poco::AutoPtr<StackFrame>> _memory;
     std::vector<Poco::AutoPtr<Terminal>> _operands;
+    uint16_t _savedOperands;
 
     ByteCodeProgram _program;
     uint8_t* _instructionPointer = nullptr;

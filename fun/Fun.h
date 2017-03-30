@@ -2,15 +2,14 @@
 
 #include <Poco/AutoPtr.h>
 #include "Lexer.h"
-#include "AST.h"
-#include "Printer.h"
-#include "Interpreter.h"
-#include "Compiler.h"
 #include "Utils.h"
-#include "Debugger.h"
 #include "VirtualMachine.h"
+#include "Debugger.h"
 
 namespace fun {
+
+class Pot;
+class Compiler;
 
 class Fun {
 public:
@@ -37,7 +36,7 @@ public:
 private:
     std::string _filename;
     Poco::AutoPtr<Debugger> _debugger;
-    Poco::AutoPtr<Visitor> _visitor;
+    Poco::AutoPtr<Compiler> _compiler;
     VirtualMachine _virtualMachine;
 };
 

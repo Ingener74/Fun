@@ -1,5 +1,6 @@
 #include <cstring>
 #include "AST.h"
+#include "Debugger.h"
 #include "VirtualMachine.h"
 
 using namespace std;
@@ -7,8 +8,10 @@ using namespace Poco;
 
 namespace fun {
 
-VirtualMachine::VirtualMachine()
-    : _flags(0) {
+VirtualMachine::VirtualMachine() {
+    _flags[FlagLoad] = 0;
+    _flags[FlagStore] = 0;
+    _flags[FlagStop] = 0;
 }
 
 VirtualMachine::~VirtualMachine() {
@@ -19,7 +22,7 @@ void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot
     _program = program;
     _pot = pot;
     _instructionPointer = _program.data();
-    while (!_flags.test(static_cast<uint8_t>(Flag::Stop))) {
+    while (!_flags[FlagStop]) {
         OpCode opCode;
         read(opCode);
         fassert(opCode < OpCode::Count, "invalid operation code");
@@ -39,6 +42,11 @@ void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot
             case OpCode::End:              end();             break;
         }
     }
+
+//    fassert(_operands.empty(), "stack of operands not empty at the end of program");
+    fassert(_memory.empty(), "stack of memory not empty at the end of program");
+    fassert(_flags[FlagLoad] == 0, "load flag balance not 0");
+    fassert(_flags[FlagStore] == 0, "store flag balance not 0");
 }
 
 void VirtualMachine::push() {
@@ -47,9 +55,9 @@ void VirtualMachine::push() {
     fassert(type < Type::Count, "invalid type");
     switch (type) {
     case Type::Nil: {
-        if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+        if (_flags[FlagLoad]) {
             _operands.push_back(new Nil);
-        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+        } else if (_flags[FlagStore]) {
             fassert(false, "can't store to terminal");
         }
         break;
@@ -57,9 +65,9 @@ void VirtualMachine::push() {
     case Type::Boolean: {
         bool value = false;
         read(value);
-        if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+        if (_flags[FlagLoad]) {
             _operands.push_back(new Boolean(value));
-        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+        } else if (_flags[FlagStore]) {
             fassert(false, "can't store to terminal");
         }
         break;
@@ -67,9 +75,9 @@ void VirtualMachine::push() {
     case Type::Integer: {
         long long value = 0;
         read(value);
-        if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+        if (_flags[FlagLoad]) {
             _operands.push_back(new Integer(value));
-        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+        } else if (_flags[FlagStore]) {
             fassert(false, "can't store to terminal");
         }
         break;
@@ -77,9 +85,9 @@ void VirtualMachine::push() {
     case Type::Real: {
         double value = 0.0;
         read(value);
-        if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+        if (_flags[FlagLoad]) {
             _operands.push_back(new Real(value));
-        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+        } else if (_flags[FlagStore]) {
             fassert(false, "can't store to terminal");
         }
         break;
@@ -87,9 +95,9 @@ void VirtualMachine::push() {
     case Type::String: {
         string value;
         read(value);
-        if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
+        if (_flags[FlagLoad]) {
             _operands.push_back(new String(value));
-        } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+        } else if (_flags[FlagStore]) {
             fassert(false, "can't store to terminal");
         }
         break;
@@ -111,16 +119,7 @@ void VirtualMachine::pop() {
 void VirtualMachine::memory() {
     string id;
     read(id);
-    if (_flags.test(static_cast<uint8_t>(Flag::Load))) {
-        for (auto stackFrameIt = _memory.rbegin(); stackFrameIt != _memory.rend(); ++stackFrameIt) {
-            auto variableIt = (*stackFrameIt)->_variables.find(id);
-            if (variableIt != (*stackFrameIt)->_variables.end()) {
-                _operands.push_back(variableIt->second);
-                return;
-            }
-        }
-        fassert(false, "undefined variable " + id);
-    } else if (_flags.test(static_cast<uint8_t>(Flag::Store))) {
+    if (_flags[FlagStore]) {
         fassert(_operands.size(), "have no operands");
         auto& vars = _memory.back()->_variables;
         auto variableIt = vars.find(id);
@@ -133,6 +132,16 @@ void VirtualMachine::memory() {
             variableIt->second.assign(_operands.back());
         }
         _operands.pop_back();
+    }
+    if (_flags[FlagLoad]) {
+        for (auto stackFrameIt = _memory.rbegin(); stackFrameIt != _memory.rend(); ++stackFrameIt) {
+            auto variableIt = (*stackFrameIt)->_variables.find(id);
+            if (variableIt != (*stackFrameIt)->_variables.end()) {
+                _operands.push_back(variableIt->second);
+                return;
+            }
+        }
+        fassert(false, "undefined variable " + id);
     }
 }
 
@@ -164,17 +173,19 @@ void VirtualMachine::unaryOperation() {
 }
 
 void VirtualMachine::setFlag() {
-    Flag flag = Flag::Load;
+    Flag flag = FlagCount;
     read(flag);
-    fassert(flag >= Flag::Load && flag < Flag::Count, "invalid flag");
-    _flags.set(static_cast<uint8_t>(flag), true);
+    fassert(flag < FlagCount, "invalid flag");
+    fassert(_flags[flag] >= 0, "no flags");
+    _flags[flag]++;
 }
 
 void VirtualMachine::clearFlag() {
-    Flag flag = Flag::Load;
+    Flag flag = FlagCount;
     read(flag);
-    fassert(flag >= Flag::Load && flag < Flag::Count, "invalid flag");
-    _flags.reset(static_cast<uint8_t>(flag));
+    fassert(flag < FlagCount, "invalid flag");
+    fassert(_flags[flag] > 0, "no flags");
+    _flags[flag]--;
 }
 
 void VirtualMachine::begin() {
@@ -182,6 +193,9 @@ void VirtualMachine::begin() {
 }
 
 void VirtualMachine::end() {
+    if (_memory.size() == 1 && _debugger) {
+        _debugger->onEndProgram();
+    }
     _memory.pop_back();
 }
 

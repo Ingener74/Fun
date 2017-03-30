@@ -56,7 +56,7 @@ void CommandLineDebugger::onOperandsChanged(const std::vector<Terminal*>&) {
 void CommandLineDebugger::onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) {
 }
 
-void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
+void CommandLineDebugger::listen(Poco::AutoPtr<Pot>, Poco::AutoPtr<Compiler>, VirtualMachine*) {
     Thread th;
     th.start(*this);
 
@@ -94,6 +94,9 @@ void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
 
     if (th.isRunning())
         th.join();
+}
+
+void CommandLineDebugger::onEndProgram() {
 }
 
 void CommandLineDebugger::run() {
