@@ -46,6 +46,14 @@ public:
 
     const ByteCodeProgram& getProgram() const;
 
+    bool hasDebugInfo() const {
+        return _debugInfo;
+    }
+
+    void setDebugInfo(bool debugInfo = false) {
+        _debugInfo = debugInfo;
+    }
+
 private:
     static const int PROGRAM_SIZE_INCREMENT = 4096;
 
@@ -57,6 +65,9 @@ private:
     template<typename T>
     void write(const T& data);
     void write(const std::string& str);
+    void write(OpCode, Statement*);
+
+    bool _debugInfo = false;
 
     ByteCodeProgram _program;
     uint8_t* _programPtr = nullptr;

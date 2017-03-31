@@ -43,13 +43,17 @@ public:
 
     void accept(Visitor*);
 
-    template<typename T>
-    T* getStatement(StatementId statementId) {
+    Poco::AutoPtr<Statement> getStatement(StatementId statementId) {
         auto stmt = _statements.find(statementId);
         if (stmt == _statements.end()) {
             return nullptr;
         }
-        return stmt->second.cast<T*>();
+        return stmt->second;
+    }
+
+    template<typename T>
+    T* getStatement(StatementId statementId) {
+        return getStatement(statementId).cast<T>();
     }
 
 private:

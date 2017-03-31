@@ -65,131 +65,131 @@ EVAL(Assign, 7, R"(foo = bar = quz = A = B = C = 42)",,
     CHECK_INTEGER(C, 42)
 )
 
-EVAL(Assign, 8, R"(foo, bar = A, B = 42, 345)",,
-    EXPECT_EQ(fun::Statement::counter(), 6 + 2 + 2);
+// EVAL(Assign, 8, R"(foo, bar = A, B = 42, 345)",,
+//     EXPECT_EQ(fun::Statement::counter(), 6 + 2 + 2);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 4);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 4);
 
-    CHECK_INTEGER(foo, 42)
-    CHECK_INTEGER(bar, 345)
+//     CHECK_INTEGER(foo, 42)
+//     CHECK_INTEGER(bar, 345)
 
-    CHECK_INTEGER(A, 42)
-    CHECK_INTEGER(B, 345)
-)
+//     CHECK_INTEGER(A, 42)
+//     CHECK_INTEGER(B, 345)
+// )
 
-EVAL(Assign, 9, R"(a, b, c = d, e, f = 42, 24, 12)",,
-    EXPECT_EQ(fun::Statement::counter(), 11);
+// EVAL(Assign, 9, R"(a, b, c = d, e, f = 42, 24, 12)",,
+//     EXPECT_EQ(fun::Statement::counter(), 11);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 6);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 6);
 
-    CHECK_INTEGER(a, 42)
-    CHECK_INTEGER(b, 24)
-    CHECK_INTEGER(c, 12)
+//     CHECK_INTEGER(a, 42)
+//     CHECK_INTEGER(b, 24)
+//     CHECK_INTEGER(c, 12)
 
-    CHECK_INTEGER(d, 42)
-    CHECK_INTEGER(e, 24)
-    CHECK_INTEGER(f, 12)
-)
+//     CHECK_INTEGER(d, 42)
+//     CHECK_INTEGER(e, 24)
+//     CHECK_INTEGER(f, 12)
+// )
 
-EVAL(Assign, 10, R"(a, b = c, d = e, f = "test", 24)",,
-    EXPECT_EQ(fun::Statement::counter(), 11);
+// EVAL(Assign, 10, R"(a, b = c, d = e, f = "test", 24)",,
+//     EXPECT_EQ(fun::Statement::counter(), 11);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 6);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 6);
 
-    CHECK_STRING(a, "test")
-    CHECK_INTEGER(b, 24)
+//     CHECK_STRING(a, "test")
+//     CHECK_INTEGER(b, 24)
     
-    CHECK_STRING(c, "test")
-    CHECK_INTEGER(d, 24)
+//     CHECK_STRING(c, "test")
+//     CHECK_INTEGER(d, 24)
 
-    CHECK_STRING(e, "test")
-    CHECK_INTEGER(f, 24)
-)
+//     CHECK_STRING(e, "test")
+//     CHECK_INTEGER(f, 24)
+// )
 
-EVAL(Assign, 11, R"(A, B, C = D, E = 42)",,
-    EXPECT_EQ(fun::Statement::counter(), 6 + 4);
+// EVAL(Assign, 11, R"(A, B, C = D, E = 42)",,
+//     EXPECT_EQ(fun::Statement::counter(), 6 + 4);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 5);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 5);
 
-    CHECK_INTEGER(A, 42)
-    CHECK_NIL(B)
-    CHECK_NIL(C)
+//     CHECK_INTEGER(A, 42)
+//     CHECK_NIL(B)
+//     CHECK_NIL(C)
 
-    CHECK_INTEGER(D, 42)
-    CHECK_NIL(E)
-)
+//     CHECK_INTEGER(D, 42)
+//     CHECK_NIL(E)
+// )
 
-EVAL(Assign, 12, R"(A = B, C = 42, 24, 12)",,
-    EXPECT_EQ(fun::Statement::counter(), 8);
+// EVAL(Assign, 12, R"(A = B, C = 42, 24, 12)",,
+//     EXPECT_EQ(fun::Statement::counter(), 8);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 3);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 3);
 
-    CHECK_INTEGER(A, 42)
-    CHECK_INTEGER(B, 42)
-    CHECK_INTEGER(C, 24)
-)
+//     CHECK_INTEGER(A, 42)
+//     CHECK_INTEGER(B, 42)
+//     CHECK_INTEGER(C, 24)
+// )
 
-EVAL(Assign, 13, R"(
-a = 42
-b = a
-a = 43
-)",
-    BREAKPOINT_LINE(4,
-        EXPECT_EQ(fun::Statement::counter(), 9);
+// EVAL(Assign, 13, R"(
+// a = 42
+// b = a
+// a = 43
+// )",
+//     BREAKPOINT_LINE(4,
+//         EXPECT_EQ(fun::Statement::counter(), 9);
 
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 2);
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 2);
 
-        CHECK_INTEGER(a, 42)
-        CHECK_INTEGER(b, 42)
-    )
-    ,
-    EXPECT_EQ(fun::Statement::counter(), 9);
+//         CHECK_INTEGER(a, 42)
+//         CHECK_INTEGER(b, 42)
+//     )
+//     ,
+//     EXPECT_EQ(fun::Statement::counter(), 9);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(a, 43)
-    CHECK_INTEGER(b, 42)
-)
+//     CHECK_INTEGER(a, 43)
+//     CHECK_INTEGER(b, 42)
+// )
 
-EVAL(Assign, 14, R"(foo, bar = 42, 24)",,
-    EXPECT_EQ(fun::Statement::counter(), 5);
+// EVAL(Assign, 14, R"(foo, bar = 42, 24)",,
+//     EXPECT_EQ(fun::Statement::counter(), 5);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(foo, 42)
-    CHECK_INTEGER(bar, 24)
-)
+//     CHECK_INTEGER(foo, 42)
+//     CHECK_INTEGER(bar, 24)
+// )
 
-EVAL(Assign, 15, R"(a, b, c = 1, 2)",,
-    EXPECT_EQ(fun::Statement::counter(), 7);
+// EVAL(Assign, 15, R"(a, b, c = 1, 2)",,
+//     EXPECT_EQ(fun::Statement::counter(), 7);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 3);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 3);
 
-    CHECK_INTEGER(a, 1);
-    CHECK_INTEGER(b, 2);
+//     CHECK_INTEGER(a, 1);
+//     CHECK_INTEGER(b, 2);
 
-    CHECK_NIL(c);
-)
+//     CHECK_NIL(c);
+// )
 
 
-EVAL(Assign, 16, R"(a, b = 1, 2, 3)",,
-    EXPECT_EQ(fun::Statement::counter(), 6);
+// EVAL(Assign, 16, R"(a, b = 1, 2, 3)",,
+//     EXPECT_EQ(fun::Statement::counter(), 6);
 
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(a, 1);
-    CHECK_INTEGER(b, 2);
-)
+//     CHECK_INTEGER(a, 1);
+//     CHECK_INTEGER(b, 2);
+// )
 
 EVAL(Assign, 17, R"(
 a = 1
@@ -547,105 +547,105 @@ foo += bar
     CHECK_INTEGER(foo, 142);
 )
 
-EVAL(Assign, 89, R"(
-foo = 42
-bar = 100
-foo, bar += 12, 13
-)",
-    BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 2);
+// EVAL(Assign, 89, R"(
+// foo = 42
+// bar = 100
+// foo, bar += 12, 13
+// )",
+//     BREAKPOINT_LINE(4,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 2);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(bar, 100);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(bar, 100);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(foo, 42 + 12);
-    CHECK_INTEGER(bar, 100 + 13);
-)
+//     CHECK_INTEGER(foo, 42 + 12);
+//     CHECK_INTEGER(bar, 100 + 13);
+// )
 
-EVAL(Assign, 90, R"(
-foo = 42
-bar = 100
-c = 123
-d = 321
-foo, bar += c, d
-)",
-    BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 4);
+// EVAL(Assign, 90, R"(
+// foo = 42
+// bar = 100
+// c = 123
+// d = 321
+// foo, bar += c, d
+// )",
+//     BREAKPOINT_LINE(6,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 4);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(bar, 100);
-        CHECK_INTEGER(c, 123);
-        CHECK_INTEGER(d, 321);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 4);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(bar, 100);
+//         CHECK_INTEGER(c, 123);
+//         CHECK_INTEGER(d, 321);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 4);
 
-    CHECK_INTEGER(foo, 42 + 123);
-    CHECK_INTEGER(bar, 100 + 321);
-    CHECK_INTEGER(c, 123);
-    CHECK_INTEGER(d, 321);
-)
+//     CHECK_INTEGER(foo, 42 + 123);
+//     CHECK_INTEGER(bar, 100 + 321);
+//     CHECK_INTEGER(c, 123);
+//     CHECK_INTEGER(d, 321);
+// )
 
-EVAL(Assign, 91, R"(
-foo = 42
-bar = 100
-c = 123
-d = 321
-foo, bar += c, d, 100
-)",
-    BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 4);
+// EVAL(Assign, 91, R"(
+// foo = 42
+// bar = 100
+// c = 123
+// d = 321
+// foo, bar += c, d, 100
+// )",
+//     BREAKPOINT_LINE(6,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 4);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(bar, 100);
-        CHECK_INTEGER(c, 123);
-        CHECK_INTEGER(d, 321);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 4);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(bar, 100);
+//         CHECK_INTEGER(c, 123);
+//         CHECK_INTEGER(d, 321);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 4);
 
-    CHECK_INTEGER(foo, 42 + 123);
-    CHECK_INTEGER(bar, 100 + 321);
-    CHECK_INTEGER(c, 123);
-    CHECK_INTEGER(d, 321);
-)
+//     CHECK_INTEGER(foo, 42 + 123);
+//     CHECK_INTEGER(bar, 100 + 321);
+//     CHECK_INTEGER(c, 123);
+//     CHECK_INTEGER(d, 321);
+// )
 
-EVAL(Assign, 92, R"(
-foo = 42
-bar = 100
-c = 123
-d = 321
-E = 0
-foo, bar, E += c, d
-)",
-    BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 4);
+// EVAL(Assign, 92, R"(
+// foo = 42
+// bar = 100
+// c = 123
+// d = 321
+// E = 0
+// foo, bar, E += c, d
+// )",
+//     BREAKPOINT_LINE(6,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 4);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(bar, 100);
-        CHECK_INTEGER(c, 123);
-        CHECK_INTEGER(d, 321);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 5);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(bar, 100);
+//         CHECK_INTEGER(c, 123);
+//         CHECK_INTEGER(d, 321);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 5);
 
-    CHECK_INTEGER(foo, 42 + 123);
-    CHECK_INTEGER(bar, 100 + 321);
-    CHECK_INTEGER(c, 123);
-    CHECK_INTEGER(d, 321);
-    CHECK_INTEGER(E, 0);
-)
+//     CHECK_INTEGER(foo, 42 + 123);
+//     CHECK_INTEGER(bar, 100 + 321);
+//     CHECK_INTEGER(c, 123);
+//     CHECK_INTEGER(d, 321);
+//     CHECK_INTEGER(E, 0);
+// )
 
 EVAL(Assign, 93, R"(
 foo = 42
@@ -664,129 +664,129 @@ foo -= 10
     CHECK_INTEGER(foo, 32);
 )
 
-EVAL_ERR(Assign, 94, R"(
-foo = 42
-foo, E -= 10
-)",
-    BREAKPOINT_LINE(3,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 1);
+// EVAL_ERR(Assign, 94, R"(
+// foo = 42
+// foo, E -= 10
+// )",
+//     BREAKPOINT_LINE(3,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 1);
 
-        CHECK_INTEGER(foo, 42);
-    ),
-)
+//         CHECK_INTEGER(foo, 42);
+//     ),
+// )
 
-EVAL(Assign, 95, R"(
-foo = 42
-a = 12
-foo -= a
-)",
-    BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 2);
+// EVAL(Assign, 95, R"(
+// foo = 42
+// a = 12
+// foo -= a
+// )",
+//     BREAKPOINT_LINE(4,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 2);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(a, 12);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(a, 12);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(foo, 30);
-    CHECK_INTEGER(a, 12);
-)
+//     CHECK_INTEGER(foo, 30);
+//     CHECK_INTEGER(a, 12);
+// )
 
-EVAL(Assign, 96, R"(
-foo = 42
-b = 10
-foo, b -= 10, 3
-)",
-    BREAKPOINT_LINE(4,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 2);
+// EVAL(Assign, 96, R"(
+// foo = 42
+// b = 10
+// foo, b -= 10, 3
+// )",
+//     BREAKPOINT_LINE(4,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 2);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(b, 10);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 2);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(b, 10);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 2);
 
-    CHECK_INTEGER(foo, 42 - 10);
-    CHECK_INTEGER(b, 10 - 3);
-)
+//     CHECK_INTEGER(foo, 42 - 10);
+//     CHECK_INTEGER(b, 10 - 3);
+// )
 
-EVAL(Assign, 97, R"(
-foo = 42
-b = 34
-a = 12
-foo, b -= a, a
-)",
-    BREAKPOINT_LINE(5,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 3);
+// EVAL(Assign, 97, R"(
+// foo = 42
+// b = 34
+// a = 12
+// foo, b -= a, a
+// )",
+//     BREAKPOINT_LINE(5,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 3);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(b, 34);
-        CHECK_INTEGER(a, 12);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 3);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(b, 34);
+//         CHECK_INTEGER(a, 12);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 3);
 
-    CHECK_INTEGER(foo, 42 - 12);
-    CHECK_INTEGER(b, 34 - 12);
-    CHECK_INTEGER(a, 12);
-)
+//     CHECK_INTEGER(foo, 42 - 12);
+//     CHECK_INTEGER(b, 34 - 12);
+//     CHECK_INTEGER(a, 12);
+// )
 
-EVAL(Assign, 98, R"(
-foo = 42
-b = 34
-a = 12
-foo, b -= a, a, a
-)",
-    BREAKPOINT_LINE(5,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 3);
+// EVAL(Assign, 98, R"(
+// foo = 42
+// b = 34
+// a = 12
+// foo, b -= a, a, a
+// )",
+//     BREAKPOINT_LINE(5,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 3);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(b, 34);
-        CHECK_INTEGER(a, 12);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 3);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(b, 34);
+//         CHECK_INTEGER(a, 12);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 3);
 
-    CHECK_INTEGER(foo, 42 - 12);
-    CHECK_INTEGER(b, 34 - 12);
-    CHECK_INTEGER(a, 12);
-)
+//     CHECK_INTEGER(foo, 42 - 12);
+//     CHECK_INTEGER(b, 34 - 12);
+//     CHECK_INTEGER(a, 12);
+// )
 
-EVAL(Assign, 99, R"(
-foo = 42
-b = 34
-a = 12
-c = 23
-foo, b, c -= a, a
-)",
-    BREAKPOINT_LINE(6,
-        EXPECT_EQ(operands->count(), 0);
-        EXPECT_EQ(memory->count(0), 4);
+// EVAL(Assign, 99, R"(
+// foo = 42
+// b = 34
+// a = 12
+// c = 23
+// foo, b, c -= a, a
+// )",
+//     BREAKPOINT_LINE(6,
+//         EXPECT_EQ(operands->count(), 0);
+//         EXPECT_EQ(memory->count(0), 4);
 
-        CHECK_INTEGER(foo, 42);
-        CHECK_INTEGER(b, 34);
-        CHECK_INTEGER(a, 12);
-        CHECK_INTEGER(c, 23);
-    )
-    ,
-    EXPECT_EQ(operands->count(), 0);
-    EXPECT_EQ(memory->count(0), 4);
+//         CHECK_INTEGER(foo, 42);
+//         CHECK_INTEGER(b, 34);
+//         CHECK_INTEGER(a, 12);
+//         CHECK_INTEGER(c, 23);
+//     )
+//     ,
+//     EXPECT_EQ(operands->count(), 0);
+//     EXPECT_EQ(memory->count(0), 4);
 
-    CHECK_INTEGER(foo, 42 - 12);
-    CHECK_INTEGER(b, 34 - 12);
-    CHECK_INTEGER(a, 12);
-    CHECK_INTEGER(c, 23);
-)
+//     CHECK_INTEGER(foo, 42 - 12);
+//     CHECK_INTEGER(b, 34 - 12);
+//     CHECK_INTEGER(a, 12);
+//     CHECK_INTEGER(c, 23);
+// )
 
 EVAL(Assign, 100, R"(
 foo = 42

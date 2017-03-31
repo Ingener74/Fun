@@ -87,3 +87,4 @@ typedef ByteCodeProgram::iterator   ByteCodeInstructionPointer;
 
 typedef uint64_t                    StatementId;
 
+static const StatementId InvalidStatementId = -1;

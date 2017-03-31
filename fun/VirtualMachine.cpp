@@ -18,28 +18,47 @@ VirtualMachine::~VirtualMachine() {
 }
 
 void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot, Debugger* debugger) {
+
     _debugger = debugger;
     _program = program;
     _pot = pot;
     _instructionPointer = _program.data();
+
+    bool hasSourceHash = false;
+    read(hasSourceHash);
+
+    string sourceHash;
+    if (hasSourceHash)
+        read(sourceHash);
+
+    read(_debugInfo);
+
     while (!_flags[FlagStop]) {
         OpCode opCode;
         read(opCode);
         fassert(opCode < OpCode::Count, "invalid operation code");
+
+        AutoPtr<Statement> stmt;
+        if (_debugInfo) {
+            StatementId statementId = InvalidStatementId;
+            read(statementId);
+            stmt = _pot->getStatement(statementId);
+        }
+
         switch (opCode) {
-            case OpCode::Push:             push();            break;
-            case OpCode::Pop:              pop();             break;
-            case OpCode::Memory:           memory();          break;
-            case OpCode::Jump:             jump();            break;
-            case OpCode::JumpIfTrue:       jumpIfTrue();      break;
-            case OpCode::JumpIfNotTrue:    jumpIfNotTrue();   break;
-            case OpCode::Print:            print();           break;
-            case OpCode::BinaryOperation:  binaryOperation(); break;
-            case OpCode::UnaryOperation:   unaryOperation();  break;
-            case OpCode::SetFlag:          setFlag();         break;
-            case OpCode::ClearFlag:        clearFlag();       break;
-            case OpCode::Begin:            begin();           break;
-            case OpCode::End:              end();             break;
+            case OpCode::Push:             push(stmt);            break;
+            case OpCode::Pop:              pop(stmt);             break;
+            case OpCode::Memory:           memory(stmt);          break;
+            case OpCode::Jump:             jump(stmt);            break;
+            case OpCode::JumpIfTrue:       jumpIfTrue(stmt);      break;
+            case OpCode::JumpIfNotTrue:    jumpIfNotTrue(stmt);   break;
+            case OpCode::Print:            print(stmt);           break;
+            case OpCode::BinaryOperation:  binaryOperation(stmt); break;
+            case OpCode::UnaryOperation:   unaryOperation(stmt);  break;
+            case OpCode::SetFlag:          setFlag(stmt);         break;
+            case OpCode::ClearFlag:        clearFlag(stmt);       break;
+            case OpCode::Begin:            begin(stmt);           break;
+            case OpCode::End:              end(stmt);             break;
         }
     }
 
@@ -49,7 +68,7 @@ void VirtualMachine::run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot
     fassert(_flags[FlagStore] == 0, "store flag balance not 0");
 }
 
-void VirtualMachine::push() {
+void VirtualMachine::push(Statement* stmt) {
     Type type = Type::Count;
     read(type);
     fassert(type < Type::Count, "invalid type");
@@ -58,7 +77,7 @@ void VirtualMachine::push() {
         if (_flags[FlagLoad]) {
             _operands.push_back(new Nil);
         } else if (_flags[FlagStore]) {
-            fassert(false, "can't store to terminal");
+            fasserts(false, stmt, "can't store to terminal");
         }
         break;
     }
@@ -113,14 +132,14 @@ void VirtualMachine::push() {
     }
 }
 
-void VirtualMachine::pop() {
+void VirtualMachine::pop(Statement*) {
 }
 
-void VirtualMachine::memory() {
+void VirtualMachine::memory(Statement* stmt) {
     string id;
     read(id);
     if (_flags[FlagStore]) {
-        fassert(_operands.size(), "have no operands");
+        fasserts(_operands.size(), stmt, "have no operands");
         auto& vars = _memory.back()->_variables;
         auto variableIt = vars.find(id);
         if (variableIt == vars.end()) {
@@ -141,27 +160,27 @@ void VirtualMachine::memory() {
                 return;
             }
         }
-        fassert(false, "undefined variable " + id);
+        fasserts(false, stmt, "undefined variable " + id);
     }
 }
 
-void VirtualMachine::jump() {
+void VirtualMachine::jump(Statement*) {
 }
 
-void VirtualMachine::jumpIfTrue() {
+void VirtualMachine::jumpIfTrue(Statement*) {
 }
 
-void VirtualMachine::jumpIfNotTrue() {
+void VirtualMachine::jumpIfNotTrue(Statement*) {
 }
 
-void VirtualMachine::print() {
+void VirtualMachine::print(Statement*) {
 }
 
-void VirtualMachine::binaryOperation() {
+void VirtualMachine::binaryOperation(Statement* stmt) {
     BinaryOperation binOp = BinaryOperation::Count;
     read(binOp);
-    fassert(binOp > BinaryOperation::Assign && binOp < BinaryOperation::Count, "invalid binary operation");
-    fassert(_operands.size() >= 2, "not enogth operands");
+    fasserts(binOp > BinaryOperation::Assign && binOp < BinaryOperation::Count, stmt, "invalid binary operation");
+    fasserts(_operands.size() >= 2, stmt, "not enogth operands");
     auto b = _operands.back();
     _operands.pop_back();
     auto a = _operands.back();
@@ -169,30 +188,30 @@ void VirtualMachine::binaryOperation() {
     _operands.push_back(operate(a, binOp, b));
 }
 
-void VirtualMachine::unaryOperation() {
+void VirtualMachine::unaryOperation(Statement*) {
 }
 
-void VirtualMachine::setFlag() {
+void VirtualMachine::setFlag(Statement* stmt) {
     Flag flag = FlagCount;
     read(flag);
-    fassert(flag < FlagCount, "invalid flag");
-    fassert(_flags[flag] >= 0, "no flags");
+    fasserts(flag < FlagCount, stmt, "invalid flag");
+    fasserts(_flags[flag] >= 0, stmt, "no flags");
     _flags[flag]++;
 }
 
-void VirtualMachine::clearFlag() {
+void VirtualMachine::clearFlag(Statement* stmt) {
     Flag flag = FlagCount;
     read(flag);
-    fassert(flag < FlagCount, "invalid flag");
-    fassert(_flags[flag] > 0, "no flags");
+    fasserts(flag < FlagCount, stmt, "invalid flag");
+    fasserts(_flags[flag] > 0, stmt, "no flags");
     _flags[flag]--;
 }
 
-void VirtualMachine::begin() {
+void VirtualMachine::begin(Statement*) {
     _memory.push_back(new StackFrame());
 }
 
-void VirtualMachine::end() {
+void VirtualMachine::end(Statement*) {
     if (_memory.size() == 1 && _debugger) {
         _debugger->onEndProgram();
     }
@@ -478,3 +497,4 @@ Terminal* VirtualMachine::operate(Terminal* a, BinaryOperation op, Terminal* b) 
 }
 
 }
+

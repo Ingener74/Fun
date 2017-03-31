@@ -12,17 +12,21 @@ Compiler::~Compiler() {
 }
 
 void Compiler::iterateStatements(Statement* statement_) {
-//    std::string sourceFileSha256Hash;
-//    write(sourceFileSha256Hash);
-//    write(BuildType::Release);
 
-    write(OpCode::Begin);
+    std::string sourceFileSha256Hash;
+    bool hasSourceFileHash = !sourceFileSha256Hash.empty();
+    write(hasSourceFileHash);
+    if (hasSourceFileHash)
+        write(sourceFileSha256Hash);
+    write(_debugInfo ? BuildType::Debug : BuildType::Release);
+
+    write(OpCode::Begin, statement_);
 
     statement_->accept(this);
 
-    write(OpCode::End);
+    write(OpCode::End, statement_);
 
-    write(OpCode::SetFlag);
+    write(OpCode::SetFlag, statement_);
     write(FlagStop);
 
     size_t realProgramSize = _programPtr - _program.data();
@@ -94,20 +98,20 @@ void Compiler::visit(Assign* assign_) {
     auto id = assign_->ids;
 
     while (expr || id) {
-        write(OpCode::SetFlag);
+        write(OpCode::SetFlag, assign_);
         write(FlagLoad);
 
         expr = expr->accept(this)->nextExpression;
 
-        write(OpCode::ClearFlag);
+        write(OpCode::ClearFlag, assign_);
         write(FlagLoad);
 
-        write(OpCode::SetFlag);
+        write(OpCode::SetFlag, assign_);
         write(FlagStore);
 
         id = id->accept(this)->nextExpression;
 
-        write(OpCode::ClearFlag);
+        write(OpCode::ClearFlag, assign_);
         write(FlagStore);
     }
     if (expr) {
@@ -121,16 +125,16 @@ void Compiler::visit(Assign* assign_) {
 }
 
 void Compiler::visit(BinaryOp* binaryop_) {
-    write(OpCode::SetFlag);
+    write(OpCode::SetFlag, binaryop_);
     write(FlagLoad);
 
     binaryop_->lhs->accept(this);
     binaryop_->rhs->accept(this);
 
-    write(OpCode::ClearFlag);
+    write(OpCode::ClearFlag, binaryop_);
     write(FlagLoad);
 
-    write(OpCode::BinaryOperation);
+    write(OpCode::BinaryOperation, binaryop_);
     write(binaryop_->m_operation);
 }
 
@@ -144,7 +148,7 @@ void Compiler::visit(Dictionary* dictionary_) {
 }
 
 void Compiler::visit(Id* id_) {
-    write(OpCode::Memory);
+    write(OpCode::Memory, id_);
     write(id_->value);
 }
 
@@ -160,30 +164,30 @@ void Compiler::visit(Terminal* terminal_) {
 }
 
 void Compiler::visit(Boolean* boolean_) {
-    write(OpCode::Push);
+    write(OpCode::Push, boolean_);
     write(Type::Boolean);
     write(boolean_->value);
 }
 
 void Compiler::visit(Integer* integer_) {
-    write(OpCode::Push);
+    write(OpCode::Push, integer_);
     write(Type::Integer);
     write(integer_->value);
 }
 
 void Compiler::visit(Nil* nil_) {
-    write(OpCode::Push);
+    write(OpCode::Push, nil_);
     write(Type::Nil);
 }
 
 void Compiler::visit(Real* real_) {
-    write(OpCode::Push);
+    write(OpCode::Push, real_);
     write(Type::Real);
     write(real_->value);
 }
 
 void Compiler::visit(String* string_) {
-    write(OpCode::Push);
+    write(OpCode::Push, string_);
     write(Type::String);
     write(string_->value);
 }
@@ -218,6 +222,17 @@ void Compiler::write(void* data, size_t size) {
 void Compiler::write(const std::string& str) {
     write(uint32_t(str.size()));
     write(const_cast<char*>(str.data()), str.size());
+}
+
+void Compiler::write(OpCode opcode, Statement* stmt) {
+    write(&opcode, sizeof(opcode));
+    if (_debugInfo)
+        write(stmt->statementId);
+}
+
+template<>
+inline void Compiler::write(const OpCode& data) {
+    fassert(false, "invalid write use write(OpCode, Statement)");
 }
 
 }

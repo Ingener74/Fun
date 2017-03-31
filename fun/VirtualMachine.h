@@ -24,25 +24,25 @@ public:
 
     void run(const ByteCodeProgram& program, const Poco::AutoPtr<Pot>& pot, Debugger* debugger);
 
-    void push();
-    void pop();
+    void push(Statement*);
+    void pop(Statement*);
 
-    void memory();
+    void memory(Statement*);
 
-    void jump();
-    void jumpIfTrue();
-    void jumpIfNotTrue();
+    void jump(Statement*);
+    void jumpIfTrue(Statement*);
+    void jumpIfNotTrue(Statement*);
 
-    void print();
+    void print(Statement*);
 
-    void binaryOperation();
-    void unaryOperation();
+    void binaryOperation(Statement*);
+    void unaryOperation(Statement*);
 
-    void setFlag();
-    void clearFlag();
+    void setFlag(Statement*);
+    void clearFlag(Statement*);
 
-    void begin();
-    void end();
+    void begin(Statement*);
+    void end(Statement*);
 
     // IOperands
     virtual size_t count() const override;
@@ -96,6 +96,8 @@ private:
         std::vector<Poco::AutoPtr<Terminal>> _operands;
         uint8_t* _ip = nullptr;
     };
+
+    bool _debugInfo = false;
 
     std::vector<Poco::AutoPtr<ThreadContext>> _threadsData;
 
