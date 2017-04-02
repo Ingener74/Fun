@@ -1,24 +1,18 @@
 #pragma once
 
-#include <vector>
-#include <string>
-
 #include "Visitor.h"
+#include "Declarations.h"
 
 namespace fun {
 
-class Printer: public Visitor {
+class StatementCompiler: public Visitor {
 public:
-    Printer();
-    virtual ~Printer();
+    StatementCompiler();
+    virtual ~StatementCompiler();
 
     virtual void iterateStatements(Statement*);
-    virtual void iterateExpressions(Expression*);
-    virtual void iterateIds(Id*);
-    virtual void iterateFunctions(Function*);
-    virtual void iterateAssigns(Assign*);
 
-//    virtual void visit(Statement*);
+    virtual void visit(Statement*);
     virtual void visit(Break*);
     virtual void visit(Continue*);
     virtual void visit(Class*);
@@ -33,7 +27,7 @@ public:
     virtual void visit(Exception*);
     virtual void visit(Throw*);
 
-//    virtual void visit(Expression*);
+    virtual void visit(Expression*);
     virtual void visit(Assign*);
     virtual void visit(BinaryOp*);
     virtual void visit(Dot*);
@@ -43,17 +37,25 @@ public:
     virtual void visit(Index*);
     virtual void visit(RoundBrackets*);
 
-//    virtual void visit(Terminal*);
+    virtual void visit(Terminal*);
     virtual void visit(Boolean*);
     virtual void visit(Integer*);
     virtual void visit(Nil*);
     virtual void visit(Real*);
     virtual void visit(String*);
 
-private:
-    int _scopeLevel = 0;
+    virtual void visit(AddFrame*);
+    virtual void visit(RemoveFrame*);
+    virtual void visit(Jump*);
+    virtual void visit(ConditionJump*);
 
-    std::string indents() const;
+    const Program& getProgram() const;
+
+private:
+    Program _program;
+
+
 };
 
 }
+

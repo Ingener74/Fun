@@ -1,7 +1,7 @@
 #include <Poco/Thread.h>
 #include "AST.h"
-#include "Visitor.h"
-#include "Interpreter.h"
+#include "Compiler.h"
+#include "VirtualMachine.h"
 #include "MockDebugger.h"
 
 namespace fun {
@@ -15,9 +15,10 @@ MockDebugger::MockDebugger() {
 MockDebugger::~MockDebugger() {
 }
 
-void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
-    _visitor = visitor;
+void MockDebugger::listen(Poco::AutoPtr<Pot> pot, Poco::AutoPtr<Compiler> compiler, VirtualMachine* vm) {
     _pot = pot;
+    _compiler = compiler;
+    _virtualMachine = vm;
 
     Thread th;
     ScopedLock<Mutex> lock(_mutex);
@@ -37,6 +38,11 @@ void MockDebugger::listen(AutoPtr<Visitor> visitor, AutoPtr<Pot> pot) {
         rethrow_exception(_exceptionPtr);
 }
 
+void MockDebugger::onEndProgram() {
+    if (_endHandler)
+        _endHandler(_virtualMachine, _virtualMachine);
+}
+
 void MockDebugger::run() {
     Finalizer f([this] {
         ScopedLock<Mutex> lock(_mutex);
@@ -45,12 +51,13 @@ void MockDebugger::run() {
         _condition.signal();
     });
     try {
-        _pot->accept(_visitor);
-        if (_endHandler)
-            _endHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
+        _pot->accept(_compiler);
+        _virtualMachine->run(_compiler->getProgram(), _pot, this);
+//        if (_endHandler)
+//            _endHandler(_virtualMachine, _virtualMachine);
     } catch (exception const& e) {
         if (_errorHandler)
-            _errorHandler(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
+            _errorHandler(_virtualMachine, _virtualMachine);
         _exceptionPtr = current_exception();
     }
 }
@@ -62,7 +69,7 @@ MockDebugger* MockDebugger::handleBreakpoint(Handler function) {
         _condition.signal();
     });
     if (function)
-        function(_visitor.cast<Interpreter>(), _visitor.cast<Interpreter>());
+        function(_virtualMachine, _virtualMachine);
     return this;
 }
 

@@ -6,6 +6,7 @@ export YACC=${3RDPARTY_INSTALL}/bin/yacc
 export M4=${3RDPARTY_INSTALL}/bin/m4
 export PATH=${3RDPARTY_INSTALL}/bin:$PATH
 
+./autogen.sh
 ./configure --prefix=${3RDPARTY_INSTALL}
 
 make

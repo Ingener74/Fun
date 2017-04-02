@@ -21,6 +21,8 @@ class IMemory;
 class IOperands;
 class Visitor;
 class Pot;
+class VirtualMachine;
+class Compiler;
 
 class Breakpoint {
 public:
@@ -79,8 +81,9 @@ public:
     virtual void onCatchBreakpoint(const Breakpoint &) = 0;
     virtual void onOperandsChanged(const std::vector<Terminal*> &) = 0;
     virtual void onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) = 0;
-    virtual void listen(Poco::AutoPtr<Visitor>, Poco::AutoPtr<Pot>) {
+    virtual void listen(Poco::AutoPtr<Pot>, Poco::AutoPtr<Compiler>, VirtualMachine*) {
     }
+    virtual void onEndProgram() = 0;
 
     // Control
     virtual void pause() { _state->pause(this); }

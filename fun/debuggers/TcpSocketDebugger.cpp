@@ -20,7 +20,10 @@ void TcpSocketDebugger::onOperandsChanged(const vector<Terminal*>&) {
 void TcpSocketDebugger::onMemoryChanged(const unordered_map<string, Terminal*>&) {
 }
 
-void TcpSocketDebugger::listen(AutoPtr<Visitor>, AutoPtr<Pot>) {
+void TcpSocketDebugger::listen(Poco::AutoPtr<Pot>, Poco::AutoPtr<Compiler>, VirtualMachine*) {
+}
+
+void TcpSocketDebugger::onEndProgram() {
 }
 
 }

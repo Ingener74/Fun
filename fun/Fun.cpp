@@ -2,6 +2,8 @@
 #include "debuggers/EmptyDebugger.h"
 #include "debuggers/CommandLineDebugger.h"
 #include "debuggers/TcpSocketDebugger.h"
+#include "Compiler.h"
+#include "VirtualMachine.h"
 #include "Fun.h"
 
 namespace fun {
@@ -10,7 +12,8 @@ using namespace std;
 using namespace Poco;
 
 Fun::Fun() {
-    _visitor = new Interpreter;
+//    _visitor = new Interpreter;
+    _compiler = new Compiler;
 }
 
 Fun::~Fun() {
@@ -24,7 +27,7 @@ AutoPtr<Pot> Fun::parseString(const string& source) {
 
 AutoPtr<Pot> Fun::parseStream(istream& source) {
     AutoPtr<Pot> pot(new Pot);
-    Lexer lexer("", source);
+    Lexer lexer(_filename, source);
     Parser parser(lexer, pot);
     if (parser.parse())
         throw FunError("Warning: parser.parse() not 0");
@@ -32,9 +35,10 @@ AutoPtr<Pot> Fun::parseStream(istream& source) {
 }
 
 AutoPtr<Pot> Fun::parseFile(const string& filename) {
-    ifstream file(filename);
+    _filename = filename;
+    ifstream file(_filename);
     if (!file.is_open())
-        throw FunError(string("can't open file ") + filename);
+        throw FunError(string("can't open file ") + _filename);
     return parseStream(file);
 }
 
@@ -51,8 +55,7 @@ void Fun::evalFile(const string& filename) {
 }
 
 void Fun::evalAst(AutoPtr<Pot> pot) {
-    _visitor.cast<Interpreter>()->setDebugger(_debugger);
-    _debugger->listen(_visitor, pot);
+    _debugger->listen(pot, _compiler.cast<Compiler>(), &_virtualMachine);
 }
 
 Fun& Fun::setDebugger(DebuggerType debugger) {

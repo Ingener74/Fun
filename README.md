@@ -11,6 +11,9 @@
 * JIT компиляция с помощью LLVM и возможно libjit.
 * FFI интерфейс с помощью libffi.
 
+## install dependecies
+sudo apt-get install autopoint texinfo help2man
+
 ## Типы языка 
 * Целые числа 
 * Плавающие числа

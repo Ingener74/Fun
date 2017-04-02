@@ -19,19 +19,11 @@ PARSE_TERM(Id, 6, R"(Test)", "Test");
 
 PARSE_TERM(Id, 7, R"(ABC)", "ABC");
 
-PARSE_TERM(Id, 8, R"(
-aBC_TEst_very_long_id123
-)", "aBC_TEst_very_long_id123");
+PARSE_TERM(Id, 8, R"(aBC_TEst_very_long_id123)", "aBC_TEst_very_long_id123");
 
-PARSE_ERR(Id, 9, R"(
-1aBc
-)", LexerError);
+PARSE_ERR(Id, 9, R"(1aBc)", LexerError);
 
-PARSE_ERR(Id, 10, R"(
-123aBc
-)", LexerError);
+PARSE_ERR(Id, 10, R"(123aBc)", LexerError);
 
-PARSE_ERR(Id, 11, R"(
-123aBc
-)", LexerError);
+PARSE_ERR(Id, 11, R"(123aBc)", LexerError);
 

@@ -15,6 +15,8 @@
 
 namespace fun {
 
+class VirtualMachine;
+
 class MockDebugger: public Debugger, public Poco::Runnable {
 public:
     MockDebugger();
@@ -24,7 +26,8 @@ public:
     MOCK_METHOD1(onCatchBreakpoint, void(const fun::Breakpoint &));
     MOCK_METHOD1(onOperandsChanged, void(const std::vector<fun::Terminal*> &));
     MOCK_METHOD1(onMemoryChanged, void(const std::unordered_map<std::string, fun::Terminal*>&));
-    virtual void listen(Poco::AutoPtr<Visitor>, Poco::AutoPtr<Pot>);
+    virtual void listen(Poco::AutoPtr<Pot>, Poco::AutoPtr<Compiler>, VirtualMachine*);
+    virtual void onEndProgram() override;
 
     using Handler = std::function<void(IOperands*, IMemory*)>;
 
@@ -52,8 +55,9 @@ private:
         std::function<void()> _f;
     };
 
-    Poco::AutoPtr<Visitor> _visitor;
     Poco::AutoPtr<Pot> _pot;
+    Poco::AutoPtr<Compiler> _compiler;
+    VirtualMachine* _virtualMachine;
 
     Handler _breakpointHandler;
     Handler _endHandler;

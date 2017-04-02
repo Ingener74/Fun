@@ -20,23 +20,26 @@ void Pot::setRoot(Statement* root) {
     _root.assign(root, true);
 }
 
-Pot::~Pot() {
-}
-
 void Pot::accept(Visitor* v) {
     v->iterateStatements(_root);
 }
 
 int Statement::stmtCounter = 0;
 
-Statement::Statement(const location& loc) :
-        loc(loc) {
+Statement::Statement(StatementId statementId) :
+        statementId(statementId) {
     stmtCounter++;
+}
+
+Statement::Statement(StatementId statementId, const location& loc) :
+        Statement(statementId) {
+    this->loc = loc;
 }
 
 Statement::~Statement(){
     stmtCounter--;
     removeRefs(nextStatement);
+
 }
 
 int Statement::counter() {
@@ -51,77 +54,37 @@ ACCEPT(Break, )
 
 ACCEPT(Class, )
 
-Class::~Class() {
-    removeRefs(name, derived, stmts);
-}
-
 ACCEPT(Continue, )
 
 ACCEPT(Exception, )
 
-Exception::~Exception(){
-    removeRefs(tryStmts, errorClasses, errorObject, catchStmts);
-}
-
 ACCEPT(For, )
-
-For::~For(){
-    removeRefs(initial, condition, increment, stmts);
-}
 
 ACCEPT(Function, )
 
-Function::~Function(){
-    removeRefs(name, args, stmts, nextFunction);
-}
-
 ACCEPT(Ifs, )
-
-Ifs::~Ifs() {
-    removeRefs(if_stmts);
-}
 
 ACCEPT(If, )
 
 If::~If(){
-    removeRefs(cond, stmts, nextIf);
+    removeRefs(nextIf);
 }
 
 ACCEPT(Import, {
     fassert(id, "Import must have an id");
 })
 
-Import::~Import(){
-    removeRefs(id);
-}
-
 ACCEPT(Print, {
     fassert(expression, "Print must have the expressions")
 })
 
-Print::~Print(){
-    removeRefs(expression);
-}
-
 ACCEPT(Return, )
 
-Return::~Return(){
-    removeRefs(expression);
-}
-
 ACCEPT(Throw, )
-
-Throw::~Throw(){
-    removeRefs(expression);
-}
 
 ACCEPT(While, {
     fassert(cond, "While must have the condition expression");
 })
-
-While::~While(){
-    removeRefs(cond, stmts);
-}
 
 void Expression::apply(Expression* expression, Visitor* v) {
     while (expression)
@@ -138,7 +101,7 @@ ACCEPT(Assign, {
 })
 
 Assign::~Assign(){
-    removeRefs(ids, exprs, nextAssign);
+    removeRefs(nextAssign);
 }
 
 void Assign::apply(Assign* assign, Visitor* v) {
@@ -151,29 +114,13 @@ ACCEPT(BinaryOp, {
     fassert(rhs, "Binary operation must have right side expression")
 })
 
-BinaryOp::~BinaryOp(){
-    removeRefs(lhs, rhs);
-}
-
 ACCEPT(Dot, )
-
-Dot::~Dot() {
-    removeRefs(lhs, rhs);
-}
 
 ACCEPT(Call, {
     fassert(callable, "Call expression must have name")
 })
 
-Call::~Call(){
-    removeRefs(callable, arguments);
-}
-
 ACCEPT(Dictionary, )
-
-Dictionary::~Dictionary(){
-    removeRefs(assign);
-}
 
 ACCEPT(Id, )
 
@@ -185,25 +132,18 @@ ACCEPT(Index, {
     fassert(indexable, "Index expression must have name")
 })
 
-Index::~Index(){
-    removeRefs(indexable, arg);
-}
 //ACCEPT(ForExpression, {
 //})
 
 ACCEPT(RoundBrackets, )
 
-RoundBrackets::~RoundBrackets(){
-    removeRefs(expr);
-}
-
-Terminal::Type Terminal::getSeniorBinaryOpType(Terminal::Type lhs, Terminal::Type rhs) {
-    fassert(lhs == Nil || lhs == Boolean || lhs == Integer || lhs == Real || lhs == String, "unsupported type");
-    fassert(rhs == Nil || rhs == Boolean || rhs == Integer || rhs == Real || rhs == String, "unsupported type");
+Type Terminal::getSeniorBinaryOpType(Type lhs, Type rhs) {
+    fassert(lhs == Type::Nil || lhs == Type::Boolean || lhs == Type::Integer || lhs == Type::Real || lhs == Type::String, "unsupported type");
+    fassert(rhs == Type::Nil || rhs == Type::Boolean || rhs == Type::Integer || rhs == Type::Real || rhs == Type::String, "unsupported type");
     return std::max<Type>(lhs, rhs);
 }
 
-Terminal::Type Terminal::getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs) {
+Type Terminal::getSeniorBinaryOpType(Terminal* lhs, Terminal* rhs) {
     return getSeniorBinaryOpType(lhs->getType(), rhs->getType());
 }
 

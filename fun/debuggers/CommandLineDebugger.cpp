@@ -1,6 +1,5 @@
-#include <map>
 #include <sstream>
-#include <functional>
+#include <map>
 #include <Poco/Thread.h>
 
 #include "AST.h"
@@ -14,17 +13,35 @@ namespace fun {
 using namespace std;
 using namespace Poco;
 
-map<Terminal::Type, string> types {
-    {Terminal::Type::Boolean,   "Boolean"},
-    {Terminal::Type::String,    "String"},
-    {Terminal::Type::Integer,   "Integer"},
-    {Terminal::Type::Real,      "Real"},
-    {Terminal::Type::Nil,       "Nil"},
-    {Terminal::Type::Function,  "Function"},
-    {Terminal::Type::Object,    "Object"},
+map<Type, string> types {
+    {Type::Boolean,   "Boolean"},
+    {Type::String,    "String"},
+    {Type::Integer,   "Integer"},
+    {Type::Real,      "Real"},
+    {Type::Nil,       "Nil"},
+    {Type::Function,  "Function"},
+    {Type::Object,    "Object"},
 };
 
-CommandLineDebugger::CommandLineDebugger() {
+CommandLineDebugger::CommandLineDebugger()
+    : _commands({
+        {"run",         &CommandLineDebugger::resumeCmd      },
+        {"r",           &CommandLineDebugger::resumeCmd      },
+        {"si",          &CommandLineDebugger::stepIntoCmd    },
+        {"stepin",      &CommandLineDebugger::stepIntoCmd    },
+        {"so",          &CommandLineDebugger::stepOverCmd    },
+        {"stepover",    &CommandLineDebugger::stepOverCmd    },
+        {"ops",         &CommandLineDebugger::operandsCmd    },
+        {"operands",    &CommandLineDebugger::operandsCmd    },
+        {"vars",        &CommandLineDebugger::memoryCmd      },
+        {"variables",   &CommandLineDebugger::memoryCmd      },
+        {"breakpoint",  &CommandLineDebugger::breakpointCmd  },
+        {"b",           &CommandLineDebugger::breakpointCmd  },
+        {"quit",        &CommandLineDebugger::quitCmd        },
+        {"list",        &CommandLineDebugger::listCmd        },
+        {"l",           &CommandLineDebugger::listCmd        },
+    })
+{
 }
 
 CommandLineDebugger::~CommandLineDebugger() {
@@ -39,7 +56,7 @@ void CommandLineDebugger::onOperandsChanged(const std::vector<Terminal*>&) {
 void CommandLineDebugger::onMemoryChanged(const std::unordered_map<std::string, Terminal*>&) {
 }
 
-void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
+void CommandLineDebugger::listen(Poco::AutoPtr<Pot>, Poco::AutoPtr<Compiler>, VirtualMachine*) {
     Thread th;
     th.start(*this);
 
@@ -65,28 +82,10 @@ void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
             }
         }
 
-        unordered_map<string, function<int()>> commands {
-            {"run",         bind(&CommandLineDebugger::resumeCmd,      this)},
-            {"r",           bind(&CommandLineDebugger::resumeCmd,      this)},
-            {"si",          bind(&CommandLineDebugger::stepIntoCmd,    this)},
-            {"stepin",      bind(&CommandLineDebugger::stepIntoCmd,    this)},
-            {"so",          bind(&CommandLineDebugger::stepOverCmd,    this)},
-            {"stepover",    bind(&CommandLineDebugger::stepOverCmd,    this)},
-            {"ops",         bind(&CommandLineDebugger::operandsCmd,    this)},
-            {"operands",    bind(&CommandLineDebugger::operandsCmd,    this)},
-            {"vars",        bind(&CommandLineDebugger::memoryCmd,      this)},
-            {"variables",   bind(&CommandLineDebugger::memoryCmd,      this)},
-            {"breakpoint",  bind(&CommandLineDebugger::breakpointCmd,  this, tokens)},
-            {"b",           bind(&CommandLineDebugger::breakpointCmd,  this, tokens)},
-            {"quit",        bind(&CommandLineDebugger::quitCmd,        this)},
-            {"list",        bind(&CommandLineDebugger::listCmd,        this)},
-            {"l",           bind(&CommandLineDebugger::listCmd,        this)},
-        };
-
-        auto cmdIt = commands.find(tokens.at(0));
-        if (cmdIt == commands.end())
+        auto cmdIt = _commands.find(tokens.at(0));
+        if (cmdIt == _commands.end())
             continue;
-        if (cmdIt->second()) {
+        if ( (this->*cmdIt->second)(tokens) ) {
         } else {
             break;
         }
@@ -97,6 +96,9 @@ void CommandLineDebugger::listen(AutoPtr<Visitor> v, AutoPtr<Pot> p) {
         th.join();
 }
 
+void CommandLineDebugger::onEndProgram() {
+}
+
 void CommandLineDebugger::run() {
     try {
         _pot->accept(_visitor);
@@ -105,54 +107,54 @@ void CommandLineDebugger::run() {
     }
 }
 
-int fun::CommandLineDebugger::resumeCmd() {
+int fun::CommandLineDebugger::resumeCmd(const std::vector<std::string>& tokens) {
     resume();
     return 1;
 }
 
-int fun::CommandLineDebugger::stepIntoCmd() {
+int fun::CommandLineDebugger::stepIntoCmd(const std::vector<std::string>& tokens) {
     return 1;
 }
 
-int fun::CommandLineDebugger::stepOverCmd() {
+int fun::CommandLineDebugger::stepOverCmd(const std::vector<std::string>& tokens) {
     stepOver();
 //            list();
     return 1;
 }
 
-int fun::CommandLineDebugger::operandsCmd() {
+int fun::CommandLineDebugger::operandsCmd(const std::vector<std::string>& tokens) {
     cout << "########### Operands ###########" << endl;
-    for (auto &i : _operands->getOperands())
-        cout << types[i->getType()] << ": " << i->toString() << endl;
+//    for (auto &i : _operands->getOperands())
+//        cout << types[i->getType()] << ": " << i->toString() << endl;
     cout << "################################" << endl;
 
     return 1;
 }
 
-int fun::CommandLineDebugger::memoryCmd() {
+int fun::CommandLineDebugger::memoryCmd(const std::vector<std::string>& tokens) {
     cout << "########### Memory #############" << endl;
-    int indents = 0;
-    for (auto &scope: _memory->getMemory()) {
-        for (auto &var: scope) {
-            cout << [&indents] {
-                stringstream ss;
-                for (int n = 0; n < indents; ++n)
-                    ss << "  ";
-                return ss.str();
-            }() << types[var.second->getType()] << " " << var.first << " == " <<
-                 var.second->toString() << " (" << var.second->referenceCount() << ")" << endl;
-        }
-        indents++;
-    }
+//    int indents = 0;
+//    for (auto &scope: _memory->getMemory()) {
+//        for (auto &var: scope) {
+//            cout << [&indents] {
+//                stringstream ss;
+//                for (int n = 0; n < indents; ++n)
+//                    ss << "  ";
+//                return ss.str();
+//            }() << types[var.second->getType()] << " " << var.first << " == " <<
+//                 var.second->toString() << " (" << var.second->referenceCount() << ")" << endl;
+//        }
+//        indents++;
+//    }
     cout << "################################" << endl;
     return 1;
 }
 
-int fun::CommandLineDebugger::quitCmd() {
+int fun::CommandLineDebugger::quitCmd(const std::vector<std::string>& tokens) {
     return 0;
 }
 
-int fun::CommandLineDebugger::listCmd() {
+int fun::CommandLineDebugger::listCmd(const std::vector<std::string>& tokens) {
 //    list();
     return 1;
 }

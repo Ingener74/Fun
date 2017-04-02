@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <mutex>
 
-#include <Visitor.h>
+#include "Visitor.h"
 #include "AST.h"
 #include "Debugger.h"
 #include "IOperands.h"
@@ -16,14 +16,6 @@ namespace fun {
 class Terminal;
 
 // Уровень стека
-class Stack: public Poco::RefCountedObject {
-public:
-    std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
-    Statement* breakIp = nullptr;
-    Statement* continueIps = nullptr;
-    Statement* catchIps = nullptr;
-};
-
 class Interpreter: public Visitor, public IOperands, public IMemory {
 public:
     Interpreter(Debugger* = nullptr);
@@ -59,46 +51,84 @@ public:
     virtual void visit(Real*);
     virtual void visit(String*);
 
-    const std::vector<Poco::AutoPtr<Terminal>>& getOperands() const override;
-    std::vector<Poco::AutoPtr<Terminal>>& getOperands() override;
-    const std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() const override;
-    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>>& getMemory() override;
+    // IOperand
+    virtual size_t count() const override;
+
+    virtual Type type(size_t operand) const override;
+
+    virtual Poco::AutoPtr<Terminal> operand(size_t operand) const override;
+
+    virtual bool boolean(size_t operand) const override;
+
+    virtual long long int integer(size_t operand) const override;
+
+    virtual double real(size_t operand) const override;
+
+    virtual std::string str(size_t operand) const override;
+
+    // IMemory
+    virtual size_t levelCount() const override;
+    virtual size_t count(size_t memoryLevel) const override;
+
+    virtual bool has(const std::string& name) const override;
+    virtual bool has(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Type type(const std::string& name) const override;
+    virtual Type type(size_t memoryLevel, const std::string& name) const override;
+
+    virtual Poco::AutoPtr<Terminal> variable(const std::string& name) const override;
+    virtual Poco::AutoPtr<Terminal> variable(size_t memoryLevel, const std::string& name) const override;
+
+    virtual bool boolean(const std::string& name) const override;
+    virtual bool boolean(size_t memoryLevel, const std::string& name) const override;
+
+    virtual long long int integer(const std::string& name) const override;
+    virtual long long int integer(size_t memoryLevel, const std::string& name) const override;
+
+    virtual double real(const std::string& name) const override;
+    virtual double real(size_t memoryLevel, const std::string& name) const override;
+
+    virtual std::string str(const std::string& name) const override;
+    virtual std::string str(size_t memoryLevel, const std::string& name) const override;
 
     Interpreter* setDebugger(Debugger* debugger);
 
 private:
-    std::vector<Poco::AutoPtr<Terminal>> operands;
-    std::vector<std::unordered_map<std::string, Poco::AutoPtr<Terminal>>> variables;
-
-    enum Flag {
-        Load, Store, FlagsCount
-    };
-    std::bitset<FlagsCount> flags;
-
-    bool load = false;
-    bool store = false;
-    bool break_flag = false;
-    bool continue_flag = false;
-    bool return_flag = false;
-
-    std::vector<Poco::AutoPtr<Stack>> stack;
-    size_t stackTop = 0;
 
     Terminal* operate(Terminal*, BinaryOperation, Terminal*);
 
-    Debugger* debugger = nullptr;
+    template<typename T> T* debug(T* stmt);
 
-    template<typename TStatement>
-    TStatement* debug(TStatement *stmt) {
-        if (debugger)
-            debugger->onBeforeStep(stmt);
-        return stmt;
-    }
+//    void iterate();
+//    Statement* next(Statement* stmt);
+
+    bool load = false;
+    bool store = false;
+
+    Debugger* _debugger = nullptr;
+
+    struct StackFrame: public Poco::RefCountedObject {
+        std::unordered_map<std::string, Poco::AutoPtr<Terminal>> variables;
+        InstructionPointer ip;
+    };
+
+    std::vector<Poco::AutoPtr<Terminal>> operands;
+    std::vector<Poco::AutoPtr<StackFrame>> stack;
+
+    Program program;
+    InstructionPointer ip;
 };
 
 inline Interpreter* Interpreter::setDebugger(Debugger* debugger) {
-    this->debugger = debugger;
+    _debugger = debugger;
     return this;
+}
+
+template<typename T>
+inline T* Interpreter::debug(T* stmt) {
+    if (_debugger)
+        _debugger->onBeforeStep(stmt);
+    return stmt;
 }
 
 }
